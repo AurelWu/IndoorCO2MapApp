@@ -1,16 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
-             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-             Title="SensorDebugPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
+               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               Title="Sensor Debug">
 
-        <Button Text="Back to Home" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+    <VerticalStackLayout Padding="10" Spacing="10">
 
+        <Label Text="Sensor Debug"
+               FontSize="20"
+               HorizontalOptions="Center" />
+
+        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Search for Bluetooth Devices" Clicked="OnSearchBluetoothDevicesClicked" HorizontalOptions="Fill"/>
+
+        <!-- List with all discovered BLE Devices -->
+        <CollectionView x:Name="BluetoothDevicesList"
+                        SelectionMode="Single"
+                        HeightRequest="300"
+                        VerticalScrollBarVisibility="Always">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="Gray" StrokeShape="RoundRectangle 5" Padding="5" Margin="2">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Details panel for selected device -->
+        <Border x:Name="SelectedDeviceDetails"
+        Stroke="Gray"
+        StrokeShape="RoundRectangle 5"
+        Padding="10"
+        IsVisible="False"
+        Margin="5">
+            <VerticalStackLayout>
+                <Label x:Name="DeviceNameLabel" Text="Name:" FontAttributes="Bold"/>
+                <Label x:Name="DeviceIdLabel" Text="Id:" FontSize="12" TextColor="Gray"/>
+                <Label x:Name="DeviceRssiLabel" Text="RSSI:" FontSize="12" TextColor="DarkGray"/>
+            </VerticalStackLayout>
+        </Border>
+        <Label Text="{Binding IsScanning, StringFormat='Scanning: {0}'}"
+       FontAttributes="Italic"
+       HorizontalOptions="Center"/>
     </VerticalStackLayout>
 </local:AppPage>

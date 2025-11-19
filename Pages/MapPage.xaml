@@ -8,7 +8,7 @@
     <VerticalStackLayout Padding="30" Spacing="25">
 
         <Label Text="Hello World — Map" FontSize="24" HorizontalOptions="Center" />
-        <Button Text="Back to Home" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
 
 
     </VerticalStackLayout>

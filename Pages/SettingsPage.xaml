@@ -11,7 +11,7 @@
                FontSize="24"
                HorizontalOptions="Center" />
         
-        <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
         <Button Text="Sensor Check" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
 
     </VerticalStackLayout>
