@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
+             Title="History">
+
+    <VerticalStackLayout Padding="30" Spacing="25">
+
+        <Label Text="Hello World — History"
+               FontSize="24"
+               HorizontalOptions="Center" />
+
+        <Button Text="Back to Home" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+
+    </VerticalStackLayout>
+
+</local:AppPage>

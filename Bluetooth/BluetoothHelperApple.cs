@@ -1,0 +1,114 @@
+﻿#if IOS
+using CoreBluetooth;
+using CoreLocation;
+using Foundation;
+using UIKit;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace IndoorCO2MapAppV2.Bluetooth
+{
+    internal class BluetoothHelperApple
+    {
+        readonly CBCentralManager bluetoothManager;
+        readonly CLLocationManager locationManager;
+
+        public BluetoothHelperApple()
+        {
+            bluetoothManager = new CBCentralManager();
+            locationManager = new CLLocationManager();
+        }
+
+        public static bool CheckStatus()
+        {
+            var status = CBManager.Authorization == CBManagerAuthorization.AllowedAlways
+            ? PermissionStatus.Granted
+            : PermissionStatus.Denied;
+
+            if (status == PermissionStatus.Granted) return true;
+            else return false;
+        }
+
+        public async Task<PermissionStatus> RequestAsync()
+        {
+            // Check if Bluetooth and Location permissions are already granted
+            if (CheckStatus())
+                return PermissionStatus.Granted;
+
+            // Request Location permission
+            locationManager.RequestWhenInUseAuthorization();
+
+            // Wait for authorization
+            var tcs = new TaskCompletionSource<PermissionStatus>();
+            locationManager.AuthorizationChanged += (sender, args) =>
+            {
+                if (args.Status == CLAuthorizationStatus.AuthorizedWhenInUse || args.Status == CLAuthorizationStatus.AuthorizedAlways)
+                {
+                    tcs.SetResult(PermissionStatus.Granted);
+                }
+                else
+                {
+                    tcs.SetResult(PermissionStatus.Denied);
+                }
+            };
+
+            return await tcs.Task;
+        }
+
+        public static void EnsureDeclared()
+        {
+            // Ensure Bluetooth and Location permissions are declared in Info.plist
+            bool hasBluetoothUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSBluetoothAlwaysUsageDescription"));
+            bool hasLocationWhenInUseUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSLocationWhenInUseUsageDescription"));
+
+            if (!hasBluetoothUsageDescription || !hasLocationWhenInUseUsageDescription)
+            {
+                throw new PermissionException("Bluetooth and/or Location permissions are not set in Info.plist.");
+            }
+        }
+
+        public static async Task RequestBluetoothEnableAsync()
+        {
+            bool result = await Shell.Current.DisplayAlertAsync(
+                "Enable Bluetooth",
+                "Bluetooth is currently disabled. Would you like to enable it?",
+                "Yes",
+                "No");
+
+            if (result)
+            {
+                var url = new NSUrl("App-Prefs:root=Bluetooth");
+
+                if (UIApplication.SharedApplication.CanOpenUrl(url))
+                {
+                    UIApplication.SharedApplication.OpenUrl(
+                        url,
+                        new NSDictionary(),
+                        null
+                    );
+                }
+            }
+        }
+
+        public bool CheckIfBTEnabled()
+        {
+            // Check if Bluetooth is enabled
+            return bluetoothManager.State == CBManagerState.PoweredOn;
+        }
+
+        public static bool HasPermissionInManifest()
+        {
+            // Ensure Bluetooth and Location permissions are declared in Info.plist
+            bool hasBluetoothUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSBluetoothAlwaysUsageDescription"));
+            bool hasLocationWhenInUseUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSLocationWhenInUseUsageDescription"));
+
+            if (!hasBluetoothUsageDescription || !hasLocationWhenInUseUsageDescription)
+            {
+                return false;
+            }
+            else return true;
+        }
+    }
+}
+#endif

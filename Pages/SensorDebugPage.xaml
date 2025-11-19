@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
+             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             Title="SensorDebugPage">
+    <VerticalStackLayout>
+        <Label 
+            Text="Welcome to .NET MAUI!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <Button Text="Back to Home" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+
+    </VerticalStackLayout>
+</local:AppPage>

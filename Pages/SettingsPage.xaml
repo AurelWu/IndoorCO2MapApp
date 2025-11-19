@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             x:Class="IndoorCO2MapAppV2.Pages.SettingsPage"
+             Title="Settings">
+
+    <VerticalStackLayout Padding="30" Spacing="25">
+
+        <Label Text="Hello World — Settings"
+               FontSize="24"
+               HorizontalOptions="Center" />
+        
+        <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Sensor Check" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
+
+    </VerticalStackLayout>
+
+</local:AppPage>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="IndoorCO2MapAppV2.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:IndoorCO2MapAppV2"
+    xmlns:pages="clr-namespace:IndoorCO2MapAppV2.Pages"
+    Title="IndoorCO2MapAppV2">
+
+    <!-- HOME -->
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="home" />
+
+    <!-- REGISTER ROUTES FOR OTHER PAGES -->
+    <ShellContent
+        Route="building"
+        ContentTemplate="{DataTemplate pages:BuildingMeasurementPage}" />
+
+    <ShellContent
+        Route="transit"
+        ContentTemplate="{DataTemplate pages:TransitMeasurementPage}" />
+
+    <ShellContent
+        Route="settings"
+        ContentTemplate="{DataTemplate pages:SettingsPage}" />
+
+    <ShellContent
+        Route="history"
+        ContentTemplate="{DataTemplate pages:HistoryPage}" />
+
+    <ShellContent
+        Route="map"
+        ContentTemplate="{DataTemplate pages:MapPage}" />
+
+    <ShellContent
+        Route="sensorDebug"
+        ContentTemplate="{DataTemplate pages:SensorDebugPage}" />
+
+
+</Shell>
