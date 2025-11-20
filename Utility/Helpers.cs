@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IndoorCO2MapAppV2.Util
+namespace IndoorCO2MapAppV2.Utility
 {
     internal class Helpers
     {

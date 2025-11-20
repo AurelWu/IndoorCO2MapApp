@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Polly;
 using Polly.Retry;
 using IndoorCO2MapAppV2.Enumerations;
-using IndoorCO2MapAppV2.Debug;
+using IndoorCO2MapAppV2.DebugTools;
 
 namespace IndoorCO2MapAppV2.DataUpload
 {

@@ -1,4 +1,4 @@
-﻿using IndoorCO2MapAppV2.Util;
+﻿using IndoorCO2MapAppV2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;

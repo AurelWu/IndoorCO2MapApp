@@ -12,7 +12,14 @@
                HorizontalOptions="Center" />
 
         <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
-        <Button Text="Search for Bluetooth Devices" Clicked="OnSearchBluetoothDevicesClicked" HorizontalOptions="Fill"/>
+
+        <Label Text="Select Monitor Type:" FontAttributes="Bold"/>
+        <Picker x:Name="MonitorTypePicker"
+        Title="Select monitor"
+        HorizontalOptions="Fill"
+        SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/>
+
+        <Button x:Name="ScanButton" Text="Search for Bluetooth Devices" Clicked="OnSearchBluetoothDevicesClicked" HorizontalOptions="Fill"/>
 
         <!-- List with all discovered BLE Devices -->
         <CollectionView x:Name="BluetoothDevicesList"
@@ -41,6 +48,7 @@
                 <Label x:Name="DeviceNameLabel" Text="Name:" FontAttributes="Bold"/>
                 <Label x:Name="DeviceIdLabel" Text="Id:" FontSize="12" TextColor="Gray"/>
                 <Label x:Name="DeviceRssiLabel" Text="RSSI:" FontSize="12" TextColor="DarkGray"/>
+                <Label x:Name="DeviceAdvertisementRecords" Text="AdvertisementData:" FontSize="10"/>
             </VerticalStackLayout>
         </Border>
         <Label Text="{Binding IsScanning, StringFormat='Scanning: {0}'}"

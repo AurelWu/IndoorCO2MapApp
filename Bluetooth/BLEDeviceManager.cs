@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Bluetooth
 {
-    public class BLEDeviceManager : INotifyPropertyChanged
+    public partial class BLEDeviceManager : INotifyPropertyChanged
     {
         private static readonly Lazy<BLEDeviceManager> _instance = new(() => new BLEDeviceManager());
         public static BLEDeviceManager Instance => _instance.Value;
@@ -16,7 +16,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
         private readonly IBluetoothLE _ble;
         private readonly IAdapter _adapter;
 
-        public ObservableCollection<BluetoothDeviceModel> Devices { get; } = new();
+        public ObservableCollection<BluetoothDeviceModel> Devices { get; } = [];
 
         private bool _isScanning;
         public bool IsScanning
@@ -55,7 +55,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             }
         }
 
-        public async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true)
+        public async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, string? filter = null)
         {
             if (clearBeforeScan)
                 Devices.Clear();
@@ -66,9 +66,23 @@ namespace IndoorCO2MapAppV2.Bluetooth
             IsScanning = true;
 
             using var cts = new CancellationTokenSource();
-
-            // stop after X milliseconds
             cts.CancelAfter(scanDurationMs);
+
+            void Handler(object? sender, DeviceEventArgs e)
+            {
+                if (!string.IsNullOrEmpty(e.Device.Name) &&
+                    (string.IsNullOrEmpty(filter) || e.Device.Name.Contains(filter)))
+                {
+                    var deviceModel = new BluetoothDeviceModel(e.Device);
+                    if (!Devices.Contains(deviceModel))
+                    {
+                        Devices.Add(deviceModel);
+                        DeviceDiscovered?.Invoke(this, deviceModel);
+                    }
+                }
+            }
+
+            _adapter.DeviceDiscovered += Handler;
 
             try
             {
@@ -76,11 +90,13 @@ namespace IndoorCO2MapAppV2.Bluetooth
             }
             catch (TaskCanceledException)
             {
-                // normal when scan times out
+                // Normal when scan times out
             }
 
             if (_adapter.IsScanning)
                 await _adapter.StopScanningForDevicesAsync();
+
+            _adapter.DeviceDiscovered -= Handler;
 
             IsScanning = false;
         }

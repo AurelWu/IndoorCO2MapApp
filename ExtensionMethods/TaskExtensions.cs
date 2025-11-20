@@ -1,4 +1,4 @@
-﻿using IndoorCO2MapAppV2.Debug;
+﻿using IndoorCO2MapAppV2.DebugTools;
 using System;
 using System.Collections.Generic;
 using System.Text;

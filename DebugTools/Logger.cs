@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Utilities;
+
+namespace IndoorCO2MapAppV2.DebugTools
+{
+    internal static class Logger
+    {
+        public static CircularBuffer<string> circularBuffer = new(500000);
+        public static bool writeAlsoToConsole = true;
+        public static bool LogDetailedGPSCoordinates = false; //if false it will round to 1° - just to see if GPS works at all, if true it will log the precise position, default will be false
+        public static bool includeSender = true;
+        //maybe add Enum for different Logging Levels
+
+        public static void WriteToLog(string text, string sender="")
+        {
+            DateTime dateTime = DateTime.Now;
+            string textWithTimeStamp = text + " | " + dateTime.ToString();
+            if (includeSender) textWithTimeStamp += " | " + sender;
+            circularBuffer.Add(textWithTimeStamp);           
+            if (writeAlsoToConsole)
+            {
+                Console.WriteLine(textWithTimeStamp);
+            }
+        }
+    }
+}

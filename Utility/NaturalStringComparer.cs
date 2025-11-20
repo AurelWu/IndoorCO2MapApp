@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace IndoorCO2MapAppV2.Util
+namespace IndoorCO2MapAppV2.Utility
 {
     internal partial class NaturalStringComparer
     {
