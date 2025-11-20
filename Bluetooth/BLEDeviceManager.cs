@@ -39,21 +39,21 @@ namespace IndoorCO2MapAppV2.Bluetooth
         {
             _ble = CrossBluetoothLE.Current;
             _adapter = CrossBluetoothLE.Current.Adapter;
-            _adapter.DeviceDiscovered += Adapter_DeviceDiscovered;
+            //_adapter.DeviceDiscovered += Adapter_DeviceDiscovered;
         }
 
-        private void Adapter_DeviceDiscovered(object? sender, DeviceEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.Device.Name))
-            {
-                var deviceModel = new BluetoothDeviceModel(e.Device);
-                if (!Devices.Contains(deviceModel))
-                {
-                    Devices.Add(deviceModel);
-                    DeviceDiscovered?.Invoke(this, deviceModel);
-                }
-            }
-        }
+        //private void Adapter_DeviceDiscovered(object? sender, DeviceEventArgs e)
+        //{
+        //    if (!string.IsNullOrEmpty(e.Device.Name))
+        //    {
+        //        var deviceModel = new BluetoothDeviceModel(e.Device);
+        //        if (!Devices.Contains(deviceModel))
+        //        {
+        //            Devices.Add(deviceModel);
+        //            DeviceDiscovered?.Invoke(this, deviceModel);
+        //        }
+        //    }
+        //}
 
         public async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, string? filter = null)
         {

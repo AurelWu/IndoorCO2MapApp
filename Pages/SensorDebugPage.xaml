@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-               x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+               x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
                Title="Sensor Debug">
+
+    <!-- Resources -->
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:BooleanToTextConverter x:Key="ScanTextConverter"
+                                       TrueText="Stop Scan"
+                                       FalseText="Search for Bluetooth Devices"/>
+        </ResourceDictionary>
+    </local:AppPage.Resources>
 
     <VerticalStackLayout Padding="10" Spacing="10">
 
@@ -11,15 +21,22 @@
                FontSize="20"
                HorizontalOptions="Center" />
 
-        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Main Menu"
+                Clicked="OnNavigateClicked"
+                CommandParameter="///home"
+                HorizontalOptions="Fill"/>
 
         <Label Text="Select Monitor Type:" FontAttributes="Bold"/>
         <Picker x:Name="MonitorTypePicker"
-        Title="Select monitor"
-        HorizontalOptions="Fill"
-        SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/>
+                Title="Select monitor"
+                HorizontalOptions="Fill"
+                SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/>
 
-        <Button x:Name="ScanButton" Text="Search for Bluetooth Devices" Clicked="OnSearchBluetoothDevicesClicked" HorizontalOptions="Fill"/>
+        <!-- Scan Button bound to IsScanning -->
+        <Button x:Name="ScanButton"
+                Text="{Binding IsScanning, Converter={StaticResource ScanTextConverter}}"
+                Clicked="OnSearchBluetoothDevicesClicked"
+                HorizontalOptions="Fill"/>
 
         <!-- List with all discovered BLE Devices -->
         <CollectionView x:Name="BluetoothDevicesList"
@@ -28,7 +45,10 @@
                         VerticalScrollBarVisibility="Always">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Stroke="Gray" StrokeShape="RoundRectangle 5" Padding="5" Margin="2">
+                    <Border Stroke="Gray"
+                            StrokeShape="RoundRectangle 5"
+                            Padding="5"
+                            Margin="2">
                         <VerticalStackLayout>
                             <Label Text="{Binding Name}" FontAttributes="Bold"/>
                         </VerticalStackLayout>
@@ -39,11 +59,11 @@
 
         <!-- Details panel for selected device -->
         <Border x:Name="SelectedDeviceDetails"
-        Stroke="Gray"
-        StrokeShape="RoundRectangle 5"
-        Padding="10"
-        IsVisible="False"
-        Margin="5">
+                Stroke="Gray"
+                StrokeShape="RoundRectangle 5"
+                Padding="10"
+                IsVisible="False"
+                Margin="5">
             <VerticalStackLayout>
                 <Label x:Name="DeviceNameLabel" Text="Name:" FontAttributes="Bold"/>
                 <Label x:Name="DeviceIdLabel" Text="Id:" FontSize="12" TextColor="Gray"/>
@@ -51,8 +71,9 @@
                 <Label x:Name="DeviceAdvertisementRecords" Text="AdvertisementData:" FontSize="10"/>
             </VerticalStackLayout>
         </Border>
+
         <Label Text="{Binding IsScanning, StringFormat='Scanning: {0}'}"
-       FontAttributes="Italic"
-       HorizontalOptions="Center"/>
+               FontAttributes="Italic"
+               HorizontalOptions="Center"/>
     </VerticalStackLayout>
 </local:AppPage>
