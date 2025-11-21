@@ -1,29 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using IndoorCO2MapAppV2.Enumerations;
+using System.Collections.Generic;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
     /// <summary>
     /// Defines friendly names and search strings for supported BLE monitors
     /// </summary>
-    public static class MonitorTypes
+    internal static class MonitorTypes
     {
         // Production: only real monitor types
-        public static readonly Dictionary<string, string> SearchStringByMonitorType = new()
+        internal static readonly Dictionary<CO2MonitorType, string> SearchStringByMonitorType = new()
         {
-            { "Aranet4", "Aranet4" },
-            { "Airvalent", "Airvalent" },
-            { "Inkbird IAM-T1", "IAM-T1" },
-            { "Airspot Health", "Airspot" }
+            { CO2MonitorType.AllMonitors, "All Monitors" }, // Only used for display
+            { CO2MonitorType.Aranet4, "Aranet4" },
+            { CO2MonitorType.Airvalent, "Airvalent" },
+            { CO2MonitorType.InkbirdIAMT1, "IAM-T1" },
+            { CO2MonitorType.AirSpotHealth, "Airspot" },
         };
 
         // Debug: includes "All Devices"
-        public static readonly Dictionary<string, string> SearchStringByMonitorTypeDebugMode = new()
+        internal static readonly Dictionary<CO2MonitorType, string> SearchStringByMonitorTypeDebugMode = new()
         {
-            { "All Devices", "" },
-            { "Aranet4", "Aranet4" },
-            { "Airvalent", "Airvalent" },
-            { "Inkbird IAM-T1", "IAM-T1" },
-            { "Airspot Health", "Airspot" }
+            { CO2MonitorType.None, "" },
+            { CO2MonitorType.AllMonitors, "All Monitors" }, // Only used for display
+            { CO2MonitorType.Aranet4, "Aranet4" },
+            { CO2MonitorType.Airvalent, "Airvalent" },
+            { CO2MonitorType.InkbirdIAMT1, "IAM-T1" },
+            { CO2MonitorType.AirSpotHealth, "Airspot"}, 
+        };
+
+        internal static readonly Dictionary<string, CO2MonitorType> MonitorTypeBySearchString = new()
+        {
+            { "Aranet4", CO2MonitorType.Aranet4 },
+            { "Airvalent", CO2MonitorType.Airvalent },
+            { "IAM-T1", CO2MonitorType.InkbirdIAMT1 },
+            { "Airspot", CO2MonitorType.AirSpotHealth }
         };
     }
 }

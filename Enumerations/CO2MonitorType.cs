@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Enumerations
 {
-   internal enum CO2MonitorType
+    [Flags]
+    internal enum CO2MonitorType
     {
-        Aranet4,
-        Airvalent,
-        InkbirdIAMT1,
-        AirSpot,
+        None = 0,
+        Aranet4 = 1 << 0,
+        Airvalent = 1 << 1,
+        InkbirdIAMT1 = 1 << 2,
+        AirSpotHealth = 1 << 3,
+        AllMonitors = Aranet4 | Airvalent | InkbirdIAMT1 | AirSpotHealth
     }
 }

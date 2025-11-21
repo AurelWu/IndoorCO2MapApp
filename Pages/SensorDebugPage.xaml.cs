@@ -1,5 +1,6 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using Microsoft.Maui.Controls;
 using System.ComponentModel;
@@ -9,9 +10,10 @@ namespace IndoorCO2MapAppV2.Pages
     public partial class SensorDebugPage : AppPage, INotifyPropertyChanged
     {
         private readonly BLEDeviceManager _bluetoothManager;
+        private readonly List<CO2MonitorType> monitorOptions = [];
 
         // Current filter string (from Picker)
-        private string? _currentFilter;
+        private CO2MonitorType monitorTypeFilter = CO2MonitorType.None;
 
         // Selected device for details panel
         private BluetoothDeviceModel? _selectedDevice;
@@ -39,9 +41,7 @@ namespace IndoorCO2MapAppV2.Pages
             BluetoothDevicesList.ItemsSource = _bluetoothManager.Devices;
 
             // Populate Picker with debug dictionary (includes "All Devices")
-            MonitorTypePicker.ItemsSource = MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys.ToList();
-            MonitorTypePicker.SelectedIndex = 0; // default selection
-            _currentFilter = MonitorTypes.SearchStringByMonitorTypeDebugMode[MonitorTypePicker.SelectedItem.ToString()!];
+            SetupMonitorPicker();
 
             // Selection handling
             BluetoothDevicesList.SelectionChanged += BluetoothDevicesList_SelectionChanged;
@@ -50,6 +50,20 @@ namespace IndoorCO2MapAppV2.Pages
             _bluetoothManager.PropertyChanged += BluetoothManager_PropertyChanged;
 
             BindingContext = this;
+        }
+
+        private void SetupMonitorPicker()
+        {
+            // Copy dictionary keys into the strongly-typed list
+            monitorOptions.AddRange(MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys);
+
+            // Set picker items to display strings
+            MonitorTypePicker.ItemsSource = monitorOptions
+                .Select(mt => MonitorTypes.SearchStringByMonitorTypeDebugMode[mt])
+                .ToList();
+
+            MonitorTypePicker.SelectedIndex = 0; // default selection
+            monitorTypeFilter = monitorOptions[0]; // initial filter
         }
 
         private void BluetoothManager_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -74,17 +88,23 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void MonitorTypePicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (MonitorTypePicker.SelectedItem is string friendlyName &&
-                MonitorTypes.SearchStringByMonitorTypeDebugMode.TryGetValue(friendlyName, out var filterString))
+            if (MonitorTypePicker.SelectedIndex >= 0)
             {
-                _currentFilter = filterString;
+                monitorTypeFilter = monitorOptions[MonitorTypePicker.SelectedIndex];
             }
         }
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
             // Start scanning with the currently selected filter
-            _bluetoothManager.StartScanningAsync(filter: _currentFilter).SafeFireAndForget();
+            _bluetoothManager.StartScanningAsync(filter: monitorTypeFilter).SafeFireAndForget();
+        }
+
+        private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
+        {
+            if (SelectedDevice == null) return;
+            if (SelectedDevice.Name == null) return; //All monitors supported so far have a name, if that ever changes this might need to be changed
+            
         }
     }
 }

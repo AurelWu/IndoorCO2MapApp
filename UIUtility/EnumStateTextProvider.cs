@@ -13,7 +13,7 @@ namespace IndoorCO2MapAppV2.UIUtility
             {
                 {(CO2MonitorType.Aranet4,"Picker"),"Aranet 4" },
                 {(CO2MonitorType.Airvalent,"Picker"),"Airvalent" },
-                {(CO2MonitorType.AirSpot,"Picker"),"Airspot Health" },
+                {(CO2MonitorType.AirSpotHealth,"Picker"),"Airspot Health" },
                 {(CO2MonitorType.InkbirdIAMT1,"Picker"),"Inkbird IAM-T1" },
 
             //{ (ScanState.Idle, "Button"), "Start scanning" }, //TODO define enum state + context combinations to provide Texts for UI

@@ -1,4 +1,6 @@
-﻿using Plugin.BLE;
+﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Enumerations;
+using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Extensions;
@@ -8,18 +10,20 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Bluetooth
 {
-    public partial class BLEDeviceManager : INotifyPropertyChanged
+    internal partial class BLEDeviceManager : INotifyPropertyChanged
     {
         private static readonly Lazy<BLEDeviceManager> _instance = new(() => new BLEDeviceManager());
-        public static BLEDeviceManager Instance => _instance.Value;
+        internal static BLEDeviceManager Instance => _instance.Value;
 
         private readonly IBluetoothLE _ble;
         private readonly IAdapter _adapter;
 
-        public ObservableCollection<BluetoothDeviceModel> Devices { get; } = [];
+        internal static BaseCO2MonitorManager? ActiveMonitorManager = null;
+
+        internal ObservableCollection<BluetoothDeviceModel> Devices { get; } = [];
 
         private bool _isScanning;
-        public bool IsScanning
+        internal bool IsScanning
         {
             get => _isScanning;
             private set
@@ -55,7 +59,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
         //    }
         //}
 
-        public async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, string? filter = null)
+        internal async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
         {
             if (clearBeforeScan)
                 Devices.Clear();
@@ -70,8 +74,22 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             void Handler(object? sender, DeviceEventArgs e)
             {
-                if (!string.IsNullOrEmpty(e.Device.Name) &&
-                    (string.IsNullOrEmpty(filter) || e.Device.Name.Contains(filter)))
+                if (string.IsNullOrEmpty(e.Device.Name))
+                    return;
+
+                // Try to find a matching monitor type
+                CO2MonitorType deviceType = CO2MonitorType.None;
+                foreach (var kv in MonitorTypes.MonitorTypeBySearchString)
+                {
+                    if (e.Device.Name.Contains(kv.Key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        deviceType = kv.Value;
+                        break;
+                    }
+                }
+
+                // Only add devices that match the current flags
+                if ((filter & deviceType) != 0)
                 {
                     var deviceModel = new BluetoothDeviceModel(e.Device);
                     if (!Devices.Contains(deviceModel))

@@ -37,6 +37,11 @@
                 Text="{Binding IsScanning, Converter={StaticResource ScanTextConverter}}"
                 Clicked="OnSearchBluetoothDevicesClicked"
                 HorizontalOptions="Fill"/>
+        
+        <Button x:Name="RetrieveDataFromMonitorButton"
+                Text="Retrieve Data from Sensor"
+                Clicked="OnRetrieveDataFromMonitorClicked"
+                HorizontalOptions="Fill"/>
 
         <!-- List with all discovered BLE Devices -->
         <CollectionView x:Name="BluetoothDevicesList"
@@ -62,13 +67,17 @@
                 Stroke="Gray"
                 StrokeShape="RoundRectangle 5"
                 Padding="10"
-                IsVisible="False"
+                IsVisible="{Binding SelectedDevice, Converter={StaticResource NullToBoolConverter}}"
                 Margin="5">
             <VerticalStackLayout>
-                <Label x:Name="DeviceNameLabel" Text="Name:" FontAttributes="Bold"/>
-                <Label x:Name="DeviceIdLabel" Text="Id:" FontSize="12" TextColor="Gray"/>
-                <Label x:Name="DeviceRssiLabel" Text="RSSI:" FontSize="12" TextColor="DarkGray"/>
-                <Label x:Name="DeviceAdvertisementRecords" Text="AdvertisementData:" FontSize="10"/>
+                <Label Text="{Binding SelectedDevice.Name, StringFormat='Name: {0}'}"
+                       FontAttributes="Bold"/>
+                <Label Text="{Binding SelectedDevice.Id, StringFormat='Id: {0}'}"
+                       FontSize="12" TextColor="Gray"/>
+                <Label Text="{Binding SelectedDevice.Rssi, StringFormat='RSSI: {0}'}"
+                       FontSize="12" TextColor="DarkGray"/>
+                <Label Text="{Binding SelectedDevice.AdvertisementInfo, StringFormat='Advertisement: {0}'}"
+                       FontSize="10"/>
             </VerticalStackLayout>
         </Border>
 
