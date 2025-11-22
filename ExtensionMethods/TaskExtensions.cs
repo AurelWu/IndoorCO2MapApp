@@ -8,7 +8,7 @@ namespace IndoorCO2MapAppV2.ExtensionMethods
     internal static class TaskExtensions
     {
         /// <summary>
-        /// Safely fire-and-forget a Task, optionally showing an alert on error.
+        /// Safely fire-and-forget a Task, writing errors to console and log.
         /// </summary>
         public static void SafeFireAndForget(this Task task)
         {

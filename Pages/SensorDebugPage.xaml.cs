@@ -10,10 +10,10 @@ namespace IndoorCO2MapAppV2.Pages
     public partial class SensorDebugPage : AppPage, INotifyPropertyChanged
     {
         private readonly BLEDeviceManager _bluetoothManager;
-        private readonly List<CO2MonitorType> monitorOptions = [];
+        private readonly List<CO2MonitorType> _monitorOptions = [];
 
         // Current filter string (from Picker)
-        private CO2MonitorType monitorTypeFilter = CO2MonitorType.None;
+        private CO2MonitorType _monitorTypeFilter = CO2MonitorType.None;
 
         // Selected device for details panel
         private BluetoothDeviceModel? _selectedDevice;
@@ -55,15 +55,15 @@ namespace IndoorCO2MapAppV2.Pages
         private void SetupMonitorPicker()
         {
             // Copy dictionary keys into the strongly-typed list
-            monitorOptions.AddRange(MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys);
+            _monitorOptions.AddRange(MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys);
 
             // Set picker items to display strings
-            MonitorTypePicker.ItemsSource = monitorOptions
+            MonitorTypePicker.ItemsSource = _monitorOptions
                 .Select(mt => MonitorTypes.SearchStringByMonitorTypeDebugMode[mt])
                 .ToList();
 
             MonitorTypePicker.SelectedIndex = 0; // default selection
-            monitorTypeFilter = monitorOptions[0]; // initial filter
+            _monitorTypeFilter = _monitorOptions[0]; // initial filter
         }
 
         private void BluetoothManager_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -90,21 +90,23 @@ namespace IndoorCO2MapAppV2.Pages
         {
             if (MonitorTypePicker.SelectedIndex >= 0)
             {
-                monitorTypeFilter = monitorOptions[MonitorTypePicker.SelectedIndex];
+                _monitorTypeFilter = _monitorOptions[MonitorTypePicker.SelectedIndex];
             }
         }
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
             // Start scanning with the currently selected filter
-            _bluetoothManager.StartScanningAsync(filter: monitorTypeFilter).SafeFireAndForget();
+            _bluetoothManager.StartScanningAsync(filter: _monitorTypeFilter).SafeFireAndForget();
         }
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
             if (SelectedDevice == null) return;
             if (SelectedDevice.Name == null) return; //All monitors supported so far have a name, if that ever changes this might need to be changed
-            
+            if (BLEDeviceManager.ActiveMonitorManager == null) return;
+            BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device).SafeFireAndForget();
         }
+
     }
 }

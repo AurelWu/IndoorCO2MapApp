@@ -16,7 +16,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
         internal static BLEDeviceManager Instance => _instance.Value;
 
         private readonly IBluetoothLE _ble;
-        private readonly IAdapter _adapter;
+        internal readonly IAdapter _adapter;
 
         internal static BaseCO2MonitorManager? ActiveMonitorManager = null;
 
@@ -41,23 +41,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
         private BLEDeviceManager()
         {
-            _ble = CrossBluetoothLE.Current;
-            _adapter = CrossBluetoothLE.Current.Adapter;
-            //_adapter.DeviceDiscovered += Adapter_DeviceDiscovered;
-        }
+            _ble = CrossBluetoothLE.Current; // this should never be null on devices which have Bluetooth ( I think)
+            _adapter = CrossBluetoothLE.Current.Adapter; // this should never be null on devices which have Bluetooth ( I think)
 
-        //private void Adapter_DeviceDiscovered(object? sender, DeviceEventArgs e)
-        //{
-        //    if (!string.IsNullOrEmpty(e.Device.Name))
-        //    {
-        //        var deviceModel = new BluetoothDeviceModel(e.Device);
-        //        if (!Devices.Contains(deviceModel))
-        //        {
-        //            Devices.Add(deviceModel);
-        //            DeviceDiscovered?.Invoke(this, deviceModel);
-        //        }
-        //    }
-        //}
+        }
 
         internal async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
         {

@@ -9,13 +9,13 @@ namespace IndoorCO2MapAppV2.Spatial
 {
     internal record LocationData
     {
-        public string Type { get; set; }
-        public long ID { get; set; }
-        public string Name { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public string Type { get; }
+        public long ID { get; }
+        public string Name { get; }
+        public double Latitude { get; }
+        public double Longitude { get; }
 
-        public double DistanceToGivenLocation { get; set; }
+        public double DistanceToGivenLocation { get; private set; }
 
         public LocationData(string type, long id, string name, double latitude, double longitude, double userLatitude, double userLongitude)
         {

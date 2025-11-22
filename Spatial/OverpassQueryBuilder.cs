@@ -38,7 +38,7 @@ namespace IndoorCO2MapAppV2.Spatial
                     ");" +
                     "out center tags qt;";
             }
-            else //doesnt include lines as we just need target location
+            else //doesnt include transit lines as we just need target location
             {
                 return "[out:json];" +
                   "(" +

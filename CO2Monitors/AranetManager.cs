@@ -10,24 +10,23 @@ namespace IndoorCO2MapAppV2.CO2Monitors
     internal class AranetManager : BaseCO2MonitorManager
     {
         // UUIDs
-        public static readonly Guid SERVICE_UUID = Guid.Parse("0000FCE0-0000-1000-8000-00805f9b34fb");
-        public static readonly Guid OLD_VERSION_SERVICE_UUID = Guid.Parse("f0cd1400-95da-4f4b-9ac8-aa55d312af0c");
+        private static readonly Guid SERVICE_UUID = Guid.Parse("0000FCE0-0000-1000-8000-00805f9b34fb");
+        private static readonly Guid OLD_VERSION_SERVICE_UUID = Guid.Parse("f0cd1400-95da-4f4b-9ac8-aa55d312af0c");
 
-        public static readonly Guid LIVE_CHARACTERISTICS_UUID = Guid.Parse("f0cd3001-95da-4f4b-9ac8-aa55d312af0c");
-        public static readonly Guid TOTAL_READINGS_CHARACTERISTIC_UUID = Guid.Parse("f0cd2001-95da-4f4b-9ac8-aa55d312af0c");
-        public static readonly Guid WRITE_CHARACTERISTIC_UUID = Guid.Parse("f0cd1402-95da-4f4b-9ac8-aa55d312af0c");
-        public static readonly Guid HISTORY_V2_CHARACTERISTIC_UUID = Guid.Parse("f0cd2005-95da-4f4b-9ac8-aa55d312af0c");
+        private static readonly Guid LIVE_CHARACTERISTICS_UUID = Guid.Parse("f0cd3001-95da-4f4b-9ac8-aa55d312af0c");
+        private static readonly Guid TOTAL_READINGS_CHARACTERISTIC_UUID = Guid.Parse("f0cd2001-95da-4f4b-9ac8-aa55d312af0c");
+        private static readonly Guid WRITE_CHARACTERISTIC_UUID = Guid.Parse("f0cd1402-95da-4f4b-9ac8-aa55d312af0c");
+        private static readonly Guid HISTORY_V2_CHARACTERISTIC_UUID = Guid.Parse("f0cd2005-95da-4f4b-9ac8-aa55d312af0c");
 
-        public ICharacteristic? LiveCharacteristic { get; private set; }
-        public ICharacteristic? TotalDataPointsCharacteristic { get; private set; }
-        public ICharacteristic? WriterCharacteristic { get; private set; }
-        public ICharacteristic? HistoryV2Characteristic { get; private set; }
+        private IService? _service;
+        private ICharacteristic? _liveCharacteristic;
+        private ICharacteristic? _totalDataPointsCharacteristic;
+        private ICharacteristic? _writerCharacteristic;
+        private ICharacteristic? _historyV2Characteristic;
 
-        public static bool IsOldVersion { get; private set; }
-        public static string SensorVersion { get; private set; } = "";
-
-        public static IDevice? ActiveDevice { get; private set; }
-
+        private static bool IsOldVersion { get; set; }
+        //private static string SensorVersion { get; set; } = ""; //we might not need this at all the way we do it now
+                
         /// <summary>
         /// Fully initialize the Aranet sensor:
         /// 1. Find correct service
@@ -38,19 +37,29 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             ActiveDevice = device;
             BLEDeviceManager.ActiveMonitorManager = this;
             // Find new-version service, fall back to old
-            var service =
+            _service =
                 await TryGetServiceAsync(device, SERVICE_UUID) ??
                 await TryGetServiceAsync(device, OLD_VERSION_SERVICE_UUID);
 
-            if (service == null)
+            if (_service == null)
             {
                 Console.WriteLine("Aranet service not found.");
                 return false;
             }
 
-            IsOldVersion = service.Id == OLD_VERSION_SERVICE_UUID;
+            IsOldVersion = _service.Id == OLD_VERSION_SERVICE_UUID;
 
-            return await DiscoverCharacteristicsAsync(service);
+            return await DiscoverCharacteristicsAsync(_service);
+        }
+
+        protected override bool IsGattValid()
+        {
+            return
+                _service != null &&
+                _liveCharacteristic != null &&
+                _totalDataPointsCharacteristic != null &&
+                _writerCharacteristic != null &&
+                _historyV2Characteristic != null;
         }
 
         /// <summary>
@@ -58,20 +67,20 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// </summary>
         private async Task<bool> DiscoverCharacteristicsAsync(IService service)
         {
-            LiveCharacteristic =
+            _liveCharacteristic =
                 await TryGetCharacteristicAsync(service, LIVE_CHARACTERISTICS_UUID);
-            TotalDataPointsCharacteristic =
+            _totalDataPointsCharacteristic =
                 await TryGetCharacteristicAsync(service, TOTAL_READINGS_CHARACTERISTIC_UUID);
-            WriterCharacteristic =
+            _writerCharacteristic =
                 await TryGetCharacteristicAsync(service, WRITE_CHARACTERISTIC_UUID);
-            HistoryV2Characteristic =
+            _historyV2Characteristic =
                 await TryGetCharacteristicAsync(service, HISTORY_V2_CHARACTERISTIC_UUID);
 
             bool ok =
-                LiveCharacteristic != null &&
-                TotalDataPointsCharacteristic != null &&
-                WriterCharacteristic != null &&
-                HistoryV2Characteristic != null;
+                _liveCharacteristic != null &&
+                _totalDataPointsCharacteristic != null &&
+                _writerCharacteristic != null &&
+                _historyV2Characteristic != null;
 
             if (!ok)
                 Console.WriteLine("Initialization incomplete: missing one or more characteristics.");
@@ -84,26 +93,54 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// </summary>
         public override async Task<int> ReadCurrentCO2Async()
         {
-            if (LiveCharacteristic == null || !LiveCharacteristic.CanRead)
+            // Ensure we are still properly connected and initialized
+            if (!await EnsureConnectionIsValidAsync())
                 return 0;
 
-            var result = await LiveCharacteristic.ReadAsync();
+            if (_liveCharacteristic == null || !_liveCharacteristic.CanRead)
+                return 0;
 
-            var data = result.data;
-            return data.Length >= 2 ? (data[1] << 8) | data[0] : 0;
+            try
+            {
+                var result = await _liveCharacteristic.ReadAsync();
+                var data = result.data;
+
+                return data.Length >= 2
+                    ? (data[1] << 8) | data[0]
+                    : 0;
+            }
+            catch
+            {
+                // If reading fails after reconnection, return 0
+                return 0;
+            }
         }
+
 
         /// <summary>
         /// Read total number of stored datapoints (if available).
         /// </summary>
         public async Task<int?> ReadTotalDataPointsAsync()
         {
-            if (TotalDataPointsCharacteristic == null || !TotalDataPointsCharacteristic.CanRead)
+            if (!await EnsureConnectionIsValidAsync())
                 return null;
 
-            var result = await TotalDataPointsCharacteristic.ReadAsync();
-            var data = result.data;
-            return data.Length >= 2 ? (data[1] << 8) | data[0] : null;
+            if (_totalDataPointsCharacteristic == null || !_totalDataPointsCharacteristic.CanRead)
+                return null;
+
+            try
+            {
+                var result = await _totalDataPointsCharacteristic.ReadAsync();
+                var data = result.data;
+
+                return data.Length >= 2
+                    ? (data[1] << 8) | data[0]
+                    : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -111,30 +148,48 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// </summary>
         public override async Task<ushort[]> ReadHistoryAsync(ushort startIndex)
         {
-            if (WriterCharacteristic == null || HistoryV2Characteristic == null)
+            if (!await EnsureConnectionIsValidAsync())
                 return [];
 
-            if (!WriterCharacteristic.CanWrite || !HistoryV2Characteristic.CanRead)
+            if (_writerCharacteristic == null ||
+                _historyV2Characteristic == null ||
+                !_writerCharacteristic.CanWrite ||
+                !_historyV2Characteristic.CanRead)
+            {
                 return [];
+            }
 
-            byte[] packet = CreateCO2HistoryRequestPacket(startIndex);
-            await WriterCharacteristic.WriteAsync(packet);
+            try
+            {
+                // Build request packet
+                byte[] packet = CreateCO2HistoryRequestPacket(startIndex);
 
-            await Task.Delay(35); // give sensor time
+                // Send request
+                await _writerCharacteristic.WriteAsync(packet);
 
-            var result = await HistoryV2Characteristic.ReadAsync();
-            var data = result.data;
+                // Give device a short moment to prepare response
+                await Task.Delay(35);
 
-            if (data.Length < 10)
+                // Read the response
+                var result = await _historyV2Characteristic.ReadAsync();
+                var data = result.data;
+
+                if (data.Length < 10)
+                    return [];
+
+                byte count = data[9];
+                ushort[] values = new ushort[count];
+
+                for (int i = 0; i < count; i++)
+                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2);
+
+                return values;
+            }
+            catch
+            {
+                // If anything failed, return empty
                 return [];
-
-            byte count = data[9];
-            ushort[] values = new ushort[count];
-
-            for (int i = 0; i < count; i++)
-                values[i] = BitConverter.ToUInt16(data, 10 + i * 2);
-
-            return values;
+            }
         }
 
         /// <summary>
