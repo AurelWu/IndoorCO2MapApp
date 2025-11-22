@@ -46,7 +46,7 @@
         <!-- List with all discovered BLE Devices -->
         <CollectionView x:Name="BluetoothDevicesList"
                         SelectionMode="Single"
-                        HeightRequest="300"
+                        HeightRequest="200"
                         VerticalScrollBarVisibility="Always">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -61,6 +61,12 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <Label Text="{Binding IsScanning, StringFormat='Scanning: {0}'}"
+               FontAttributes="Italic"
+               HorizontalOptions="Center"/>
+        <Label Text="{Binding CurrentCO2, StringFormat='Current CO₂ Value: {0}'}"/>
+        <Label Text="{Binding MeasurementInterval, StringFormat='Measurement Interval: {0} sec'}"/>
 
         <!-- Details panel for selected device -->
         <Border x:Name="SelectedDeviceDetails"

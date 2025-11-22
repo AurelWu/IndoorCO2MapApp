@@ -91,11 +91,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// <summary>
         /// Read current CO2 from live characteristic.
         /// </summary>
-        public override async Task<int> ReadCurrentCO2Async()
+        protected override async Task<int> DoReadCurrentCO2Async()
         {
-            // Ensure we are still properly connected and initialized
-            if (!await EnsureConnectionIsValidAsync())
-                return 0;
 
             if (_liveCharacteristic == null || !_liveCharacteristic.CanRead)
                 return 0;
@@ -144,19 +141,19 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         }
 
         /// <summary>
-        /// Read CO2 history block from sensor.
+        /// Read CO2 history block from sensor. Returns null if anything goes wrong, returns empty array if the sensor returned data but data length is less than 10
         /// </summary>
-        public override async Task<ushort[]> ReadHistoryAsync(ushort startIndex)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
         {
             if (!await EnsureConnectionIsValidAsync())
-                return [];
+                return null;
 
             if (_writerCharacteristic == null ||
                 _historyV2Characteristic == null ||
                 !_writerCharacteristic.CanWrite ||
                 !_historyV2Characteristic.CanRead)
             {
-                return [];
+                return null;
             }
 
             try
@@ -177,7 +174,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (data.Length < 10)
                     return [];
 
-                byte count = data[9];
+                byte count = data[9]; 
                 ushort[] values = new ushort[count];
 
                 for (int i = 0; i < count; i++)
@@ -188,7 +185,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             catch
             {
                 // If anything failed, return empty
-                return [];
+                return null;
             }
         }
 

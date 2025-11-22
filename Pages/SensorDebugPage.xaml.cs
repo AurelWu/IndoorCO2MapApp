@@ -4,10 +4,17 @@ using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using Microsoft.Maui.Controls;
 using System.ComponentModel;
+using CommunityToolkit;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+
 
 namespace IndoorCO2MapAppV2.Pages
 {
-    public partial class SensorDebugPage : AppPage, INotifyPropertyChanged
+    public partial class SensorDebugPage : AppPage
     {
         private readonly BLEDeviceManager _bluetoothManager;
         private readonly List<CO2MonitorType> _monitorOptions = [];
@@ -31,6 +38,20 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
         public bool IsScanning => _bluetoothManager.IsScanning;
+
+        private int _measurementInterval;
+        public int MeasurementInterval
+        {
+            get => _measurementInterval;
+            set
+            {
+                if (_measurementInterval != value)
+                {
+                    _measurementInterval = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public SensorDebugPage()
         {
@@ -79,6 +100,8 @@ namespace IndoorCO2MapAppV2.Pages
             if (e.CurrentSelection != null && e.CurrentSelection.Count > 0)
             {
                 SelectedDevice = e.CurrentSelection[0] as BluetoothDeviceModel;
+                if (SelectedDevice == null || SelectedDevice.Device == null) return;                
+                BLEDeviceManager.ConnectAsync(SelectedDevice.Device).SafeFireAndForget();
             }
             else
             {
@@ -102,10 +125,17 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
+            RetrieveDataFromMonitorAsync().SafeFireAndForget();
+        }
+
+        private async Task RetrieveDataFromMonitorAsync()
+        {
             if (SelectedDevice == null) return;
             if (SelectedDevice.Name == null) return; //All monitors supported so far have a name, if that ever changes this might need to be changed
             if (BLEDeviceManager.ActiveMonitorManager == null) return;
-            BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device).SafeFireAndForget();
+            await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
+            int result = await BLEDeviceManager.ActiveMonitorManager.ReadCurrentCO2SafeAsync();
+            Console.WriteLine(result);
         }
 
     }

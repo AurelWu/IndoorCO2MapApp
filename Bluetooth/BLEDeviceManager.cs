@@ -105,5 +105,46 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             IsScanning = false;
         }
+
+        public static async Task<bool> ConnectAsync(IDevice device)
+        {
+            // if another monitor was active, clean up
+            if (ActiveMonitorManager is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
+            ActiveMonitorManager = null;
+
+            // Create Manager for the selected device
+            ActiveMonitorManager = CreateManagerForDevice(device);
+
+            // Initialize
+            return await ActiveMonitorManager.InitializeAsync(device);
+        }
+
+        private static BaseCO2MonitorManager CreateManagerForDevice(IDevice device)
+        {
+            var name = device.Name ?? string.Empty;
+
+            foreach (var kv in MonitorTypes.MonitorTypeBySearchString)
+            {
+                if (name.Contains(kv.Key, StringComparison.OrdinalIgnoreCase))
+                {
+                    switch (kv.Value)
+                    {
+                        case CO2MonitorType.Aranet4:
+                            return new AranetManager();
+
+                        case CO2MonitorType.Airvalent:
+                            return new AirvalentManager();
+                        case CO2MonitorType.InkbirdIAMT1:
+                            return new InkbirdManager();
+                        case CO2MonitorType.AirSpotHealth:
+                            return new AirvalentManager();                            
+                    }
+                }
+            }
+
+            throw new NotSupportedException(
+                $"No CO₂ monitor implementation found for device '{device.Name}'");
+        }
     }
 }

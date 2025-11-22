@@ -1,6 +1,7 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace IndoorCO2MapAppV2.ExtensionMethods

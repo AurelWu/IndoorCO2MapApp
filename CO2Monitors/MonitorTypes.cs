@@ -21,7 +21,6 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         // Debug: includes "All Devices"
         internal static readonly Dictionary<CO2MonitorType, string> SearchStringByMonitorTypeDebugMode = new()
         {
-            { CO2MonitorType.None, "" },
             { CO2MonitorType.AllMonitors, "All Monitors" }, // Only used for display
             { CO2MonitorType.Aranet4, "Aranet4" },
             { CO2MonitorType.Airvalent, "Airvalent" },

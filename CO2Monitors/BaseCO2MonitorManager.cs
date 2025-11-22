@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-internal abstract class BaseCO2MonitorManager
+internal abstract class BaseCO2MonitorManager : IAsyncDisposable
 {
     protected const int RetryCount = 3;
     protected const int RetryDelayMs = 100;
@@ -71,7 +71,29 @@ internal abstract class BaseCO2MonitorManager
     }
 
     public abstract Task<bool> InitializeAsync(IDevice device);
-    public abstract Task<int> ReadCurrentCO2Async();
-    public abstract Task<ushort[]> ReadHistoryAsync(ushort startIndex);
+    public async Task<int> ReadCurrentCO2SafeAsync()
+    {
+        if (!await EnsureConnectionIsValidAsync())
+            return 0;
+
+        return await DoReadCurrentCO2Async();
+    }
+
+    protected abstract Task<int> DoReadCurrentCO2Async();
+
+    public async Task<ushort[]?> ReadHistorySafeAsync(ushort startIndex)
+    {
+        if (!await EnsureConnectionIsValidAsync())
+            return null;
+
+        return await DoReadHistoryAsync(startIndex);
+    }
+    protected abstract Task<ushort[]?> DoReadHistoryAsync(ushort startIndex);
+
+    public virtual ValueTask DisposeAsync()
+    {
+        // Some implementations might need cleanup (e.g., notifications)
+        return ValueTask.CompletedTask;
+    }
 }
 
