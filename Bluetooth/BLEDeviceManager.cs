@@ -138,7 +138,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
                         case CO2MonitorType.InkbirdIAMT1:
                             return new InkbirdManager();
                         case CO2MonitorType.AirSpotHealth:
-                            return new AirvalentManager();                            
+                            return new AirspotManager();                            
                     }
                 }
             }

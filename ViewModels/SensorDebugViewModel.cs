@@ -96,15 +96,16 @@ namespace IndoorCO2MapAppV2.ViewModels
             MeasurementInterval = await BLEDeviceManager.ActiveMonitorManager.ReadUpdateIntervalSafeAsync();
         }
 
-        public async Task RetrieveHistoryAsync()
+        public async Task RetrieveHistoryAsync(ushort amountOfMinutes)
         {
             if (SelectedDevice == null || BLEDeviceManager.ActiveMonitorManager == null)
                 return;
 
             await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
 
-            ushort startIndex = 0; // start from beginning, or calculate if you store last read
-            var history = await BLEDeviceManager.ActiveMonitorManager.ReadHistorySafeAsync(startIndex);
+            //TODO => calculate based on interval or timesteps in concrete implementations for now it just returns last n values ignoring the interval
+            
+            var history = await BLEDeviceManager.ActiveMonitorManager.ReadHistorySafeAsync(amountOfMinutes);
 
             if (history != null)
             {

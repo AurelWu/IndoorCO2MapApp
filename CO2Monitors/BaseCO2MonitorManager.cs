@@ -91,12 +91,12 @@ internal abstract class BaseCO2MonitorManager : IAsyncDisposable
 
     protected abstract Task<int> DoReadUpdateIntervalAsync();
 
-    public async Task<ushort[]?> ReadHistorySafeAsync(ushort startIndex)
+    public async Task<ushort[]?> ReadHistorySafeAsync(ushort amountOfMinutes)
     {
         if (!await EnsureConnectionIsValidAsync())
             return null;
 
-        return await DoReadHistoryAsync(startIndex);
+        return await DoReadHistoryAsync(amountOfMinutes);
     }
     protected abstract Task<ushort[]?> DoReadHistoryAsync(ushort startIndex);
 

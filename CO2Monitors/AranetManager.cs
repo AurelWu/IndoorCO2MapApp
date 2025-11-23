@@ -164,7 +164,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// <summary>
         /// Read CO2 history block from sensor. Returns null if anything goes wrong, returns empty array if the sensor returned data but data length is less than 10
         /// </summary>
-        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes)
         {
             if (!await EnsureConnectionIsValidAsync())
                 return null;
@@ -179,62 +179,67 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             try
             {
-                // Build request packet
-                byte[] packet = CreateCO2HistoryRequestPacket(startIndex);
+                // 1. Read total number of data points
+                int? totalDataPoints = await ReadTotalDataPointsAsync();
+                if (totalDataPoints == null || totalDataPoints == 0)
+                    return [];
+
+                // 2. Determine start index (last N points)
+                int pointsToRead = amountOfMinutes; // currently using amountOfMinutes as "last N"
+                int startIndex = totalDataPoints.Value - pointsToRead;
+                if (startIndex < 0)
+                    startIndex = 0;
+
+                Console.WriteLine($"TotalDataPoints: {totalDataPoints}, StartIndex: {startIndex}, PointsToRead: {pointsToRead}");
+
+                // 3. Build request packet with startIndex (adjust CreateCO2HistoryRequestPacket to take start index)
+                byte[] packet = CreateCO2HistoryRequestPacket((ushort)startIndex);
 
                 if (_writerCharacteristic.WriteType != Plugin.BLE.Abstractions.CharacteristicWriteType.Default)
-                {
                     _writerCharacteristic.WriteType = Plugin.BLE.Abstractions.CharacteristicWriteType.Default;
-                }
 
-                Console.WriteLine($"CanWrite: {_writerCharacteristic.CanWrite}, WriteType: {_writerCharacteristic.WriteType}");
-
-                // Send request
+                // 4. Send request
                 try
                 {
                     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
                     await _writerCharacteristic.WriteAsync(packet, cts.Token);
                 }
-
-                //Happens if not bonded / paired ... depending on OS it triggers bonding but we should make sure its bonded already and abort + trigger bonding ourselves (or rather do that even earlier)
                 catch (Exception ex)
                 {
                     Console.WriteLine($"WriteAsync failed: {ex.Message}");
-                    return null; // or handle as needed
+                    return null;
                 }
-                
 
-                // Give device a short moment to prepare response
+                // 5. Give device a short moment to prepare response
                 await Task.Delay(35);
 
-                // Read the response
+                // 6. Read the response
                 var result = await _historyV2Characteristic.ReadAsync();
                 var data = result.data;
 
                 if (data.Length < 10)
                     return [];
 
-                byte count = data[9]; 
+                byte count = data[9];
                 ushort[] values = new ushort[count];
 
                 for (int i = 0; i < count; i++)
-                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2); //newest Value is first 
+                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2); 
 
-                values = [.. values.Reverse()]; //now newest Value is last
 
                 return values;
             }
             catch
             {
-                // If anything failed, return empty
                 return null;
             }
         }
 
+
         /// <summary>
         /// Create CO2 history request packet.
         /// </summary>
-        public static byte[] CreateCO2HistoryRequestPacket(ushort startIndex)
+        public static byte[] CreateCO2HistoryRequestPacket(ushort start)
         {
             using var memoryStream = new MemoryStream();
             byte header = 0x61;
@@ -243,7 +248,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             {
                 binaryWriter.Write(header);       // Write 1 byte
                 binaryWriter.Write(co2ID);   // Write 1 byte
-                binaryWriter.Write(startIndex);        // Write 2 bytes (little-endian by default)
+                binaryWriter.Write(start);        // Write 2 bytes (little-endian by default) //
             }
 
             byte[] data = memoryStream.ToArray();

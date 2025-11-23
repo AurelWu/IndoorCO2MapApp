@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
-    internal class AirSpotDataPage
+    internal class AirspotDataPage
     {
         public int PageID { get; private set; }
         public List<long> Timestamps { get; } = [];
         public List<int> CO2Values { get; } = [];
         public bool FinishedPage { get; private set; } = true;
 
-        public AirSpotDataPage(byte[] data)
+        public AirspotDataPage(byte[] data)
         {
             ParseData(data);
         }
