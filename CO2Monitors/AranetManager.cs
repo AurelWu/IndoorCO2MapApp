@@ -113,6 +113,27 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
         }
 
+        protected override async Task<int> DoReadUpdateIntervalAsync()
+        {
+            if (_liveCharacteristic == null || !_liveCharacteristic.CanRead)
+                return 0;
+
+            try
+            {
+                var result = await _liveCharacteristic.ReadAsync();
+                var data = result.data;
+
+                // Only read if data has enough bytes
+                return data.Length >= 11
+                    ? (data[10] << 8) | data[9]
+                    : 0;
+            }
+            catch
+            {
+                return 0; // return 0 if reading fails
+            }
+        }
+
 
         /// <summary>
         /// Read total number of stored datapoints (if available).
@@ -161,8 +182,27 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 // Build request packet
                 byte[] packet = CreateCO2HistoryRequestPacket(startIndex);
 
+                if (_writerCharacteristic.WriteType != Plugin.BLE.Abstractions.CharacteristicWriteType.Default)
+                {
+                    _writerCharacteristic.WriteType = Plugin.BLE.Abstractions.CharacteristicWriteType.Default;
+                }
+
+                Console.WriteLine($"CanWrite: {_writerCharacteristic.CanWrite}, WriteType: {_writerCharacteristic.WriteType}");
+
                 // Send request
-                await _writerCharacteristic.WriteAsync(packet);
+                try
+                {
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                    await _writerCharacteristic.WriteAsync(packet, cts.Token);
+                }
+
+                //Happens if not bonded / paired ... depending on OS it triggers bonding but we should make sure its bonded already and abort + trigger bonding ourselves (or rather do that even earlier)
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"WriteAsync failed: {ex.Message}");
+                    return null; // or handle as needed
+                }
+                
 
                 // Give device a short moment to prepare response
                 await Task.Delay(35);
@@ -178,7 +218,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 ushort[] values = new ushort[count];
 
                 for (int i = 0; i < count; i++)
-                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2);
+                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2); //newest Value is first 
+
+                values = [.. values.Reverse()]; //now newest Value is last
 
                 return values;
             }
@@ -209,7 +251,5 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             //System.Diagnostics.Debug.WriteLine("Sent data: " + BitConverter.ToString(data));
             return memoryStream.ToArray();
         }
-
-
     }
 }

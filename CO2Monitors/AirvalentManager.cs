@@ -24,6 +24,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             throw new NotImplementedException();
         }
 
+        protected override Task<int> DoReadUpdateIntervalAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override bool IsGattValid()
         {
             throw new NotImplementedException();

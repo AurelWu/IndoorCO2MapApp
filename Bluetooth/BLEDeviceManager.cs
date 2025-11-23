@@ -23,7 +23,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
         internal ObservableCollection<BluetoothDeviceModel> Devices { get; } = [];
 
         private bool _isScanning;
-        internal bool IsScanning
+        public bool IsScanning
         {
             get => _isScanning;
             private set

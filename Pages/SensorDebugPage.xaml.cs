@@ -2,141 +2,77 @@ using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
-using System.ComponentModel;
-using CommunityToolkit;
-using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm;
-using CommunityToolkit.Mvvm.ComponentModel;
-
-
+using System;
+using System.Linq;
 
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class SensorDebugPage : AppPage
     {
-        private readonly BLEDeviceManager _bluetoothManager;
-        private readonly List<CO2MonitorType> _monitorOptions = [];
-
-        // Current filter string (from Picker)
-        private CO2MonitorType _monitorTypeFilter = CO2MonitorType.None;
-
-        // Selected device for details panel
-        private BluetoothDeviceModel? _selectedDevice;
-        public BluetoothDeviceModel? SelectedDevice
-        {
-            get => _selectedDevice;
-            set
-            {
-                if (_selectedDevice != value)
-                {
-                    _selectedDevice = value;
-                    OnPropertyChanged(nameof(SelectedDevice));
-                }
-            }
-        }
-
-        public bool IsScanning => _bluetoothManager.IsScanning;
-
-        private int _measurementInterval;
-        public int MeasurementInterval
-        {
-            get => _measurementInterval;
-            set
-            {
-                if (_measurementInterval != value)
-                {
-                    _measurementInterval = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        private readonly SensorDebugPageViewModel _viewModel;
 
         public SensorDebugPage()
         {
             InitializeComponent();
 
-            // BLE setup
-            _bluetoothManager = BLEDeviceManager.Instance;
-            BluetoothDevicesList.ItemsSource = _bluetoothManager.Devices;
+            // Create the viewmodel and set as binding context
+            _viewModel = new SensorDebugPageViewModel();
+            BindingContext = _viewModel;
 
-            // Populate Picker with debug dictionary (includes "All Devices")
-            SetupMonitorPicker();
+            // Bind device list
+            BluetoothDevicesList.ItemsSource = _viewModel.Devices;
 
-            // Selection handling
-            BluetoothDevicesList.SelectionChanged += BluetoothDevicesList_SelectionChanged;
-
-            // Listen for scanning property changes
-            _bluetoothManager.PropertyChanged += BluetoothManager_PropertyChanged;
-
-            BindingContext = this;
-        }
-
-        private void SetupMonitorPicker()
-        {
-            // Copy dictionary keys into the strongly-typed list
-            _monitorOptions.AddRange(MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys);
-
-            // Set picker items to display strings
-            MonitorTypePicker.ItemsSource = _monitorOptions
+            // Populate monitor type picker
+            MonitorTypePicker.ItemsSource = _viewModel.MonitorOptions
                 .Select(mt => MonitorTypes.SearchStringByMonitorTypeDebugMode[mt])
                 .ToList();
+            MonitorTypePicker.SelectedIndex = 0;
 
-            MonitorTypePicker.SelectedIndex = 0; // default selection
-            _monitorTypeFilter = _monitorOptions[0]; // initial filter
-        }
-
-        private void BluetoothManager_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(_bluetoothManager.IsScanning))
-            {
-                OnPropertyChanged(nameof(IsScanning));
-            }
+            // Event handlers
+            BluetoothDevicesList.SelectionChanged += BluetoothDevicesList_SelectionChanged;
+            MonitorTypePicker.SelectedIndexChanged += MonitorTypePicker_SelectedIndexChanged;
         }
 
         private void BluetoothDevicesList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (e.CurrentSelection != null && e.CurrentSelection.Count > 0)
+            HandleSelectionChangedAsync(e).SafeFireAndForget();
+        }
+
+        private async Task HandleSelectionChangedAsync(SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection?.Count > 0)
             {
-                SelectedDevice = e.CurrentSelection[0] as BluetoothDeviceModel;
-                if (SelectedDevice == null || SelectedDevice.Device == null) return;                
-                BLEDeviceManager.ConnectAsync(SelectedDevice.Device).SafeFireAndForget();
+                var device = e.CurrentSelection[0] as BluetoothDeviceModel;
+                if (device != null)
+                    await _viewModel.SelectDeviceAsync(device);
             }
             else
             {
-                SelectedDevice = null;
+                _viewModel.SelectedDevice = null;
             }
         }
 
-        private void MonitorTypePicker_SelectedIndexChanged(object sender, EventArgs e)
+        private void MonitorTypePicker_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (MonitorTypePicker.SelectedIndex >= 0)
             {
-                _monitorTypeFilter = _monitorOptions[MonitorTypePicker.SelectedIndex];
+                _viewModel.SelectedMonitorType = _viewModel.MonitorOptions[MonitorTypePicker.SelectedIndex];
             }
         }
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
-            // Start scanning with the currently selected filter
-            _bluetoothManager.StartScanningAsync(filter: _monitorTypeFilter).SafeFireAndForget();
+            _viewModel.StartScanAsync(_viewModel.SelectedMonitorType).SafeFireAndForget();
         }
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
-            RetrieveDataFromMonitorAsync().SafeFireAndForget();
+            _viewModel.RetrieveCO2Async().SafeFireAndForget();
+            _viewModel.RetrieveUpdateIntervalAsync().SafeFireAndForget();
+            _viewModel.RetrieveHistoryAsync().SafeFireAndForget();
+            //TODO: also read History and maybe wait for one to finish before other instead of fire&forget at same time?
         }
-
-        private async Task RetrieveDataFromMonitorAsync()
-        {
-            if (SelectedDevice == null) return;
-            if (SelectedDevice.Name == null) return; //All monitors supported so far have a name, if that ever changes this might need to be changed
-            if (BLEDeviceManager.ActiveMonitorManager == null) return;
-            await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
-            int result = await BLEDeviceManager.ActiveMonitorManager.ReadCurrentCO2SafeAsync();
-            Console.WriteLine(result);
-        }
-
     }
 }

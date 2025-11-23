@@ -17,10 +17,6 @@
 
     <VerticalStackLayout Padding="10" Spacing="10">
 
-        <Label Text="Sensor Debug"
-               FontSize="20"
-               HorizontalOptions="Center" />
-
         <Button Text="Main Menu"
                 Clicked="OnNavigateClicked"
                 CommandParameter="///home"
@@ -32,12 +28,12 @@
                 HorizontalOptions="Fill"
                 SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/>
 
-        <!-- Scan Button bound to IsScanning -->
+        <!-- Scan button -->
         <Button x:Name="ScanButton"
                 Text="{Binding IsScanning, Converter={StaticResource ScanTextConverter}}"
                 Clicked="OnSearchBluetoothDevicesClicked"
                 HorizontalOptions="Fill"/>
-        
+
         <Button x:Name="RetrieveDataFromMonitorButton"
                 Text="Retrieve Data from Sensor"
                 Clicked="OnRetrieveDataFromMonitorClicked"
@@ -62,11 +58,22 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Label Text="{Binding IsScanning, StringFormat='Scanning: {0}'}"
-               FontAttributes="Italic"
-               HorizontalOptions="Center"/>
+
+
+        <Label Text="On Windows, need to manually pair device for some results - iOS/Android trigger pairing if trying to read/write characteristics requiring it"/>
+        <!-- CO2 and interval labels -->
         <Label Text="{Binding CurrentCO2, StringFormat='Current CO₂ Value: {0}'}"/>
         <Label Text="{Binding MeasurementInterval, StringFormat='Measurement Interval: {0} sec'}"/>
+
+        <Label Text="CO₂ History" FontAttributes="Bold"/>
+        <CollectionView ItemsSource="{Binding Co2History}"
+                HeightRequest="200">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding}" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
         <!-- Details panel for selected device -->
         <Border x:Name="SelectedDeviceDetails"

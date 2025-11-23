@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace IndoorCO2MapAppV2.Enumerations
 {
     [Flags]
-    internal enum CO2MonitorType
+    public enum CO2MonitorType
     {
         None = 0,
         Aranet4 = 1 << 0,

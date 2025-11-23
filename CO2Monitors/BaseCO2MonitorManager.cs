@@ -81,6 +81,16 @@ internal abstract class BaseCO2MonitorManager : IAsyncDisposable
 
     protected abstract Task<int> DoReadCurrentCO2Async();
 
+    public async Task<int> ReadUpdateIntervalSafeAsync()
+    {
+        if (!await EnsureConnectionIsValidAsync())
+            return 0;
+
+        return await DoReadUpdateIntervalAsync();
+    }
+
+    protected abstract Task<int> DoReadUpdateIntervalAsync();
+
     public async Task<ushort[]?> ReadHistorySafeAsync(ushort startIndex)
     {
         if (!await EnsureConnectionIsValidAsync())
