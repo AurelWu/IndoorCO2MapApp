@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+               x:Class="IndoorCO2MapAppV2.Pages.OverpassRequestDebugPage"
+               x:Name="ThisPage"
+               Title="Overpass Request Debug">
+
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
+                                       TrueText="Fetching Data..."
+                                       FalseText="Search Buildings"/>
+            <ui:InvertBooleanConverter x:Key="InvertBool"/>
+        </ResourceDictionary>
+    </local:AppPage.Resources>
+
+    <VerticalStackLayout Padding="20" Spacing="16">
+
+        <Label Text="Debug Page Overpass Request"
+               FontSize="24"
+               HorizontalOptions="Center" />
+
+        <!-- INPUT GRID -->
+        <Grid ColumnDefinitions="140, *" RowDefinitions="Auto, Auto, Auto" ColumnSpacing="10" RowSpacing="10">
+
+            <Label Text="Latitude:" Grid.Row="0" Grid.Column="0" VerticalOptions="Center" />
+            <Entry x:Name="LatitudeEntry"
+                   Text="51.3397"
+                   Keyboard="Numeric"
+                   Grid.Row="0" Grid.Column="1" />
+
+            <Label Text="Longitude:" Grid.Row="1" Grid.Column="0" VerticalOptions="Center" />
+            <Entry x:Name="LongitudeEntry"
+                   Text="12.3731"
+                   Keyboard="Numeric"
+                   Grid.Row="1" Grid.Column="1" />
+
+            <Label Text="Search Range (m):" Grid.Row="2" Grid.Column="0" VerticalOptions="Center" />
+            <Entry x:Name="RangeEntry"
+                   Text="250"
+                   Keyboard="Numeric"
+                   Grid.Row="2" Grid.Column="1" />
+
+        </Grid>
+
+        <!-- ACTION BUTTONS -->
+        <VerticalStackLayout Spacing="10">
+
+            <Button x:Name="SearchBuildingsButton"
+                    Text="{Binding IsFetching, Converter={StaticResource FetchButtonTextConverter}}"
+                    IsEnabled="{Binding IsFetching, Converter={StaticResource InvertBool}}"
+                    Clicked="OnSearchBuildingsClicked" />
+
+            <Label x:Name="BuildingsStatusLabel" Text="" LineBreakMode="WordWrap" />
+
+            <Button Text="Search Transit Stops"
+                    Clicked="OnSearchTransitStopsClicked" />
+
+            <Button Text="Search Transit Lines"
+                    Clicked="OnSearchTransitLinesClicked" />
+
+            <Button Text="Main Menu"
+                    Clicked="OnNavigateClicked"
+                    CommandParameter="///home" />
+
+        </VerticalStackLayout>
+
+    </VerticalStackLayout>
+
+</local:AppPage>

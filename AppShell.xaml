@@ -38,5 +38,9 @@
         Route="sensorDebug"
         ContentTemplate="{DataTemplate pages:SensorDebugPage}" />
 
+    <ShellContent
+        Route="overpassDebug"
+        ContentTemplate="{DataTemplate pages:OverpassRequestDebugPage}" />
+
 
 </Shell>
