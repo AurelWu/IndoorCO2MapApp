@@ -38,6 +38,19 @@ namespace IndoorCO2MapAppV2.Spatial
         internal void SetTransitLines(IEnumerable<TransitLineData> newData)
             => _transitLines = newData?.ToList() ?? [];
 
+        // ---- Sorted View Helpers ----
+
+        internal IReadOnlyList<LocationData> GetBuildingsSortedByDistance()
+        {
+            return [.. _buildingLocationData.OrderBy(loc => loc.Distance)];
+        }
+
+        internal IReadOnlyList<LocationData> GetBuildingsSortedByName()
+        {
+            return [.. _buildingLocationData.OrderBy(loc => loc.Name ?? string.Empty)];
+        }
+
+
         // ---- Clear everything ----
         internal void ClearAll()
         {

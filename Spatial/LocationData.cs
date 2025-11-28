@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Spatial
 {
-    internal record LocationData
+    public record LocationData
     {
         public string Type { get; }
         public long ID { get; }
@@ -15,7 +15,7 @@ namespace IndoorCO2MapAppV2.Spatial
         public double Latitude { get; }
         public double Longitude { get; }
 
-        public double DistanceToGivenLocation { get; private set; }
+        public double Distance { get; private set; }
 
         public LocationData(string type, long id, string name, double latitude, double longitude, double userLatitude, double userLongitude)
         {
@@ -28,7 +28,7 @@ namespace IndoorCO2MapAppV2.Spatial
         }
         private void CalculateDistanceToGivenLocation(double userLatitude, double userLongitude)
         {
-            DistanceToGivenLocation = Haversine.GetDistanceInMeters(userLatitude, userLongitude, Latitude, Longitude);
+            Distance = Haversine.GetDistanceInMeters(userLatitude, userLongitude, Latitude, Longitude);
         }
 
         public override string ToString()
@@ -58,7 +58,7 @@ namespace IndoorCO2MapAppV2.Spatial
             //}
             else
             {
-                return $"{Name} | {(int)DistanceToGivenLocation}m";
+                return $"{Name} | {(int)Distance}m";
             }
 
 

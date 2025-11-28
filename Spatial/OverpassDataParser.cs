@@ -4,7 +4,7 @@ using System.Text.Json;
 
 internal static class OverpassDataParser
 {
-    internal static List<LocationData> ParseBuildingLocationOverpassResponse(string response, double userLat, double userLon)
+    internal static List<LocationData> ParseBuildingLocationOverpassResponse(string response, double userLat, double userLon, bool updateLocationStore = true, bool keepResultsIfEmptyResults = true)
     {
         var locations = new List<LocationData>();
         using var doc = JsonDocument.Parse(response);
@@ -49,7 +49,12 @@ internal static class OverpassDataParser
 
             locations.Add(new LocationData(type, id, name, lat, lon, userLat, userLon));
         }
-
+        if(updateLocationStore)
+        {
+            if (keepResultsIfEmptyResults == true && locations.Count == 0) return locations;
+            LocationStore.Instance.SetBuildingLocations(locations);
+        }
+        
         return locations;
     }
 

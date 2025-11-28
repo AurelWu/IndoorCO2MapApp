@@ -36,6 +36,30 @@ namespace IndoorCO2MapAppV2.Spatial
             set { _lastError = value; OnPropertyChanged(); }
         }
 
+        // Stores parsed locations from the last request
+        private List<LocationData> _buildingResults = [];
+        public List<LocationData> BuildingResults
+        {
+            get => _buildingResults;
+            set
+            {
+                _buildingResults = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Sort mode (true = distance, false = alphabetical)
+        private bool _sortByDistance = true;
+        public bool SortByDistance
+        {
+            get => _sortByDistance;
+            set
+            {
+                _sortByDistance = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

@@ -39,7 +39,7 @@
 
             <Label Text="Search Range (m):" Grid.Row="2" Grid.Column="0" VerticalOptions="Center" />
             <Entry x:Name="RangeEntry"
-                   Text="250"
+                   Text="150"
                    Keyboard="Numeric"
                    Grid.Row="2" Grid.Column="1" />
 
@@ -54,6 +54,32 @@
                     Clicked="OnSearchBuildingsClicked" />
 
             <Label x:Name="BuildingsStatusLabel" Text="" LineBreakMode="WordWrap" />
+
+            <Picker x:Name="ResultsPicker" Title="Select a building" ItemsSource="{x:Null}" />
+
+            <HorizontalStackLayout Spacing="0" Padding="0">
+                <Button
+        x:Name="DistanceButton"
+        Text="Sort By Distance"
+        CornerRadius="8"
+        BackgroundColor="#007AFF"
+        TextColor="White"
+        Clicked="OnSortDistanceClicked"
+        WidthRequest="160" />
+
+                <Button
+        x:Name="AlphaButton"
+        Text="Sort Alphabetical"
+        CornerRadius="8"
+        BackgroundColor="#E0E0E0"
+        TextColor="Black"
+        Clicked="OnSortAlphaClicked"
+        WidthRequest="160" />
+            </HorizontalStackLayout>
+
+            <Entry x:Name="FilterEntry"
+       Placeholder="Search by name..."
+       TextChanged="OnFilterTextChanged" />
 
             <Button Text="Search Transit Stops"
                     Clicked="OnSearchTransitStopsClicked" />
