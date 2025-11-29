@@ -97,4 +97,10 @@
 	  <Folder Include="Localisation\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Pages\BuildingRecordingDebugPage.xaml.cs">
+	    <DependentUpon>BuildingRecordingDebugPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

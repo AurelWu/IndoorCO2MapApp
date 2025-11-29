@@ -11,7 +11,7 @@ namespace IndoorCO2MapAppV2
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkit()                
             // After initializing the .NET MAUI Community Toolkit, optionally add additional fonts
 
                 .ConfigureFonts(fonts =>

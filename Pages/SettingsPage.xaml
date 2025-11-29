@@ -14,6 +14,7 @@
         <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
         <Button Text="Sensor Debug" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
         <Button Text="Overpass Debug" Clicked="OnNavigateClicked" CommandParameter="///overpassDebug" HorizontalOptions="Fill"/>
+        <Button Text="Building Recording Debug" Clicked="OnNavigateClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
 
     </VerticalStackLayout>
 

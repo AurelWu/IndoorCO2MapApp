@@ -42,5 +42,10 @@
         Route="overpassDebug"
         ContentTemplate="{DataTemplate pages:OverpassRequestDebugPage}" />
 
+    <ShellContent
+        Route="buildingRecordingDebug"
+        ContentTemplate="{DataTemplate pages:BuildingRecordingDebugPage}" />
+
+
 
 </Shell>
