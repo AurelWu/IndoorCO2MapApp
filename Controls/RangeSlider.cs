@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Graphics;
 
 namespace IndoorCO2MapAppV2.Controls;
 
@@ -7,22 +8,28 @@ public partial class RangeSlider : ContentView
 {
     // Bindable properties
     public static readonly BindableProperty MinimumProperty =
-        BindableProperty.Create(nameof(Minimum), typeof(int), typeof(RangeSlider), 0);
+        BindableProperty.Create(nameof(Minimum), typeof(int), typeof(RangeSlider), 0, propertyChanged: OnMinimumChanged);
 
     public static readonly BindableProperty MaximumProperty =
-        BindableProperty.Create(nameof(Maximum), typeof(int), typeof(RangeSlider), 100);
+        BindableProperty.Create(nameof(Maximum), typeof(int), typeof(RangeSlider), 100, propertyChanged: OnMaximumChanged);
 
     public static readonly BindableProperty LowerValueProperty =
-        BindableProperty.Create(nameof(LowerValue), typeof(int), typeof(RangeSlider), 0, BindingMode.TwoWay);
+        BindableProperty.Create(nameof(LowerValue), typeof(int), typeof(RangeSlider), 0, BindingMode.TwoWay, propertyChanged: OnLowerValueChanged);
 
     public static readonly BindableProperty UpperValueProperty =
-        BindableProperty.Create(nameof(UpperValue), typeof(int), typeof(RangeSlider), 100, BindingMode.TwoWay);
+        BindableProperty.Create(nameof(UpperValue), typeof(int), typeof(RangeSlider), 100, BindingMode.TwoWay, propertyChanged: OnUpperValueChanged);
 
     public static readonly BindableProperty ThumbSizeProperty =
         BindableProperty.Create(nameof(ThumbSize), typeof(double), typeof(RangeSlider), 24.0, propertyChanged: OnThumbSizeChanged);
 
     public static readonly BindableProperty TrackHeightProperty =
         BindableProperty.Create(nameof(TrackHeight), typeof(double), typeof(RangeSlider), 4.0, propertyChanged: OnTrackHeightChanged);
+
+    public static readonly BindableProperty TrackColorProperty =
+        BindableProperty.Create(nameof(TrackColor), typeof(Color), typeof(RangeSlider), Colors.Gray, propertyChanged: OnTrackColorChanged);
+
+    public static readonly BindableProperty HighlightColorProperty =
+        BindableProperty.Create(nameof(HighlightColor), typeof(Color), typeof(RangeSlider), Colors.DodgerBlue, propertyChanged: OnHighlightColorChanged);
 
     // Properties
     public int Minimum { get => (int)GetValue(MinimumProperty); set => SetValue(MinimumProperty, value); }
@@ -31,10 +38,12 @@ public partial class RangeSlider : ContentView
     public int UpperValue { get => (int)GetValue(UpperValueProperty); set => SetValue(UpperValueProperty, value); }
     public double ThumbSize { get => (double)GetValue(ThumbSizeProperty); set => SetValue(ThumbSizeProperty, value); }
     public double TrackHeight { get => (double)GetValue(TrackHeightProperty); set => SetValue(TrackHeightProperty, value); }
+    public Color TrackColor { get => (Color)GetValue(TrackColorProperty); set => SetValue(TrackColorProperty, value); }
+    public Color HighlightColor { get => (Color)GetValue(HighlightColorProperty); set => SetValue(HighlightColorProperty, value); }
 
     // Visual Elements
-    private readonly BoxView _track = new() { Color = Colors.Gray, HeightRequest = 4, CornerRadius = 2 };
-    private readonly BoxView _highlight = new() { Color = Colors.DodgerBlue, HeightRequest = 4, CornerRadius = 2 };
+    private readonly BoxView _track = new() { HeightRequest = 4, CornerRadius = 2 };
+    private readonly BoxView _highlight = new() { HeightRequest = 4, CornerRadius = 2 };
 
     private readonly Border _lowerThumb = new()
     {
@@ -54,9 +63,9 @@ public partial class RangeSlider : ContentView
 
     public RangeSlider()
     {
-        // Set default thumb size
         UpdateThumbSize();
         UpdateTrackHeight();
+        UpdateTrackColors();
 
         // Add elements
         _layout.Children.Add(_track);
@@ -79,7 +88,7 @@ public partial class RangeSlider : ContentView
     }
 
     // -----------------------------
-    // Thumb and Track updates
+    // Property changed handlers
     // -----------------------------
     private static void OnThumbSizeChanged(BindableObject bindable, object oldVal, object newVal)
     {
@@ -91,6 +100,85 @@ public partial class RangeSlider : ContentView
         if (bindable is RangeSlider slider) slider.UpdateTrackHeight();
     }
 
+    private static void OnTrackColorChanged(BindableObject bindable, object oldVal, object newVal)
+    {
+        if (bindable is RangeSlider slider) slider.UpdateTrackColors();
+    }
+
+    private static void OnHighlightColorChanged(BindableObject bindable, object oldVal, object newVal)
+    {
+        if (bindable is RangeSlider slider) slider.UpdateTrackColors();
+    }
+
+    private static void OnMinimumChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var slider = (RangeSlider)bindable;
+        int min = (int)newValue;
+
+        // Clamp lower
+        if (slider.LowerValue < min)
+            slider.LowerValue = min;
+
+        // Clamp upper (and ensure upper > lower)
+        if (slider.UpperValue < slider.LowerValue + 1)
+            slider.UpperValue = slider.LowerValue + 1;
+
+        slider.UpdateLayoutPositions();   // <--- REQUIRED
+    }
+
+    private static void OnMaximumChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var slider = (RangeSlider)bindable;
+        int max = (int)newValue;
+
+        // Clamp upper
+        if (slider.UpperValue > max)
+            slider.UpperValue = max;
+
+        // Clamp lower (and ensure lower < upper)
+        if (slider.LowerValue > slider.UpperValue - 1)
+            slider.LowerValue = slider.UpperValue - 1;
+
+        slider.UpdateLayoutPositions();   // <--- REQUIRED
+    }
+
+
+    private static void OnLowerValueChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var slider = (RangeSlider)bindable;
+        int lower = (int)newValue;
+
+        // Clamp to [Minimum, Maximum]
+        int corrected = Math.Clamp(lower, slider.Minimum, slider.Maximum);
+
+        // Enforce lower < upper
+        if (corrected >= slider.UpperValue)
+            corrected = slider.UpperValue - 1;
+
+        // Update only if value actually changes (prevents callback loops)
+        if (corrected != lower)
+            slider.LowerValue = corrected;
+    }
+
+    private static void OnUpperValueChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var slider = (RangeSlider)bindable;
+        int upper = (int)newValue;
+
+        // Clamp to [Minimum, Maximum]
+        int corrected = Math.Clamp(upper, slider.Minimum, slider.Maximum);
+
+        // Enforce upper > lower
+        if (corrected <= slider.LowerValue)
+            corrected = slider.LowerValue + 1;
+
+        // Update only if value actually changes (avoids callback loops)
+        if (corrected != upper)
+            slider.UpperValue = corrected;
+    }
+
+
+
     private void UpdateThumbSize()
     {
         _lowerThumb.WidthRequest = ThumbSize;
@@ -100,6 +188,7 @@ public partial class RangeSlider : ContentView
         _upperThumb.WidthRequest = ThumbSize;
         _upperThumb.HeightRequest = ThumbSize;
         _upperThumb.StrokeShape = new RoundRectangle { CornerRadius = ThumbSize / 2 };
+
         UpdateLayoutPositions();
     }
 
@@ -108,6 +197,12 @@ public partial class RangeSlider : ContentView
         _track.HeightRequest = TrackHeight;
         _highlight.HeightRequest = TrackHeight;
         UpdateLayoutPositions();
+    }
+
+    private void UpdateTrackColors()
+    {
+        _track.Color = TrackColor;
+        _highlight.Color = HighlightColor;
     }
 
     // -----------------------------
@@ -166,11 +261,9 @@ public partial class RangeSlider : ContentView
 
         double centerY = Height / 2 - ThumbSize / 2;
 
-        // Track and highlight
         AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, Height / 2 - TrackHeight / 2, _layout.Width, TrackHeight));
         AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lw + ThumbSize / 2, Height / 2 - TrackHeight / 2, uw - lw, TrackHeight));
 
-        // Thumbs
         _lowerThumb.TranslationX = lw;
         _lowerThumb.TranslationY = centerY;
 

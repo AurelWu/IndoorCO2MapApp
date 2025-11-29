@@ -10,15 +10,23 @@
             Text="Building Recording Debug Page"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
-
+        <Button Text="Generate Random Data"
+        Clicked="OnGenerateRandomDataClicked"
+        HorizontalOptions="Fill" />
+        <StackLayout>
+            <controls:LineChartView x:Name="lineChartView" HeightRequest="150" WidthRequest="400" />
+        </StackLayout>
         <controls:RangeSlider
-    x:Name="MyRangeSlider"
+    x:Name="TrimSilder"
     Minimum="0"
     Maximum="20"
-    LowerValue="5"
-    UpperValue="15"
+    LowerValue="2"
+    UpperValue="5"
     ThumbSize="30"
-    TrackHeight="12"
+    TrackHeight="15"
+    TrackColor="LightGray"
+    HighlightColor="DodgerBlue"
+    WidthRequest="400"
     HeightRequest="60"/>
 
     </VerticalStackLayout>
