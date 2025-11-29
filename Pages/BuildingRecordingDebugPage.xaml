@@ -12,13 +12,14 @@
             HorizontalOptions="Center" />
 
         <controls:RangeSlider
-        x:Name="MyRangeSlider"
-        Minimum="0"
-        Maximum="20"
-        LowerValue="5"
-        UpperValue="10"
-        ShowLabels="True"
-        HeightRequest="60"/>
+    x:Name="MyRangeSlider"
+    Minimum="0"
+    Maximum="20"
+    LowerValue="5"
+    UpperValue="15"
+    ThumbSize="30"
+    TrackHeight="12"
+    HeightRequest="60"/>
 
     </VerticalStackLayout>
 </local:AppPage>
