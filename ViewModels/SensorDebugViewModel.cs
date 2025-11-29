@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
-    public partial class SensorDebugPageViewModel :ObservableObject
+    public partial class DebugSensorPageViewModel :ObservableObject
     {
         private readonly BLEDeviceManager _bluetoothManager;
 
-        public SensorDebugPageViewModel()
+        public DebugSensorPageViewModel()
         {
             _bluetoothManager = BLEDeviceManager.Instance;
 

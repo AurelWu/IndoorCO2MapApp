@@ -70,7 +70,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Pages\AppPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\BuildingMeasurementPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\DebugBLEPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\DebugMainMenu.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\HistoryPage.xaml">
@@ -79,10 +88,10 @@
 	  <MauiXaml Update="Pages\MapPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\OverpassRequestDebugPage.xaml">
+	  <MauiXaml Update="Pages\DebugOverpassRequestPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\SensorDebugPage.xaml">
+	  <MauiXaml Update="Pages\DebugSensorPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\SettingsPage.xaml">
@@ -98,8 +107,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Pages\BuildingRecordingDebugPage.xaml.cs">
-	    <DependentUpon>BuildingRecordingDebugPage.xaml</DependentUpon>
+	  <Compile Update="Pages\DebugBuildingRecordingPage.xaml.cs">
+	    <DependentUpon>DebugBuildingRecordingPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Pages\DebugOverpassRequestPage.xaml.cs">
+	    <DependentUpon>DebugOverpassRequestPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Pages\DebugSensorPage.xaml.cs">
+	    <DependentUpon>DebugSensorPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

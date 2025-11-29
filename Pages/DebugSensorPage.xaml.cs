@@ -9,16 +9,16 @@ using System.Linq;
 
 namespace IndoorCO2MapAppV2.Pages
 {
-    public partial class SensorDebugPage : AppPage
+    public partial class DebugSensorPage : AppPage
     {
-        private readonly SensorDebugPageViewModel _viewModel;
+        private readonly DebugSensorPageViewModel _viewModel;
 
-        public SensorDebugPage()
+        public DebugSensorPage()
         {
             InitializeComponent();
 
             // Create the viewmodel and set as binding context
-            _viewModel = new SensorDebugPageViewModel();
+            _viewModel = new DebugSensorPageViewModel();
             BindingContext = _viewModel;
 
             // Bind device list

@@ -3,7 +3,7 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
                xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
-               x:Class="IndoorCO2MapAppV2.Pages.OverpassRequestDebugPage"
+               x:Class="IndoorCO2MapAppV2.Pages.DebugOverpassRequestPage"
                x:Name="ThisPage"
                Title="Overpass Request Debug">
 
@@ -87,9 +87,9 @@
             <Button Text="Search Transit Lines"
                     Clicked="OnSearchTransitLinesClicked" />
 
-            <Button Text="Main Menu"
+            <Button Text="Debug Menu"
                     Clicked="OnNavigateClicked"
-                    CommandParameter="///home" />
+                    CommandParameter="///debugMainMenu" />
 
         </VerticalStackLayout>
 

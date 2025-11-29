@@ -5,14 +5,14 @@ using Microsoft.Maui.Controls;
 
 namespace IndoorCO2MapAppV2.Pages
 {
-    public partial class OverpassRequestDebugPage : AppPage
+    public partial class DebugOverpassRequestPage : AppPage
     {
         private static OverpassDataFetcher Fetcher => OverpassDataFetcher.Instance;
         public static OverpassFetchState FetcherState => Fetcher.State;
 
         private bool _sortByDistance = true;
 
-        public OverpassRequestDebugPage()
+        public DebugOverpassRequestPage()
         {
             InitializeComponent();
             BindingContext = FetcherState;

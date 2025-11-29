@@ -36,15 +36,18 @@
 
     <ShellContent
         Route="sensorDebug"
-        ContentTemplate="{DataTemplate pages:SensorDebugPage}" />
+        ContentTemplate="{DataTemplate pages:DebugSensorPage}" />
 
     <ShellContent
         Route="overpassDebug"
-        ContentTemplate="{DataTemplate pages:OverpassRequestDebugPage}" />
+        ContentTemplate="{DataTemplate pages:DebugOverpassRequestPage}" />
 
     <ShellContent
         Route="buildingRecordingDebug"
-        ContentTemplate="{DataTemplate pages:BuildingRecordingDebugPage}" />
+        ContentTemplate="{DataTemplate pages:DebugBuildingRecordingPage}" />
+    <ShellContent
+        Route="debugMainMenu"
+        ContentTemplate="{DataTemplate pages:DebugMainMenu}" />
 
 
 

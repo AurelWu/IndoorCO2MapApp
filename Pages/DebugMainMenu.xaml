@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IndoorCO2MapAppV2.Pages.DebugMainMenu"
+             Title="DebugMainMenu">
+    <VerticalStackLayout Spacing="25">
+        <Label 
+            Text="Debug Main Menu"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="Sensor Debug" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
+        <Button Text="Overpass Debug" Clicked="OnNavigateClicked" CommandParameter="///overpassDebug" HorizontalOptions="Fill"/>
+        <Button Text="Building Recording Debug" Clicked="OnNavigateClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
+    </VerticalStackLayout>
+</local:AppPage>

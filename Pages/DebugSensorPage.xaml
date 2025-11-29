@@ -3,7 +3,7 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
                xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
-               x:Class="IndoorCO2MapAppV2.Pages.SensorDebugPage"
+               x:Class="IndoorCO2MapAppV2.Pages.DebugSensorPage"
                Title="Sensor Debug">
 
     <!-- Resources -->
@@ -17,9 +17,9 @@
 
     <VerticalStackLayout Padding="10" Spacing="10">
 
-        <Button Text="Main Menu"
+        <Button Text="Debug Menu"
                 Clicked="OnNavigateClicked"
-                CommandParameter="///home"
+                CommandParameter="///debugMainMenu"
                 HorizontalOptions="Fill"/>
 
         <Label Text="Select Monitor Type:" FontAttributes="Bold"/>

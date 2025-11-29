@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="IndoorCO2MapAppV2.Pages.AppPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ContentPage.ControlTemplate>
+        <ControlTemplate>
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Top status bar visible on all pages inheriting from AppPage -->
+                <HorizontalStackLayout Padding="10" Spacing="10" Grid.Row="0">
+                    <Label x:Name="BluetoothLabel" Text="BLE Status: TODO" />
+                    <Label x:Name="Separator" Text="|" />
+                    <Label x:Name="GpsLabel" Text="GPS Status : TODO" />
+                </HorizontalStackLayout>
+
+                <!-- Child page content injected here -->
+                <ContentPresenter Grid.Row="1" />
+
+            </Grid>
+        </ControlTemplate>
+    </ContentPage.ControlTemplate>
+
+</ContentPage>

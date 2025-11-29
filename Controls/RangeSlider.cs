@@ -6,6 +6,9 @@ namespace IndoorCO2MapAppV2.Controls;
 
 public partial class RangeSlider : ContentView
 {
+    //event which is triggered when the rangeSlider gets changed
+    public event EventHandler? RangeChanged;
+
     // Bindable properties
     public static readonly BindableProperty MinimumProperty =
         BindableProperty.Create(nameof(Minimum), typeof(int), typeof(RangeSlider), 0, propertyChanged: OnMinimumChanged);
@@ -123,7 +126,8 @@ public partial class RangeSlider : ContentView
         if (slider.UpperValue < slider.LowerValue + 1)
             slider.UpperValue = slider.LowerValue + 1;
 
-        slider.UpdateLayoutPositions();   // <--- REQUIRED
+        slider.UpdateLayoutPositions();   
+        slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
     private static void OnMaximumChanged(BindableObject bindable, object oldValue, object newValue)
@@ -139,7 +143,8 @@ public partial class RangeSlider : ContentView
         if (slider.LowerValue > slider.UpperValue - 1)
             slider.LowerValue = slider.UpperValue - 1;
 
-        slider.UpdateLayoutPositions();   // <--- REQUIRED
+        slider.UpdateLayoutPositions();
+        slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
 
@@ -158,6 +163,7 @@ public partial class RangeSlider : ContentView
         // Update only if value actually changes (prevents callback loops)
         if (corrected != lower)
             slider.LowerValue = corrected;
+        slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
     private static void OnUpperValueChanged(BindableObject bindable, object oldValue, object newValue)
@@ -175,6 +181,7 @@ public partial class RangeSlider : ContentView
         // Update only if value actually changes (avoids callback loops)
         if (corrected != upper)
             slider.UpperValue = corrected;
+        slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
 

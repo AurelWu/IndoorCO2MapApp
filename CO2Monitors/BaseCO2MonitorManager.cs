@@ -50,6 +50,7 @@ internal abstract class BaseCO2MonitorManager : IAsyncDisposable
 
     protected static async Task<IService?> TryGetServiceAsync(IDevice device, Guid uuid)
     {
+        if (device == null) return null;
         for (int i = 0; i < RetryCount; i++)
         {
             var svc = await device.GetServiceAsync(uuid);

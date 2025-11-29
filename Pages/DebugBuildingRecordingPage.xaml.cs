@@ -3,9 +3,10 @@ using IndoorCO2MapAppV2.CO2Monitors;
 
 namespace IndoorCO2MapAppV2.Pages
 {
-	public partial class BuildingRecordingDebugPage : AppPage
+	public partial class DebugBuildingRecordingPage : AppPage
 	{
-		public BuildingRecordingDebugPage()
+        List<CO2Reading> _currentData = [];
+		public DebugBuildingRecordingPage()
 		{
 			InitializeComponent();			
 			List<CO2Reading> mockData = [];
@@ -16,9 +17,20 @@ namespace IndoorCO2MapAppV2.Pages
             mockData.Add(new CO2Reading(750, 4, DateTime.Now));
             mockData.Add(new CO2Reading(550, 5, DateTime.Now));
             mockData.Add(new CO2Reading(625, 6, DateTime.Now));
-			lineChartView.SetData(mockData,0,mockData.Count-1);
+            _currentData = mockData;
+			lineChartView.SetData(mockData,TrimSilder.LowerValue,TrimSilder.UpperValue);
 			TrimSilder.Maximum = mockData.Count - 1;
 		}
+
+        private void OnTrimChanged(object sender, EventArgs e)
+        {
+            if (TrimSilder == null) return;
+            lineChartView.SetData(
+                _currentData,
+                TrimSilder.LowerValue,
+                TrimSilder.UpperValue
+            );
+        }
 
         private void OnGenerateRandomDataClicked(object sender, EventArgs e)
         {
@@ -33,9 +45,10 @@ namespace IndoorCO2MapAppV2.Pages
 			{
 				mockData.Add(new CO2Reading((int)Random.Shared.NextInt64(450, 2500), i, DateTime.Now));
 			}
-			lineChartView.SetData(mockData,0,mockData.Count-1);
+            _currentData = mockData;
+            lineChartView.SetData(mockData, TrimSilder.LowerValue, TrimSilder.UpperValue);
             TrimSilder.Maximum = mockData.Count - 1;
-			TrimSilder.Minimum = 0;
+			TrimSilder.Minimum = 0;			
         }
 	}
 }
