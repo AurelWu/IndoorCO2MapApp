@@ -2,6 +2,7 @@ using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using Microsoft.Maui.Controls;
+using System.Globalization;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -38,9 +39,9 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async Task<bool> GetBuildingLocationsAsync()
         {
-            double longitude = double.Parse(LongitudeEntry.Text);
-            double latitude = double.Parse(LatitudeEntry.Text);
-            double range = double.Parse(RangeEntry.Text);
+            double longitude = double.Parse(LongitudeEntry.Text,CultureInfo.InvariantCulture);
+            double latitude = double.Parse(LatitudeEntry.Text, CultureInfo.InvariantCulture);
+            double range = double.Parse(RangeEntry.Text, CultureInfo.InvariantCulture);
 
             string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(latitude, longitude, range);
 
