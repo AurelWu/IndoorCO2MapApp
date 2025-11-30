@@ -5,7 +5,7 @@ using System.Timers;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
-    public class StatusViewModel : INotifyPropertyChanged
+    public partial class StatusViewModel : INotifyPropertyChanged
     {
         // Singleton instance for app-wide usage
         private static StatusViewModel? _instance;
