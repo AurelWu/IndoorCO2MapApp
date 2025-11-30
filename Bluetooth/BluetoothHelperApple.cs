@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IndoorCO2MapAppV2.Bluetooth
+namespace IndoorCO2MapAppV2.Bluetooth 
 {
-    internal class BluetoothHelperApple
+    internal class BluetoothHelperApple : IBluetoothHelper
     {
         readonly CBCentralManager bluetoothManager;
         readonly CLLocationManager locationManager;
@@ -20,7 +20,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             locationManager = new CLLocationManager();
         }
 
-        public static bool CheckStatus()
+        public bool CheckStatus()
         {
             var status = CBManager.Authorization == CBManagerAuthorization.AllowedAlways
             ? PermissionStatus.Granted
@@ -56,7 +56,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             return await tcs.Task;
         }
 
-        public static void EnsureDeclared()
+        public void EnsureDeclared()
         {
             // Ensure Bluetooth and Location permissions are declared in Info.plist
             bool hasBluetoothUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSBluetoothAlwaysUsageDescription"));
@@ -68,7 +68,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             }
         }
 
-        public static async Task RequestBluetoothEnableAsync()
+        public async Task RequestBluetoothEnableAsync()
         {
             bool result = await Shell.Current.DisplayAlertAsync(
                 "Enable Bluetooth",
@@ -97,7 +97,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             return bluetoothManager.State == CBManagerState.PoweredOn;
         }
 
-        public static bool HasPermissionInManifest()
+        public bool HasPermissionInManifest()
         {
             // Ensure Bluetooth and Location permissions are declared in Info.plist
             bool hasBluetoothUsageDescription = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString("NSBluetoothAlwaysUsageDescription"));

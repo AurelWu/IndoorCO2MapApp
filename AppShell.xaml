@@ -11,7 +11,7 @@
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate pages:MainPage}"
-        Route="home" />
+        Route="home" /> 
 
     <!-- REGISTER ROUTES FOR OTHER PAGES -->
     <ShellContent

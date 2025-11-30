@@ -2,27 +2,51 @@
 <ContentPage
     x:Class="IndoorCO2MapAppV2.Pages.AppPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:util="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+    xmlns:pages="clr-namespace:IndoorCO2MapAppV2.Pages"
+    xmlns:vm="clr-namespace:IndoorCO2MapAppV2.ViewModels">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <util:BooleanToColorConverter x:Key="BooleanToColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <ContentPage.ControlTemplate>
         <ControlTemplate>
-            <Grid RowDefinitions="Auto,*">
+            <Grid RowDefinitions="Auto,*" 
+                  BindingContext="{x:Static vm:StatusViewModel.Instance}">
 
-                <!-- Top status bar visible on all pages inheriting from AppPage -->
-                <HorizontalStackLayout x:Name="StatusButtons"
-Spacing="10"
-HorizontalOptions="Center">
-                    <ImageButton x:Name="ButtonGPSStatus" Source="gps_icon_v2.png" Clicked="OnRequestGPSEnableDialog"  Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton x:Name="ButtonGPSPermission" Source="gps_icon_permission.png" Clicked="OnRequestGPSPermissionDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton x:Name="ButtonBluetoothStatus" Source="bluetoothstatus.png" Clicked="OnRequestBluetoothEnableDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton x:Name="ButtonBluetoothPermissions" Source="bluetoothscan.png" Clicked="OnRequestBluetoothPermissionsDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                <!-- Top status bar -->
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <ImageButton 
+                        Source="gps_icon_v2.png"
+                        BackgroundColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                        Clicked="OnRequestGPSEnableDialog"
+                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton 
+                        Source="gps_icon_permission.png"
+                        BackgroundColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                        Clicked="OnRequestGPSPermissionDialog"
+                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton 
+                        Source="bluetoothstatus.png"
+                        BackgroundColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                        Clicked="OnRequestBluetoothEnableDialog"
+                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton 
+                        Source="bluetoothscan.png"
+                        BackgroundColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                        Clicked="OnRequestBluetoothPermissionsDialog"
+                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
                 </HorizontalStackLayout>
 
-                <!-- Child page content injected here -->
+
+                <!-- Child page content -->
                 <ContentPresenter Grid.Row="1" />
 
             </Grid>
         </ControlTemplate>
     </ContentPage.ControlTemplate>
-
 </ContentPage>

@@ -1,13 +1,43 @@
+using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.ExtensionMethods;
 
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class AppPage : ContentPage
     {
+
+        private readonly IBluetoothHelper bluetoothHelper;
+
+        // References to template controls
+        private ImageButton ButtonBluetoothStatus = null!; //set in OnApplyTemplate
+        private ImageButton ButtonBluetoothPermissions = null!;
+        private ImageButton ButtonGPSStatus = null!;
+        private ImageButton ButtonGPSPermission = null!;
         public AppPage()
         {
-            InitializeComponent(); 
+            InitializeComponent();
+            bluetoothHelper = BluetoothPlatformProvider.Create();
         }
+
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            // Get references from ControlTemplate
+            ButtonBluetoothStatus =
+                this.FindByName<ImageButton>("ButtonBluetoothStatus");
+
+            ButtonBluetoothPermissions =
+                this.FindByName<ImageButton>("ButtonBluetoothPermissions");
+
+            ButtonGPSStatus =
+                this.FindByName<ImageButton>("ButtonGPSStatus");
+
+            ButtonGPSPermission =
+                this.FindByName<ImageButton>("ButtonGPSPermission");
+
+        }
+
 
         private void OnNavigateClicked(object sender, EventArgs e)
         {
@@ -22,10 +52,6 @@ namespace IndoorCO2MapAppV2.Pages
             await Shell.Current.GoToAsync(route);
         }
 
-        //protected void SetPageContent(View view)
-        //{
-        //    PageContent.Content = view;
-        //}
 
         private void OnRequestGPSEnableDialog(object sender, EventArgs e)
         {
@@ -45,6 +71,6 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnRequestBluetoothPermissionsDialog(object sender, EventArgs e)
         {
 
-        }
+        }        
     }
 }
