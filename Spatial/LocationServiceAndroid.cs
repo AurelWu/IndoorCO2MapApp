@@ -34,6 +34,12 @@ namespace IndoorCO2MapAppV2.Spatial
 
         public async Task<bool> ShowEnableGpsDialogAsync()
         {
+            var locationManager = (AndLoc.LocationManager?)Android.App.Application.Context
+                .GetSystemService(Context.LocationService);
+
+            bool enabled = locationManager?.IsProviderEnabled(AndLoc.LocationManager.GpsProvider) ?? false;
+            if (enabled) return true;
+
             // Get the current visible page
             var page = Application.Current!.Windows.FirstOrDefault()?.Page; //Application.Current should never be null, thats why "!" is used so the static analyser is happy.
             if (page == null)

@@ -80,7 +80,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             // Use singleton BLE helper
             var bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
             IsBluetoothOn = bluetoothHelper.CheckIfBTEnabled();
-            BluetoothPermissionGranted = bluetoothHelper.CheckStatus();
+            BluetoothPermissionGranted = bluetoothHelper.CheckPermissions();
 
             var locationHelper = LocationServicePlatformProvider.CreateOrUse();
             UpdateGpsStatusAsync(locationHelper).SafeFireAndForget();

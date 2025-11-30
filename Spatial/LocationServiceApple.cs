@@ -10,7 +10,7 @@ namespace IndoorCO2MapAppV2.Spatial
 {
     internal class LocationServiceApple : ILocationService
     {
-        CLLocationManager locationManager;
+        readonly CLLocationManager locationManager;
 
         public LocationServiceApple()
         {

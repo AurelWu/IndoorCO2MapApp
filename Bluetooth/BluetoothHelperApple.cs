@@ -20,7 +20,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             locationManager = new CLLocationManager();
         }
 
-        public bool CheckStatus()
+        public bool CheckPermissions()
         {
             var status = CBManager.Authorization == CBManagerAuthorization.AllowedAlways
             ? PermissionStatus.Granted
@@ -30,10 +30,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
             else return false;
         }
 
-        public async Task<PermissionStatus> RequestAsync()
+        public async Task<PermissionStatus> RequestPermissionsAsync()
         {
             // Check if Bluetooth and Location permissions are already granted
-            if (CheckStatus())
+            if (CheckPermissions())
                 return PermissionStatus.Granted;
 
             // Request Location permission

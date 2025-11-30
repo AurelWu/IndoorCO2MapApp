@@ -10,10 +10,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
         public bool CheckIfBTEnabled() => true;
 
         // No runtime permissions needed on Windows.
-        public bool CheckStatus() => true;
+        public bool CheckPermissions() => true;
 
         // Always granted.
-        public Task<PermissionStatus> RequestAsync()
+        public Task<PermissionStatus> RequestPermissionsAsync()
             => Task.FromResult(PermissionStatus.Granted);
 
         // Cannot open Windows Bluetooth settings automatically

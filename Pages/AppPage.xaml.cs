@@ -1,5 +1,6 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.Spatial;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -55,22 +56,23 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnRequestGPSEnableDialog(object sender, EventArgs e)
         {
-
+            //LocationServicePlatformProvider.CreateOrUse() => should probably be changed to just get instance of the singleton instead which then internally creates it if it doesnt already...)
+            LocationServicePlatformProvider.CreateOrUse().ShowEnableGpsDialogAsync().SafeFireAndForget();
         }
 
         private void OnRequestGPSPermissionDialog(object sender, EventArgs e)
         {
-
+            LocationServicePlatformProvider.CreateOrUse().RequestLocationPermissionAsync().SafeFireAndForget();
         }
 
         private void OnRequestBluetoothEnableDialog(object sender, EventArgs e)
         {
-
+            BluetoothPlatformProvider.CreateOrUse().RequestBluetoothEnableAsync().SafeFireAndForget();
         }
 
         private void OnRequestBluetoothPermissionsDialog(object sender, EventArgs e)
         {
-
+            BluetoothPlatformProvider.CreateOrUse().RequestPermissionsAsync().SafeFireAndForget();
         }        
     }
 }

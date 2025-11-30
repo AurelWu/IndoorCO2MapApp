@@ -3,8 +3,8 @@
     public interface IBluetoothHelper
     {
         bool CheckIfBTEnabled();
-        bool CheckStatus();
-        Task<PermissionStatus> RequestAsync();
+        bool CheckPermissions();
+        Task<PermissionStatus> RequestPermissionsAsync();
         Task RequestBluetoothEnableAsync();
         bool HasPermissionInManifest();
         void EnsureDeclared();

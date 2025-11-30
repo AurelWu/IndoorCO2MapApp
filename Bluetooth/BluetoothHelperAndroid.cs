@@ -40,13 +40,12 @@ namespace IndoorCO2MapAppV2.Bluetooth
         public bool CheckIfBTEnabled() => bluetoothAdapter?.IsEnabled ?? false;
 
         // Check if all required permissions are granted
-        public bool CheckStatus()
+        public bool CheckPermissions()
         {
             // Basic permissions
             var permissions = new[]
             {
                 Android.Manifest.Permission.Bluetooth,
-                Android.Manifest.Permission.BluetoothAdmin,
                 Android.Manifest.Permission.AccessFineLocation
             };
 
@@ -55,8 +54,6 @@ namespace IndoorCO2MapAppV2.Bluetooth
             {
                 permissions =
                 [
-                    Android.Manifest.Permission.Bluetooth,
-                    Android.Manifest.Permission.BluetoothAdmin,
                     Android.Manifest.Permission.AccessFineLocation,
                     Android.Manifest.Permission.BluetoothConnect,
                     Android.Manifest.Permission.BluetoothScan
@@ -73,9 +70,9 @@ namespace IndoorCO2MapAppV2.Bluetooth
         }
 
         // Request runtime permissions
-        public async Task<PermissionStatus> RequestAsync()
+        public async Task<PermissionStatus> RequestPermissionsAsync()
         {
-            if (CheckStatus())
+            if (CheckPermissions())
                 return PermissionStatus.Granted;
 
             // Request Location
