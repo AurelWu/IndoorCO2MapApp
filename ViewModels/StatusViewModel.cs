@@ -1,4 +1,7 @@
-﻿using System;
+﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.Spatial;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Timers;
@@ -66,7 +69,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         private void StatusTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             // This runs on a background thread, so use MainThread for UI updates
-            Microsoft.Maui.ApplicationModel.MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
                 UpdateStatus();
             });
@@ -74,15 +77,42 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private void UpdateStatus()
         {
-            // Here you check your actual hardware status
-            var bluetoothHelper = IndoorCO2MapAppV2.Bluetooth.BluetoothPlatformProvider.Create();
-
+            // Use singleton BLE helper
+            var bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
             IsBluetoothOn = bluetoothHelper.CheckIfBTEnabled();
             BluetoothPermissionGranted = bluetoothHelper.CheckStatus();
 
-            // Example GPS checks (replace with actual implementation)
-            IsGpsOn = true; // TODO: query device GPS
-            GpsPermissionGranted = true; // TODO: query permissions
+            var locationHelper = LocationServicePlatformProvider.CreateOrUse();
+            UpdateGpsStatusAsync(locationHelper).SafeFireAndForget();
         }
+
+        private async Task UpdateGpsStatusAsync(ILocationService locationHelper)
+        {
+            try
+            {
+                bool gpsOn = await locationHelper.IsGpsEnabledAsync();
+                bool permGranted = await locationHelper.HasLocationPermissionAsync();
+
+                // Update UI on main thread
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    IsGpsOn = gpsOn;
+                    GpsPermissionGranted = permGranted;
+                });
+            }
+            catch (Exception ex)
+            {
+                // fallback in case something fails (maybe we should just do nothing instead, but lets try)
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    IsGpsOn = false;
+                    GpsPermissionGranted = false;
+                });
+
+                Console.WriteLine($"UpdateGpsStatusAsync failed: {ex.Message}");
+            }
+        }
+
+
     }
 }

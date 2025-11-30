@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
+using IndoorCO2MapAppV2.Spatial;
+using IndoorCO2MapAppV2.Bluetooth;
+using Microsoft.Extensions.Logging;
 
 
 namespace IndoorCO2MapAppV2

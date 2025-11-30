@@ -6,7 +6,7 @@ namespace IndoorCO2MapAppV2.Pages
     public partial class AppPage : ContentPage
     {
 
-        private readonly IBluetoothHelper bluetoothHelper;
+        //private readonly IBluetoothHelper bluetoothHelper;
 
         // References to template controls
         private ImageButton ButtonBluetoothStatus = null!; //set in OnApplyTemplate
@@ -16,7 +16,7 @@ namespace IndoorCO2MapAppV2.Pages
         public AppPage()
         {
             InitializeComponent();
-            bluetoothHelper = BluetoothPlatformProvider.Create();
+            //bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
         }
 
         protected override void OnApplyTemplate()

@@ -1,18 +1,22 @@
-﻿
-
-namespace IndoorCO2MapAppV2.Bluetooth
+﻿namespace IndoorCO2MapAppV2.Bluetooth
 {
     public static class BluetoothPlatformProvider
     {
-        public static IBluetoothHelper Create()
+        private static IBluetoothHelper? _instance;
+
+        public static IBluetoothHelper CreateOrUse()
         {
+            if (_instance != null)
+                return _instance;
+
 #if ANDROID
-        return new BluetoothHelperAndroid();
+            _instance = new BluetoothHelperAndroid();
 #elif IOS
-            return new BluetoothHelperApple();
+            _instance = new BluetoothHelperApple();
 #else
-        return new BluetoothHelperDefault();   
+            _instance = new BluetoothHelperDefault();
 #endif
+            return _instance;
         }
     }
 }
