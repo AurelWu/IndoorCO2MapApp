@@ -9,10 +9,13 @@
             <Grid RowDefinitions="Auto,*">
 
                 <!-- Top status bar visible on all pages inheriting from AppPage -->
-                <HorizontalStackLayout Padding="10" Spacing="10" Grid.Row="0">
-                    <Label x:Name="BluetoothLabel" Text="BLE Status: TODO" />
-                    <Label x:Name="Separator" Text="|" />
-                    <Label x:Name="GpsLabel" Text="GPS Status : TODO" />
+                <HorizontalStackLayout x:Name="StatusButtons"
+Spacing="10"
+HorizontalOptions="Center">
+                    <ImageButton x:Name="ButtonGPSStatus" Source="gps_icon_v2.png" Clicked="OnRequestGPSEnableDialog"  Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton x:Name="ButtonGPSPermission" Source="gps_icon_permission.png" Clicked="OnRequestGPSPermissionDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton x:Name="ButtonBluetoothStatus" Source="bluetoothstatus.png" Clicked="OnRequestBluetoothEnableDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+                    <ImageButton x:Name="ButtonBluetoothPermissions" Source="bluetoothscan.png" Clicked="OnRequestBluetoothPermissionsDialog" Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
                 </HorizontalStackLayout>
 
                 <!-- Child page content injected here -->

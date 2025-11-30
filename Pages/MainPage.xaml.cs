@@ -2,7 +2,7 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
 
-namespace IndoorCO2MapAppV2
+namespace IndoorCO2MapAppV2.Pages
 {
     public partial class MainPage : AppPage
     {

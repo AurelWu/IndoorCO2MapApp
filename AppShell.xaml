@@ -10,7 +10,7 @@
     <!-- HOME -->
     <ShellContent
         Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
+        ContentTemplate="{DataTemplate pages:MainPage}"
         Route="home" />
 
     <!-- REGISTER ROUTES FOR OTHER PAGES -->

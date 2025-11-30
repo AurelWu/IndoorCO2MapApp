@@ -26,5 +26,25 @@ namespace IndoorCO2MapAppV2.Pages
         //{
         //    PageContent.Content = view;
         //}
+
+        private void OnRequestGPSEnableDialog(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnRequestGPSPermissionDialog(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnRequestBluetoothEnableDialog(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnRequestBluetoothPermissionsDialog(object sender, EventArgs e)
+        {
+
+        }
     }
 }

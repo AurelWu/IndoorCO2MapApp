@@ -2,7 +2,7 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-             x:Class="IndoorCO2MapAppV2.MainPage"
+             x:Class="IndoorCO2MapAppV2.Pages.MainPage"
              Title="Home">
 
     <ScrollView>
