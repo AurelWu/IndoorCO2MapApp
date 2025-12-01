@@ -16,6 +16,7 @@
         </ResourceDictionary>
     </local:AppPage.Resources>
 
+    <ScrollView>
     <VerticalStackLayout Padding="20" Spacing="16">
 
         <Label Text="Debug Page Overpass Request"
@@ -47,6 +48,10 @@
 
         <!-- ACTION BUTTONS -->
         <VerticalStackLayout Spacing="10">
+
+            <Button x:Name="GetGPSPositionButton"
+                    Text="Get Current Position"                    
+                    Clicked="OnGetGPSPositionClicked" />
 
             <Button x:Name="SearchBuildingsButton"
                     Text="{Binding IsFetching, Converter={StaticResource FetchButtonTextConverter}}"
@@ -94,5 +99,6 @@
         </VerticalStackLayout>
 
     </VerticalStackLayout>
+    </ScrollView>
 
 </local:AppPage>

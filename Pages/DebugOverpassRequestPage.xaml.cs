@@ -32,6 +32,21 @@ namespace IndoorCO2MapAppV2.Pages
             };
         }
 
+        private void OnGetGPSPositionClicked(object sender, EventArgs e)
+        {
+            GetGPSPositionAsync().SafeFireAndForget();
+        }
+
+        private async Task GetGPSPositionAsync()
+        {
+            var result = await LocationServicePlatformProvider.CreateOrUse().GetCurrentLocationAsync();
+            if(result != null) 
+            {
+                LatitudeEntry.Text = result.Latitude.ToString(CultureInfo.InvariantCulture);
+                LongitudeEntry.Text = result.Longitude.ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
         private void OnSearchBuildingsClicked(object sender, EventArgs e)
         {
             GetBuildingLocationsAsync().SafeFireAndForget();
