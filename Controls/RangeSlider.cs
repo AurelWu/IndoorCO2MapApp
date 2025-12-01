@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Layouts;
 
 namespace IndoorCO2MapAppV2.Controls;
 
@@ -62,7 +63,8 @@ public partial class RangeSlider : ContentView
         StrokeThickness = 1
     };
 
-    private readonly AbsoluteLayout _layout = [];
+    private readonly AbsoluteLayout _layout = new();
+    private bool _isInitialized = false;
 
     public RangeSlider()
     {
@@ -70,11 +72,27 @@ public partial class RangeSlider : ContentView
         UpdateTrackHeight();
         UpdateTrackColors();
 
-        // Add elements
+        // Set explicit layout flags for cross-platform consistency
+        AbsoluteLayout.SetLayoutFlags(_track, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutFlags(_highlight, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutFlags(_lowerThumb, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutFlags(_upperThumb, AbsoluteLayoutFlags.None);
+
         _layout.Children.Add(_track);
         _layout.Children.Add(_highlight);
         _layout.Children.Add(_lowerThumb);
         _layout.Children.Add(_upperThumb);
+
+        // Listen to layout's size changes for reliable initialization
+        _layout.SizeChanged += (s, e) =>
+        {
+            if (_layout.Width > 0 && _layout.Height > 0 && !_isInitialized)
+            {
+                _isInitialized = true;
+                UpdateLayoutPositions();
+            }
+        };
+
         Content = _layout;
 
         // Gesture recognizers
@@ -85,9 +103,6 @@ public partial class RangeSlider : ContentView
         var upperPan = new PanGestureRecognizer();
         upperPan.PanUpdated += OnUpperPan;
         _upperThumb.GestureRecognizers.Add(upperPan);
-
-        Loaded += (_, __) => UpdateLayoutPositions();
-        SizeChanged += (_, __) => UpdateLayoutPositions();
     }
 
     // -----------------------------
@@ -126,7 +141,7 @@ public partial class RangeSlider : ContentView
         if (slider.UpperValue < slider.LowerValue + 1)
             slider.UpperValue = slider.LowerValue + 1;
 
-        slider.UpdateLayoutPositions();   
+        slider.UpdateLayoutPositions();
         slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
@@ -162,7 +177,12 @@ public partial class RangeSlider : ContentView
 
         // Update only if value actually changes (prevents callback loops)
         if (corrected != lower)
+        {
             slider.LowerValue = corrected;
+            return;
+        }
+
+        slider.UpdateLayoutPositions();
         slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
@@ -180,7 +200,12 @@ public partial class RangeSlider : ContentView
 
         // Update only if value actually changes (avoids callback loops)
         if (corrected != upper)
+        {
             slider.UpperValue = corrected;
+            return;
+        }
+
+        slider.UpdateLayoutPositions();
         slider.RangeChanged?.Invoke(slider, EventArgs.Empty);
     }
 
@@ -215,37 +240,85 @@ public partial class RangeSlider : ContentView
     // -----------------------------
     // Pan logic
     // -----------------------------
-    private double _startLowerX;
-    private double _startUpperX;
+    private double _dragStartLowerPos;
+    private double _dragStartUpperPos;
+    private bool _isDragging = false;
 
     private void OnLowerPan(object? sender, PanUpdatedEventArgs e)
     {
-        if (_layout.Width <= 0) return;
+        if (!_isInitialized || _layout.Width <= 0) return;
 
-        if (e.StatusType == GestureStatus.Started) _startLowerX = _lowerThumb.TranslationX;
+        double trackWidth = _layout.Width - ThumbSize;
 
-        if (e.StatusType == GestureStatus.Running)
+        if (e.StatusType == GestureStatus.Started)
         {
-            double trackWidth = _layout.Width - ThumbSize;
-            double newX = Math.Clamp(_startLowerX + e.TotalX, 0, _upperThumb.TranslationX);
-            LowerValue = PositionToValue(newX, trackWidth);
+            _isDragging = true;
+            _dragStartLowerPos = ValueToPosition(LowerValue, trackWidth);
+        }
+        else if (e.StatusType == GestureStatus.Running)
+        {
+            double upperPos = ValueToPosition(UpperValue, trackWidth);
+            double newPos = Math.Clamp(_dragStartLowerPos + e.TotalX, 0, upperPos - 1);
+            int newValue = PositionToValue(newPos, trackWidth);
+
+            if (newValue != LowerValue)
+            {
+                LowerValue = newValue;
+                UpdateThumbPositionsDuringDrag();
+            }
+        }
+        else if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
+        {
+            _isDragging = false;
             UpdateLayoutPositions();
         }
     }
 
     private void OnUpperPan(object? sender, PanUpdatedEventArgs e)
     {
-        if (_layout.Width <= 0) return;
+        if (!_isInitialized || _layout.Width <= 0) return;
 
-        if (e.StatusType == GestureStatus.Started) _startUpperX = _upperThumb.TranslationX;
+        double trackWidth = _layout.Width - ThumbSize;
 
-        if (e.StatusType == GestureStatus.Running)
+        if (e.StatusType == GestureStatus.Started)
         {
-            double trackWidth = _layout.Width - ThumbSize;
-            double newX = Math.Clamp(_startUpperX + e.TotalX, _lowerThumb.TranslationX, trackWidth);
-            UpperValue = PositionToValue(newX, trackWidth);
+            _isDragging = true;
+            _dragStartUpperPos = ValueToPosition(UpperValue, trackWidth);
+        }
+        else if (e.StatusType == GestureStatus.Running)
+        {
+            double lowerPos = ValueToPosition(LowerValue, trackWidth);
+            double newPos = Math.Clamp(_dragStartUpperPos + e.TotalX, lowerPos + 1, trackWidth);
+            int newValue = PositionToValue(newPos, trackWidth);
+
+            if (newValue != UpperValue)
+            {
+                UpperValue = newValue;
+                UpdateThumbPositionsDuringDrag();
+            }
+        }
+        else if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
+        {
+            _isDragging = false;
             UpdateLayoutPositions();
         }
+    }
+
+    // Update only thumb positions during drag for smoother performance
+    private void UpdateThumbPositionsDuringDrag()
+    {
+        if (!_isInitialized || _layout.Width <= 0 || _layout.Height <= 0) return;
+
+        double trackWidth = _layout.Width - ThumbSize;
+        double lowerPos = ValueToPosition(LowerValue, trackWidth);
+        double upperPos = ValueToPosition(UpperValue, trackWidth);
+        double centerY = _layout.Height / 2 - ThumbSize / 2;
+        double trackCenterY = _layout.Height / 2 - TrackHeight / 2;
+
+        // Update thumb and highlight positions only
+        AbsoluteLayout.SetLayoutBounds(_lowerThumb, new Rect(lowerPos, centerY, ThumbSize, ThumbSize));
+        AbsoluteLayout.SetLayoutBounds(_upperThumb, new Rect(upperPos, centerY, ThumbSize, ThumbSize));
+        AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lowerPos + ThumbSize / 2, trackCenterY, upperPos - lowerPos, TrackHeight));
     }
 
     // -----------------------------
@@ -254,28 +327,68 @@ public partial class RangeSlider : ContentView
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-        UpdateLayoutPositions();
+
+        // Additional trigger for layout when ContentView gets its size
+        if (width > 0 && height > 0 && _layout.Width > 0 && _layout.Height > 0)
+        {
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+            }
+            UpdateLayoutPositions();
+        }
     }
 
     private void UpdateLayoutPositions()
     {
-        if (_layout.Width <= 0) return;
+        // Must check both ContentView size and internal layout size
+        if (_isDragging || _layout.Width <= 0 || _layout.Height <= 0)
+            return;
+
+        // Force initialization if we have valid dimensions
+        if (!_isInitialized && _layout.Width > 0 && _layout.Height > 0)
+        {
+            _isInitialized = true;
+        }
+
+        if (!_isInitialized) return;
 
         double trackWidth = _layout.Width - ThumbSize;
+        double lowerPos = ValueToPosition(LowerValue, trackWidth);
+        double upperPos = ValueToPosition(UpperValue, trackWidth);
+        double centerY = _layout.Height / 2 - ThumbSize / 2;
+        double trackCenterY = _layout.Height / 2 - TrackHeight / 2;
 
-        double lw = ValueToPosition(LowerValue, trackWidth);
-        double uw = ValueToPosition(UpperValue, trackWidth);
+        // Update all elements
+        AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, trackCenterY, _layout.Width, TrackHeight));
+        AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lowerPos + ThumbSize / 2, trackCenterY, upperPos - lowerPos, TrackHeight));
+        AbsoluteLayout.SetLayoutBounds(_lowerThumb, new Rect(lowerPos, centerY, ThumbSize, ThumbSize));
+        AbsoluteLayout.SetLayoutBounds(_upperThumb, new Rect(upperPos, centerY, ThumbSize, ThumbSize));
+    }
 
-        double centerY = Height / 2 - ThumbSize / 2;
-
-        AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, Height / 2 - TrackHeight / 2, _layout.Width, TrackHeight));
-        AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lw + ThumbSize / 2, Height / 2 - TrackHeight / 2, uw - lw, TrackHeight));
-
-        _lowerThumb.TranslationX = lw;
-        _lowerThumb.TranslationY = centerY;
-
-        _upperThumb.TranslationX = uw;
-        _upperThumb.TranslationY = centerY;
+    // -----------------------------
+    // Public Methods
+    // -----------------------------
+    public new void ForceLayout()
+    {
+        // Force initialization even if layout hasn't reported size yet
+        if (_layout.Width > 0 && _layout.Height > 0)
+        {
+            _isInitialized = true;
+            UpdateLayoutPositions();
+        }
+        else
+        {
+            // Queue the layout for when size becomes available
+            Dispatcher.Dispatch(() =>
+            {
+                if (_layout.Width > 0 && _layout.Height > 0)
+                {
+                    _isInitialized = true;
+                    UpdateLayoutPositions();
+                }
+            });
+        }
     }
 
     // -----------------------------
@@ -284,6 +397,7 @@ public partial class RangeSlider : ContentView
     private double ValueToPosition(int value, double trackWidth)
     {
         double range = Maximum - Minimum;
+        if (range <= 0) return 0;
         return (value - Minimum) / range * trackWidth;
     }
 

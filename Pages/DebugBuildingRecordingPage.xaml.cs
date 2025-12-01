@@ -18,9 +18,10 @@ namespace IndoorCO2MapAppV2.Pages
             mockData.Add(new CO2Reading(550, 5, DateTime.Now));
             mockData.Add(new CO2Reading(625, 6, DateTime.Now));
             _currentData = mockData;
-			lineChartView.SetData(mockData,TrimSilder.LowerValue,TrimSilder.UpperValue);
 			TrimSilder.Maximum = mockData.Count - 1;
-		}
+			lineChartView.SetData(mockData,TrimSilder.LowerValue,TrimSilder.UpperValue);
+            TrimSilder.ForceLayout();
+        }
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
