@@ -2,15 +2,96 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
              x:Class="IndoorCO2MapAppV2.Pages.MainPage"
              Title="Home">
 
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="25">
 
-            <Label Text="Indoor CO₂ Map"
-                   FontSize="32"
-                   HorizontalOptions="Center" />
+
+            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+
+                <Picker x:Name="CO2MonitorPicker"
+            Grid.Column="0"
+            Title="{x:Static t:Localisation.MonitorSelectionLabel}"/>
+                <Button x:Name="RefreshButton"
+            Grid.Column="1"
+            Text="🔄"
+            WidthRequest="60"
+            HeightRequest="30"
+            CornerRadius="0"
+            VerticalOptions="End"
+            FontSize="20"
+            Margin="8,0,0,0" />
+            </Grid>
+            <!--SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/> needs to be changed  -->
+            <Label Text="TODO - Status Info About Sensor"  />
+
+            <HorizontalStackLayout
+                x:Name="SearchRangeStackLayout"
+                Spacing="5"
+                VerticalOptions="Start">
+                <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" LineBreakMode="WordWrap" VerticalOptions="Center" />
+                <StackLayout Orientation="Horizontal" Spacing="10" >
+                    <Label Text=" 100m" HorizontalOptions="Start" VerticalOptions="Center" />
+                    <RadioButton x:Name="RadioButton100m" GroupName="SearchRange" VerticalOptions="Center" HorizontalOptions="Start" />
+                    <Label Text=" 250m" HorizontalOptions="Start" VerticalOptions="Center" />
+                    <RadioButton x:Name="RadioButton250m" GroupName="SearchRange" VerticalOptions="Center" HorizontalOptions="Start" />
+                </StackLayout>
+            </HorizontalStackLayout>
+
+
+            <Grid x:Name="LocationUpdateGrid" ColumnDefinitions="3*,1*" HorizontalOptions="Fill" ColumnSpacing="10">
+                <Button
+                x:Name="UpdateLocationsButton"
+                Text="Update Locations"            
+                HorizontalOptions="Fill"
+                Grid.Column="0" />
+                <Button
+                x:Name="GetCachedLocationsButton"
+                Text="Get Cached Locations"
+                HorizontalOptions="Fill"
+                Grid.Column="1" />
+            </Grid>
+
+            <Label 
+                x:Name="LocationInfoLabel" 
+                Text="LocationSearchInfoText" 
+                FontSize="14" 
+                VerticalOptions="Center" />
+            
+            <Grid 
+        ColumnDefinitions="*, Auto" 
+        VerticalOptions="Center" 
+        HorizontalOptions="Fill">
+
+                <Border
+                    BackgroundColor="Transparent"
+                    Stroke="{SolidColorBrush #808080}"
+                    StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+                    <!-- Picker in the first column, takes up remaining space -->
+                    <Picker 
+            x:Name="LocationPicker" 
+            Grid.Column="0" 
+            VerticalOptions="Center" />
+                </Border>
+                <!-- Star Icon Toggle Button in the second column, with fixed width -->
+                <ImageButton 
+            x:Name="StarIconToggleBuilding"
+            Grid.Column="1" 
+            Source="star_icon.png" 
+            WidthRequest="30" 
+            HeightRequest="30" 
+            VerticalOptions="Center"
+            HorizontalOptions="End"
+            Margin="5,0,0,0"
+            BackgroundColor="Transparent" />
+
+            </Grid>
 
             <Button Text="Start Building" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
             <Button Text="Start Transit" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
