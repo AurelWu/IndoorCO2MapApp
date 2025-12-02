@@ -32,6 +32,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             };
         }
 
+#pragma warning disable IDE0079
+#pragma warning disable MVVMTK0045
+
         [ObservableProperty] private BaseCO2MonitorProvider? activeCO2MonitorProvider;
         [ObservableProperty] private BluetoothDeviceModel? selectedDevice;
         [ObservableProperty] private CO2MonitorType selectedMonitorType;
@@ -39,6 +42,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         [ObservableProperty] private int currentCO2;
         [ObservableProperty] private int updateInterval;
         [ObservableProperty] private List<ushort> co2History = [];
+
+#pragma warning restore MVVMTK0045
+#pragma warning restore IDE0079
 
         public ObservableCollection<BluetoothDeviceModel> Devices { get; }
 

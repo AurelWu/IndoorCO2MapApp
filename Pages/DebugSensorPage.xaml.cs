@@ -11,14 +11,14 @@ namespace IndoorCO2MapAppV2.Pages
 {
     public partial class DebugSensorPage : AppPage
     {
-        private readonly DebugSensorPageViewModel _viewModel;
+        private readonly SensorViewModel _viewModel;
 
         public DebugSensorPage()
         {
             InitializeComponent();
 
             // Create the viewmodel and set as binding context
-            _viewModel = new DebugSensorPageViewModel();
+            _viewModel = new SensorViewModel();
             BindingContext = _viewModel;
 
             // Bind device list
@@ -69,13 +69,23 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
-            SearchBluetoothDevices().SafeFireAndForget();
+            SearchBluetoothDevicesAsync().SafeFireAndForget();
         }
 
-        private async Task SearchBluetoothDevices()
+        private async Task SearchBluetoothDevicesAsync()
         {
             await _viewModel.StartScanAsync(_viewModel.SelectedMonitorType);
-            DevicePicker.ItemsSource = _viewModel.Devices.Select(d => d.Name).ToList();
+
+            var deviceNames = _viewModel.Devices.Select(d => d.Name).ToList();
+            DevicePicker.ItemsSource = deviceNames;
+
+            if (deviceNames.Count > 0)
+            {
+                DevicePicker.SelectedIndex = 0;
+
+                var firstDevice = _viewModel.Devices[0];
+                await _viewModel.SelectDeviceAsync(firstDevice);
+            }
         }
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)

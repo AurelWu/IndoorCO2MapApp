@@ -18,6 +18,7 @@
                 <Button x:Name="RefreshButton"
             Grid.Column="1"
             Text="🔄"
+            Clicked="OnRefreshSensorListClicked"
             WidthRequest="60"
             HeightRequest="30"
             CornerRadius="0"

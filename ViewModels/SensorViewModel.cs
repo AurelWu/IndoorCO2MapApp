@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
-    public partial class DebugSensorPageViewModel : ObservableObject
+    public partial class SensorViewModel : ObservableObject
     {
         private readonly CO2MonitorManager _monitorManager;
 
-        public DebugSensorPageViewModel()
+        public SensorViewModel()
         {
             _monitorManager = CO2MonitorManager.Instance;
 
