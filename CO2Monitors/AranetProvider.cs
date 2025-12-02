@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
     //TODO => Add method to calculate StartIndex of History based on current time, device interval, and start of recording
-    internal class AranetManager : BaseCO2MonitorManager
+    internal class AranetProvider : BaseCO2MonitorProvider
     {
         // UUIDs
         private static readonly Guid SERVICE_UUID = Guid.Parse("0000FCE0-0000-1000-8000-00805f9b34fb");
@@ -35,7 +35,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-            BLEDeviceManager.ActiveMonitorManager = this;
+            CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
             // Find new-version service, fall back to old
             _service =
                 await TryGetServiceAsync(device, SERVICE_UUID) ??

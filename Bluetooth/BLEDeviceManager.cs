@@ -6,6 +6,7 @@ using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Extensions;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Bluetooth
@@ -17,8 +18,6 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
         private readonly IBluetoothLE _ble;
         internal readonly IAdapter _adapter;
-
-        internal static BaseCO2MonitorManager? ActiveMonitorManager = null;
 
         internal ObservableCollection<BluetoothDeviceModel> Devices { get; } = [];
 
@@ -36,17 +35,16 @@ namespace IndoorCO2MapAppV2.Bluetooth
             }
         }
 
-        public event EventHandler<BluetoothDeviceModel>? DeviceDiscovered;
         public event PropertyChangedEventHandler? PropertyChanged;
+        public event EventHandler<BluetoothDeviceModel>? DeviceDiscovered;
 
         private BLEDeviceManager()
         {
-            _ble = CrossBluetoothLE.Current; // this should never be null on devices which have Bluetooth ( I think)
-            _adapter = CrossBluetoothLE.Current.Adapter; // this should never be null on devices which have Bluetooth ( I think)
-
+            _ble = CrossBluetoothLE.Current;
+            _adapter = CrossBluetoothLE.Current.Adapter;
         }
 
-        internal async Task StartScanningAsync(int scanDurationMs = 10000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
+        internal async Task StartScanningAsync(int scanDurationMs = 15000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
         {
             if (clearBeforeScan)
                 Devices.Clear();
@@ -56,27 +54,14 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             IsScanning = true;
 
-            using var cts = new CancellationTokenSource();
-            cts.CancelAfter(scanDurationMs);
+            using var cts = new CancellationTokenSource(scanDurationMs);
 
             void Handler(object? sender, DeviceEventArgs e)
             {
-                if (string.IsNullOrEmpty(e.Device.Name))
-                    return;
+                if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
 
-                // Try to find a matching monitor type
-                CO2MonitorType deviceType = CO2MonitorType.None;
-                foreach (var kv in MonitorTypes.MonitorTypeBySearchString)
-                {
-                    if (e.Device.Name.Contains(kv.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        deviceType = kv.Value;
-                        break;
-                    }
-                }
-
-                // Only add devices that match the current flags
-                if ((filter & deviceType) != 0)
+                var detectedType = CO2MonitorProviderFactory.DetectFromName(e.Device.Name);
+                if (detectedType.HasValue && (filter & detectedType.Value) != 0)
                 {
                     var deviceModel = new BluetoothDeviceModel(e.Device);
                     if (!Devices.Contains(deviceModel))
@@ -89,62 +74,25 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             _adapter.DeviceDiscovered += Handler;
 
-            try
-            {
-                await _adapter.StartScanningForDevicesAsync(cts.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                // Normal when scan times out
-            }
+            try { await _adapter.StartScanningForDevicesAsync(cts.Token); }
+            catch (TaskCanceledException) { }
 
             if (_adapter.IsScanning)
                 await _adapter.StopScanningForDevicesAsync();
 
             _adapter.DeviceDiscovered -= Handler;
-
             IsScanning = false;
         }
 
-        public static async Task<bool> ConnectAsync(IDevice device)
+        internal async Task<bool> ConnectDeviceAsync(IDevice device)
         {
-            // if another monitor was active, clean up
-            if (ActiveMonitorManager is IAsyncDisposable asyncDisposable)
-                await asyncDisposable.DisposeAsync();
-            ActiveMonitorManager = null;
-
-            // Create Manager for the selected device
-            ActiveMonitorManager = CreateManagerForDevice(device);
-
-            // Initialize
-            return await ActiveMonitorManager.InitializeAsync(device);
-        }
-
-        private static BaseCO2MonitorManager CreateManagerForDevice(IDevice device)
-        {
-            var name = device.Name ?? string.Empty;
-
-            foreach (var kv in MonitorTypes.MonitorTypeBySearchString)
+            try
             {
-                if (name.Contains(kv.Key, StringComparison.OrdinalIgnoreCase))
-                {
-                    switch (kv.Value)
-                    {
-                        case CO2MonitorType.Aranet4:
-                            return new AranetManager();
-
-                        case CO2MonitorType.Airvalent:
-                            return new AirvalentManager();
-                        case CO2MonitorType.InkbirdIAMT1:
-                            return new InkbirdManager();
-                        case CO2MonitorType.AirSpotHealth:
-                            return new AirspotManager();                            
-                    }
-                }
+                if (!_adapter.ConnectedDevices.Contains(device))
+                    await _adapter.ConnectToDeviceAsync(device);
+                return true;
             }
-
-            throw new NotSupportedException(
-                $"No CO₂ monitor implementation found for device '{device.Name}'");
+            catch { return false; }
         }
     }
 }

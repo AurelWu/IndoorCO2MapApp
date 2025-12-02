@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
-    internal class AirvalentManager : BaseCO2MonitorManager
+    internal class InkbirdProvider : BaseCO2MonitorProvider
     {
         public override Task<bool> InitializeAsync(IDevice device)
         {

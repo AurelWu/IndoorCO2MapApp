@@ -69,10 +69,8 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
-            //_viewModel.RetrieveCO2Async().SafeFireAndForget();
-            //_viewModel.RetrieveUpdateIntervalAsync().SafeFireAndForget();
-            _viewModel.RetrieveHistoryAsync(20).SafeFireAndForget();
-            //TODO: also read History and maybe wait for one to finish before other instead of fire&forget at same time?
+            _viewModel.RefreshLiveCO2Async().SafeFireAndForget();
+            _viewModel.RefreshHistoryAsync(20).SafeFireAndForget();         
         }
     }
 }

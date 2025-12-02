@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
-    internal class AirspotManager : BaseCO2MonitorManager
+    internal class AirspotProvider : BaseCO2MonitorProvider
     {
 
         private static readonly Guid SERVICE_UUID = new("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
@@ -33,7 +33,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-            BLEDeviceManager.ActiveMonitorManager = this;
+            CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
 
             _service = await TryGetServiceAsync(device, SERVICE_UUID);
             if (_service == null) return false;

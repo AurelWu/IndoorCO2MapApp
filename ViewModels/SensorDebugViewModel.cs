@@ -9,108 +9,89 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
-    public partial class DebugSensorPageViewModel :ObservableObject
+    public partial class DebugSensorPageViewModel : ObservableObject
     {
-        private readonly BLEDeviceManager _bluetoothManager;
+        private readonly CO2MonitorManager _monitorManager;
 
         public DebugSensorPageViewModel()
         {
-            _bluetoothManager = BLEDeviceManager.Instance;
+            _monitorManager = CO2MonitorManager.Instance;
 
-            Devices = _bluetoothManager.Devices;
-            MonitorOptions = [.. MonitorTypes.SearchStringByMonitorTypeDebugMode.Keys];
+            Devices = _monitorManager.Devices;
+            MonitorOptions = _monitorManager._monitorTypes;
             SelectedMonitorType = MonitorOptions.FirstOrDefault();
 
-            _bluetoothManager.PropertyChanged += (s, e) =>
+            _monitorManager.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(_bluetoothManager.IsScanning))
+                switch (e.PropertyName)
                 {
-                    IsScanning = _bluetoothManager.IsScanning; // updates the observable property
+                    case nameof(CO2MonitorManager.IsScanning):
+                        IsScanning = _monitorManager.IsScanning;
+                        break;
+                    case nameof(CO2MonitorManager.CurrentCO2):
+                        CurrentCO2 = _monitorManager.CurrentCO2;
+                        break;
+                    case nameof(CO2MonitorManager.UpdateInterval):
+                        MeasurementInterval = _monitorManager.UpdateInterval;
+                        break;
+                    case nameof(CO2MonitorManager.Co2History):
+                        Co2History = _monitorManager.Co2History;
+                        break;
+                    case nameof(CO2MonitorManager.SelectedDevice):
+                        SelectedDevice = _monitorManager.SelectedDevice;
+                        break;
+                    case nameof(CO2MonitorManager.SelectedMonitorType):
+                        SelectedMonitorType = _monitorManager.SelectedMonitorType;
+                        break;
                 }
             };
         }
 
-#pragma warning disable IDE0079 // supresses warning about supressed warning...
-#pragma warning disable MVVMTK0045 // only affects Win RT which doesn't play nice with ObservableProperty apparently
+#pragma warning disable IDE0079
+#pragma warning disable MVVMTK0045
 
-        [ObservableProperty]
-        private int currentCO2;
-
-        [ObservableProperty]
-        private int measurementInterval;
-
-        [ObservableProperty]
-        private List<ushort> co2History = [];
-
-        [ObservableProperty]
-        private BluetoothDeviceModel? selectedDevice;
-
-        [ObservableProperty]
-        private CO2MonitorType selectedMonitorType;
-
-        [ObservableProperty]
-        private bool isScanning;
+        [ObservableProperty] private int currentCO2;
+        [ObservableProperty] private int measurementInterval;
+        [ObservableProperty] private List<ushort> co2History = [];
+        [ObservableProperty] private BluetoothDeviceModel? selectedDevice;
+        [ObservableProperty] private CO2MonitorType selectedMonitorType;
+        [ObservableProperty] private bool isScanning;
 
 #pragma warning restore MVVMTK0045
 #pragma warning restore IDE0079
 
-
         internal ObservableCollection<BluetoothDeviceModel> Devices { get; }
-
         internal List<CO2MonitorType> MonitorOptions { get; }
 
-        // Call this whenever device selection changes in UI
+        public async Task StartScanAsync(CO2MonitorType filter)
+        {
+            await _monitorManager.StartScanAsync(filter);
+        }
+
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
-            if (device?.Device == null) return;
-
-            SelectedDevice = device;
-
-            await BLEDeviceManager.ConnectAsync(device.Device);
-
-            if (BLEDeviceManager.ActiveMonitorManager != null)
-            {
-                await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(device.Device);
-                CurrentCO2 = await BLEDeviceManager.ActiveMonitorManager.ReadCurrentCO2SafeAsync();
-            }
+            if (device == null) return;
+            await _monitorManager.SelectDeviceAsync(device);
         }
 
-        internal async Task StartScanAsync(CO2MonitorType filter)
+        public async Task RefreshLiveCO2Async()
         {
-            await _bluetoothManager.StartScanningAsync(filter: filter);
+            await _monitorManager.RefreshLiveCO2Async();
         }
 
-        public async Task RetrieveCO2Async()
+        public async Task RefreshUpdateIntervalAsync()
         {
-            if (SelectedDevice == null || BLEDeviceManager.ActiveMonitorManager == null) return;
-
-            await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
-            CurrentCO2 = await BLEDeviceManager.ActiveMonitorManager.ReadCurrentCO2SafeAsync();
+            await _monitorManager.RefreshUpdateIntervalAsync();
         }
 
-        public async Task RetrieveUpdateIntervalAsync()
+        public async Task RefreshHistoryAsync(ushort minutes)
         {
-            if (SelectedDevice == null || BLEDeviceManager.ActiveMonitorManager == null) return;
-
-            await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
-            MeasurementInterval = await BLEDeviceManager.ActiveMonitorManager.ReadUpdateIntervalSafeAsync();
+            await _monitorManager.RefreshHistoryAsync(minutes);
         }
 
-        public async Task RetrieveHistoryAsync(ushort amountOfMinutes)
+        public async Task DisconnectAsync()
         {
-            if (SelectedDevice == null || BLEDeviceManager.ActiveMonitorManager == null)
-                return;
-
-            await BLEDeviceManager.ActiveMonitorManager.InitializeAsync(SelectedDevice.Device);
-
-            //TODO => calculate based on interval or timesteps in concrete implementations for now it just returns last n values ignoring the interval
-            
-            var history = await BLEDeviceManager.ActiveMonitorManager.ReadHistorySafeAsync(amountOfMinutes);
-
-            if (history != null)
-            {
-                Co2History = [..history];
-            }
+            await _monitorManager.DisconnectAsync();
         }
     }
 }

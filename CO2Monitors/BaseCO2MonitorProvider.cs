@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-internal abstract class BaseCO2MonitorManager : IAsyncDisposable
+public abstract class BaseCO2MonitorProvider : IAsyncDisposable
 {
     protected const int RetryCount = 3;
     protected const int RetryDelayMs = 100;
