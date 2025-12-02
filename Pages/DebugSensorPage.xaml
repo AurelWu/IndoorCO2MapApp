@@ -39,7 +39,7 @@
                 Clicked="OnRetrieveDataFromMonitorClicked"
                 HorizontalOptions="Fill"/>
 
-        <!-- List with all discovered BLE Devices -->
+        <!-- List with all discovered BLE Devices 
         <CollectionView x:Name="BluetoothDevicesList"
                         SelectionMode="Single"
                         HeightRequest="200"
@@ -56,9 +56,10 @@
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+        </CollectionView> -->
 
-
+        <Picker x:Name="DevicePicker"
+        Title="Select Device" />
 
         <Label Text="On Windows, need to manually pair device for some results - iOS/Android trigger pairing if trying to read/write characteristics requiring it"/>
         <!-- CO2 and interval labels -->

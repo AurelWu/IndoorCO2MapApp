@@ -22,7 +22,11 @@ namespace IndoorCO2MapAppV2.Pages
             BindingContext = _viewModel;
 
             // Bind device list
-            BluetoothDevicesList.ItemsSource = _viewModel.Devices;
+            //BluetoothDevicesList.ItemsSource = _viewModel.Devices;
+
+            // Bind device list to Picker
+            DevicePicker.ItemsSource = _viewModel.Devices.Select(d => d.Name).ToList();
+
 
             // Populate monitor type picker
             MonitorTypePicker.ItemsSource = _viewModel.MonitorOptions
@@ -31,8 +35,9 @@ namespace IndoorCO2MapAppV2.Pages
             MonitorTypePicker.SelectedIndex = 0;
 
             // Event handlers
-            BluetoothDevicesList.SelectionChanged += BluetoothDevicesList_SelectionChanged;
+            //BluetoothDevicesList.SelectionChanged += BluetoothDevicesList_SelectionChanged;
             MonitorTypePicker.SelectedIndexChanged += MonitorTypePicker_SelectedIndexChanged;
+            DevicePicker.SelectedIndexChanged += DevicePicker_SelectedIndexChanged;
         }
 
         private void BluetoothDevicesList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -64,13 +69,29 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
-            _viewModel.StartScanAsync(_viewModel.SelectedMonitorType).SafeFireAndForget();
+            SearchBluetoothDevices().SafeFireAndForget();
+        }
+
+        private async Task SearchBluetoothDevices()
+        {
+            await _viewModel.StartScanAsync(_viewModel.SelectedMonitorType);
+            DevicePicker.ItemsSource = _viewModel.Devices.Select(d => d.Name).ToList();
         }
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
             _viewModel.RefreshLiveCO2Async().SafeFireAndForget();
             _viewModel.RefreshHistoryAsync(20).SafeFireAndForget();         
+        }
+
+        // Sync picker selection with viewmodel
+        private void DevicePicker_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (DevicePicker.SelectedIndex >= 0)
+            {
+                var device = _viewModel.Devices[DevicePicker.SelectedIndex];
+                _viewModel.SelectDeviceAsync(device).SafeFireAndForget();
+            }
         }
     }
 }
