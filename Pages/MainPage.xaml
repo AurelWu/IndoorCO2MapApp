@@ -123,8 +123,32 @@
 
             </Grid>
 
-            <Button Text="Start Building" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
-            <Button Text="Start Transit" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
+            <HorizontalStackLayout Spacing="0" Padding="0">
+                <Button
+ x:Name="DistanceButton"
+ Text="Sort By Distance"
+ CornerRadius="8"
+ BackgroundColor="#007AFF"
+ TextColor="White"
+ Clicked="OnSortDistanceClicked"
+ WidthRequest="160" />
+
+                <Button
+ x:Name="AlphaButton"
+ Text="Sort Alphabetical"
+ CornerRadius="8"
+ BackgroundColor="#E0E0E0"
+ TextColor="Black"
+ Clicked="OnSortAlphaClicked"
+ WidthRequest="160" />
+            </HorizontalStackLayout>
+
+            <Entry x:Name="FilterEntry"
+Placeholder="Search by name..."
+TextChanged="OnLocationFilterChanged" />
+
+            <Button Text="Start Building Recording" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
+            <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
             <Button Text="Map" Clicked="OnNavigateClicked" CommandParameter="///map" HorizontalOptions="Fill"/>
             <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
             <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>

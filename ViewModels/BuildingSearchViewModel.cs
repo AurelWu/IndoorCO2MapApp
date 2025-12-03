@@ -53,8 +53,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             Longitude is double lon &&
             lat != 0 && lon != 0;
 
-        // This collection is ONLY for binding to the picker / UI list
-        // It is NOT used for data storage anymore
+        // This collection is used for binding to the picker        
         public ObservableCollection<LocationData> Buildings { get; } = new();
 
 
@@ -64,6 +63,15 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task GetGpsAsync()
         {
+#if WINDOWS
+            // Fake coordinates for desktop debugging
+            Latitude = 52.520008;   // somewhere in Berlin
+            Longitude = 13.404954;
+            Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
+            OnPropertyChanged(nameof(HasValidGPS));
+            return;
+#endif
+
             Status = "Acquiring GPS...";
 
             var loc = await _locationService.GetCurrentLocationAsync();

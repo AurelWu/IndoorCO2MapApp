@@ -1,5 +1,6 @@
 ﻿using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
+using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using IndoorCO2MapAppV2.ViewModels;
@@ -93,12 +94,16 @@ namespace IndoorCO2MapAppV2.Pages
         {
             _sortByDistance = true;
             PopulateLocationPicker(); //TODO: add filter text when implemented
+            AlphaButton.BackgroundColor = SettingsManager.Instance.Settings.NotPickedToggleButtonColor;
+            DistanceButton.BackgroundColor = SettingsManager.Instance.Settings.DefaultButtonColor;
         }
 
         private void OnSortAlphaClicked(object sender, EventArgs e)
         {
             _sortByDistance = false;
             PopulateLocationPicker(); //TODO: add filter text when implemented
+            AlphaButton.BackgroundColor = SettingsManager.Instance.Settings.DefaultButtonColor;
+            DistanceButton.BackgroundColor = SettingsManager.Instance.Settings.NotPickedToggleButtonColor; 
         }
 
         private void OnLocationFilterChanged(object sender, TextChangedEventArgs e)
