@@ -42,6 +42,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             set => SetProperty(ref _gpsPermissionGranted, value);
         }
 
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string? propertyName = null)

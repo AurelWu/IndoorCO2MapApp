@@ -3,8 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
              xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
+             xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="IndoorCO2MapAppV2.Pages.MainPage"
              Title="Home">
+
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
+                       TrueText="Fetching Data..."
+                       FalseText="Search Buildings"/>
+        </ResourceDictionary>
+    </local:AppPage.Resources>
+
 
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="25">
@@ -24,10 +36,11 @@
             CornerRadius="0"
             VerticalOptions="End"
             FontSize="20"
-            Margin="8,0,0,0" />
+            Margin="8,0,0,0"
+            IsEnabled="{Binding Sensor.IsScanning, Converter={StaticResource InvertBooleanConverter}}" />
             </Grid>
             <!--SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/> needs to be changed  -->
-            <Label Text="TODO - Status Info About Sensor"  />
+            <Label Text="{Binding Sensor.SelectedDeviceStatusText}" />
 
             <HorizontalStackLayout
                 x:Name="SearchRangeStackLayout"
@@ -36,9 +49,24 @@
                 <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" LineBreakMode="WordWrap" VerticalOptions="Center" />
                 <StackLayout Orientation="Horizontal" Spacing="10" >
                     <Label Text=" 100m" HorizontalOptions="Start" VerticalOptions="Center" />
-                    <RadioButton x:Name="RadioButton100m" GroupName="SearchRange" VerticalOptions="Center" HorizontalOptions="Start" />
+
+                    <RadioButton 
+                        x:Name="RadioButton100m" 
+                        GroupName="SearchRange" 
+                        VerticalOptions="Center" 
+                        CheckedChanged="OnSearchRangeChanged"
+                        HorizontalOptions="Start">
+                    </RadioButton>
+                    
                     <Label Text=" 250m" HorizontalOptions="Start" VerticalOptions="Center" />
-                    <RadioButton x:Name="RadioButton250m" GroupName="SearchRange" VerticalOptions="Center" HorizontalOptions="Start" />
+
+                    <RadioButton 
+                        x:Name="RadioButton250m" 
+                        GroupName="SearchRange" 
+                        VerticalOptions="Center" 
+                        CheckedChanged="OnSearchRangeChanged"
+                        HorizontalOptions="Start">
+                    </RadioButton>
                 </StackLayout>
             </HorizontalStackLayout>
 
@@ -48,6 +76,7 @@
                 x:Name="UpdateLocationsButton"
                 Text="Update Locations"            
                 HorizontalOptions="Fill"
+                Clicked="OnSearchBuildingsClicked"
                 Grid.Column="0" />
                 <Button
                 x:Name="GetCachedLocationsButton"

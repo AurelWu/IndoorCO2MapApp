@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.Resources.Strings;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -63,6 +64,20 @@ namespace IndoorCO2MapAppV2.ViewModels
         internal ObservableCollection<BluetoothDeviceModel> Devices { get; }
         internal List<CO2MonitorType> MonitorOptions { get; }
 
+        public string SelectedDeviceStatusText
+        {
+            get
+            {
+                if (IsScanning)
+                    return Localisation.ScanningStatusLabel;
+
+                if (SelectedDevice != null)
+                    return Localisation.CO2LevelsLabel + CurrentCO2;
+
+                return Localisation.NoSensorFoundStatusLabel;
+            }
+        }
+
         public async Task StartScanAsync(CO2MonitorType filter)
         {
             await _monitorManager.StartScanAsync(filter);
@@ -72,6 +87,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             if (device == null) return;
             await _monitorManager.SelectDeviceAsync(device);
+            await RefreshLiveCO2Async();
         }
 
         public async Task RefreshLiveCO2Async()
@@ -92,6 +108,21 @@ namespace IndoorCO2MapAppV2.ViewModels
         public async Task DisconnectAsync()
         {
             await _monitorManager.DisconnectAsync();
+        }
+
+        partial void OnIsScanningChanged(bool value)
+        {
+            OnPropertyChanged(nameof(SelectedDeviceStatusText));
+        }
+
+        partial void OnSelectedDeviceChanged(BluetoothDeviceModel? value)
+        {
+            OnPropertyChanged(nameof(SelectedDeviceStatusText));
+        }
+
+        partial void OnCurrentCO2Changed(int value)
+        {
+            OnPropertyChanged(nameof(SelectedDeviceStatusText));
         }
     }
 }

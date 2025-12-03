@@ -65,9 +65,7 @@ namespace IndoorCO2MapAppV2.Spatial
             }
         }
 
-        /// <summary>
-        /// Actual core fetching logic with fallback.
-        /// </summary>
+
         private async Task<string?> FetchInternalAsync(string query, CancellationToken externalToken)
         {
             if (State.IsFetching)

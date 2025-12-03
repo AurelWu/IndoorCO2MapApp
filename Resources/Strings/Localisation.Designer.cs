@@ -61,7 +61,25 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die select your CO2-Monitor ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die CO2 Levels:  ähnelt.
+        /// </summary>
+        internal static string CO2LevelsLabel {
+            get {
+                return ResourceManager.GetString("CO2LevelsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Current CO2:  ähnelt.
+        /// </summary>
+        internal static string CurrentCOLevelsLabel {
+            get {
+                return ResourceManager.GetString("CurrentCOLevelsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Select your CO2-Monitor ähnelt.
         /// </summary>
         internal static string MonitorSelectionLabel {
             get {
@@ -70,7 +88,43 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Search Range ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die No Sensor Found ähnelt.
+        /// </summary>
+        internal static string NoSensorFoundStatusLabel {
+            get {
+                return ResourceManager.GetString("NoSensorFoundStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Scanning for devices... ähnelt.
+        /// </summary>
+        internal static string ScanningStatusLabel {
+            get {
+                return ResourceManager.GetString("ScanningStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search Buildings ähnelt.
+        /// </summary>
+        internal static string SearchBuildingButtonLabel_Ready {
+            get {
+                return ResourceManager.GetString("SearchBuildingButtonLabel_Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fetching Data... ähnelt.
+        /// </summary>
+        internal static string SearchBuildingButtonLabel_Searching {
+            get {
+                return ResourceManager.GetString("SearchBuildingButtonLabel_Searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search Range:  ähnelt.
         /// </summary>
         internal static string SearchRangeLabel {
             get {

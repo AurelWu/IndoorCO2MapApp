@@ -25,6 +25,8 @@ namespace IndoorCO2MapAppV2.Pages
         //Show Map Preview on Main Menu
         //Copy Crash & Debug Log to Clipboard
         //Version Info Text
+        //Optional GPS Search Time Length
+        //Optional Bluetooth Search Time Length
 
     }
 }
