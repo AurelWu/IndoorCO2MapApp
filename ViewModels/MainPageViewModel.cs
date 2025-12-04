@@ -6,9 +6,12 @@ public class MainPageViewModel
     public SensorViewModel Sensor { get; }
     public BuildingSearchViewModel BuildingSearch { get; }
 
+    public SettingsViewModel Settings { get; }
+
     public MainPageViewModel()
     {
         Sensor = new SensorViewModel();
         BuildingSearch = new BuildingSearchViewModel();
+        Settings = new SettingsViewModel();
     }
 }

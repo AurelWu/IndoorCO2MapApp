@@ -2,6 +2,8 @@
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Bluetooth;
 using Microsoft.Extensions.Logging;
+using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.ExtensionMethods;
 
 
 namespace IndoorCO2MapAppV2
@@ -10,6 +12,8 @@ namespace IndoorCO2MapAppV2
     {
         public static MauiApp CreateMauiApp()
         {
+            UserSettings.Load();
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -21,7 +25,7 @@ namespace IndoorCO2MapAppV2
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
-
+            
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif

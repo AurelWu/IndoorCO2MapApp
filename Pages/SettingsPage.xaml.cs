@@ -1,13 +1,21 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.Resources.Strings;
 using Microsoft.Maui.Controls;
+using Microsoft.VisualBasic;
+using IndoorCO2MapAppV2.ViewModels;
 
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class SettingsPage : AppPage
     {
+        private readonly SettingsViewModel _settingsViewModel;
+
         public SettingsPage()
         {
             InitializeComponent();
+            _settingsViewModel = new SettingsViewModel();
+            BindingContext = _settingsViewModel; //
+
         }
 
         //Select Language Dropdown

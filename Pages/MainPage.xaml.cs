@@ -94,16 +94,16 @@ namespace IndoorCO2MapAppV2.Pages
         {
             _sortByDistance = true;
             PopulateLocationPicker(); //TODO: add filter text when implemented
-            AlphaButton.BackgroundColor = SettingsManager.Instance.Settings.NotPickedToggleButtonColor;
-            DistanceButton.BackgroundColor = SettingsManager.Instance.Settings.DefaultButtonColor;
+            AlphaButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor;
+            DistanceButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
         }
 
         private void OnSortAlphaClicked(object sender, EventArgs e)
         {
             _sortByDistance = false;
             PopulateLocationPicker(); //TODO: add filter text when implemented
-            AlphaButton.BackgroundColor = SettingsManager.Instance.Settings.DefaultButtonColor;
-            DistanceButton.BackgroundColor = SettingsManager.Instance.Settings.NotPickedToggleButtonColor; 
+            AlphaButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
+            DistanceButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor; 
         }
 
         private void OnLocationFilterChanged(object sender, TextChangedEventArgs e)
@@ -122,10 +122,10 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnRefreshSensorListClicked(object sender, EventArgs e)
         {
-            RefreshSensorList().SafeFireAndForget();
+            RefreshSensorListAsync().SafeFireAndForget();
         }
 
-        private async Task RefreshSensorList()
+        private async Task RefreshSensorListAsync()
         {
             await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
 

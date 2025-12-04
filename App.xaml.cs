@@ -7,7 +7,6 @@ namespace IndoorCO2MapAppV2
         public App()
         {
             InitializeComponent();
-            _ = SettingsManager.Instance.LoadAsync();
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

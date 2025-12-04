@@ -141,4 +141,10 @@
   <data name="SearchBuildingButtonLabel_Searching" xml:space="preserve">
     <value>Fetching Data...</value>
   </data>
+  <data name="Sort_Alphabetical" xml:space="preserve">
+    <value>Alphabetical</value>
+  </data>
+  <data name="Sort_Distance" xml:space="preserve">
+    <value>Distance</value>
+  </data>
 </root>

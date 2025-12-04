@@ -1,0 +1,80 @@
+﻿using IndoorCO2MapAppV2.Resources.Strings;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using IndoorCO2MapAppV2.PersistentData;
+
+namespace IndoorCO2MapAppV2.ViewModels
+{
+
+
+    public class SettingsViewModel : INotifyPropertyChanged
+    {
+
+        private const string FileName = "user_settings.json";
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public SettingsViewModel() { }
+
+
+        // Bindable properties
+
+        public string DefaultSortMode
+        {
+            get
+            {
+                // Map the boolean to the localized string
+                return UserSettings.Instance.SortBuildingsAlphabetical
+                    ? Localisation.Sort_Alphabetical
+                    : Localisation.Sort_Distance;
+            }
+
+            set
+            {
+                // Explicit mapping for the setter
+                if (value == Localisation.Sort_Alphabetical)
+                {
+                    UserSettings.Instance.SortBuildingsAlphabetical = true;
+                }
+                else if (value == Localisation.Sort_Distance)
+                {
+                    UserSettings.Instance.SortBuildingsAlphabetical = false;
+                }
+
+                OnPropertyChanged(nameof(DefaultSortMode));
+            }
+
+        }
+
+        public IReadOnlyCollection<string> SortModes => new List<string>
+        {
+            Localisation.Sort_Distance,
+            Localisation.Sort_Alphabetical,
+        };
+
+        public bool SortBuildingsAlphabetical
+        {
+            get => UserSettings.Instance.SortBuildingsAlphabetical;
+            set { UserSettings.Instance.SortBuildingsAlphabetical = value; OnPropertyChanged(); }
+        }
+
+        public bool DisplaySortingModeToggle
+        {
+            get => UserSettings.Instance.DisplaySortingModeToggle;
+            set { UserSettings.Instance.DisplaySortingModeToggle = value; OnPropertyChanged(); }
+        }
+
+        public bool DisplayBuildingFilterInputField
+        {
+            get => UserSettings.Instance.DisplayBuildingFilterInputField;
+            set { UserSettings.Instance.DisplayBuildingFilterInputField = value; OnPropertyChanged(); }
+        }
+
+
+        private void OnPropertyChanged([CallerMemberName] string name = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+}

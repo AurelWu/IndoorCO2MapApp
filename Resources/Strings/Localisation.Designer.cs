@@ -131,5 +131,23 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
                 return ResourceManager.GetString("SearchRangeLabel", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alphabetical ähnelt.
+        /// </summary>
+        internal static string Sort_Alphabetical {
+            get {
+                return ResourceManager.GetString("Sort_Alphabetical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Distance ähnelt.
+        /// </summary>
+        internal static string Sort_Distance {
+            get {
+                return ResourceManager.GetString("Sort_Distance", resourceCulture);
+            }
+        }
     }
 }

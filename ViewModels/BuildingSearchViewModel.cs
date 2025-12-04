@@ -57,10 +57,6 @@ namespace IndoorCO2MapAppV2.ViewModels
         public ObservableCollection<LocationData> Buildings { get; } = new();
 
 
-        // ---------------------------
-        // Methods
-        // ---------------------------
-
         public async Task GetGpsAsync()
         {
 #if WINDOWS
