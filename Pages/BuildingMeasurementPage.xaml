@@ -2,19 +2,39 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-               x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage"
-               Title="Building Measurement">
+               xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
+               x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage">
 
+    <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
-        <Label Text="Hello World — Building Measurement"
-               FontSize="24"
-               HorizontalOptions="Center" />
 
-        <Button Text="Cancel"
+    <StackLayout>
+        <controls:LineChartView x:Name="lineChartView"
+                             HeightRequest="150"
+                             WidthRequest="400" />
+    </StackLayout>
+
+    <controls:RangeSlider
+     x:Name="TrimSilder"
+     RangeChanged="OnTrimChanged"
+     Minimum="0"
+     Maximum="20"
+     LowerValue="0"
+     UpperValue="20"
+     ThumbSize="30"
+     TrackHeight="15"
+     TrackColor="LightGray"
+     HighlightColor="DodgerBlue"
+     WidthRequest="375"
+     HeightRequest="60"/>
+
+
+    <Button Text="Cancel"
                 Clicked="OnCancelClicked"
                 HorizontalOptions="Fill" />
 
     </VerticalStackLayout>
+    </ScrollView>
 
 </local:AppPage>
