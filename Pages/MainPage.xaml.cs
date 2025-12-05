@@ -1,6 +1,7 @@
 ﻿using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using IndoorCO2MapAppV2.ViewModels;
@@ -13,7 +14,7 @@ namespace IndoorCO2MapAppV2.Pages
     {
         private readonly MainPageViewModel _mainPageViewModel;
 
-        private bool _sortByDistance = true; // same as debug page
+        private bool sortAlphabetical = false;
 
         public MainPage()
         {
@@ -24,8 +25,10 @@ namespace IndoorCO2MapAppV2.Pages
             CO2MonitorPicker.ItemsSource = _mainPageViewModel.Sensor.Devices.Select(d => d.Name).ToList();
             CO2MonitorPicker.SelectedIndexChanged += DevicePicker_SelectedIndexChanged;
 
+            sortAlphabetical = UserSettings.Instance.SortBuildingsAlphabetical;
+
             // Populate locations *after* constructor
-            PopulateLocationPicker();
+            PopulateLocationPicker(sortAlphabetical);
         }
 
         // Update after GPS or building search
@@ -34,25 +37,23 @@ namespace IndoorCO2MapAppV2.Pages
             await _mainPageViewModel.BuildingSearch.GetGpsAsync();
             await _mainPageViewModel.BuildingSearch.SearchBuildingsAsync();
 
-            PopulateLocationPicker();
+            PopulateLocationPicker(sortAlphabetical);
         }
 
 
-        private void PopulateLocationPicker(string? filter = "")
+        private void PopulateLocationPicker(bool sortAlphabetical, string filter = "")
         {
-            var list = _mainPageViewModel.BuildingSearch.Buildings;
             LocationPicker.Items.Clear();
 
-            if (list == null || list.Count == 0)
-                return;
+            var store = LocationStore.Instance;
+
+            IEnumerable<LocationData> sorted =
+                sortAlphabetical == true
+                    ? store.GetBuildingsSortedByName()
+                    : store.GetBuildingsSortedByDistance();
 
             string f = filter?.Trim() ?? "";
             bool useFilter = f.Length > 0;
-
-            IEnumerable<LocationData> sorted =
-                _sortByDistance
-                    ? list.OrderBy(b => b.Distance)
-                    : list.OrderBy(b => Helpers.RemoveDiacritics(b.Name ?? "").ToLower());
 
             foreach (var loc in sorted)
             {
@@ -67,12 +68,19 @@ namespace IndoorCO2MapAppV2.Pages
                         continue;
                 }
 
-                string display = $"{loc.Name ?? "(no name)"} — {loc.Distance:F0} m";
-                LocationPicker.Items.Add(display);
+                LocationPicker.Items.Add($"{loc.Name ?? "(no name)"} — {loc.Distance:F0} m");
             }
 
             if (LocationPicker.Items.Count > 0)
                 LocationPicker.SelectedIndex = 0;
+        }
+
+
+        private void OnSortingChanged(object sender, string selected)
+        {
+            bool sortAlphabetical = false;
+            if (selected == Localisation.Sort_Alphabetical) sortAlphabetical = true;
+            PopulateLocationPicker(sortAlphabetical, FilterEntry.Text);
         }
 
 
@@ -87,28 +95,27 @@ namespace IndoorCO2MapAppV2.Pages
                 _mainPageViewModel.BuildingSearch.Range = 250;
         }
 
-        // 
-        //  SORTING BUTTONS (TODO))
-        // 
-        private void OnSortDistanceClicked(object sender, EventArgs e)
-        {
-            _sortByDistance = true;
-            PopulateLocationPicker(); //TODO: add filter text when implemented
-            AlphaButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor;
-            DistanceButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
-        }
 
-        private void OnSortAlphaClicked(object sender, EventArgs e)
-        {
-            _sortByDistance = false;
-            PopulateLocationPicker(); //TODO: add filter text when implemented
-            AlphaButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
-            DistanceButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor; 
-        }
+        //to be removed, just if things dont work yet to have revert
+        //private void OnSortDistanceClicked(object sender, EventArgs e)
+        //{
+        //    _sortByDistance = true;
+        //    PopulateLocationPicker(); //TODO: add filter text when implemented
+        //    AlphaButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor;
+        //    DistanceButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
+        //}
+        //
+        //private void OnSortAlphaClicked(object sender, EventArgs e)
+        //{
+        //    _sortByDistance = false;
+        //    PopulateLocationPicker(); //TODO: add filter text when implemented
+        //    AlphaButton.BackgroundColor = UserSettings.Instance.DefaultButtonColor;
+        //    DistanceButton.BackgroundColor = UserSettings.Instance.NotPickedToggleButtonColor; 
+        //}
 
         private void OnLocationFilterChanged(object sender, TextChangedEventArgs e)
         {
-            PopulateLocationPicker(e.NewTextValue);
+            PopulateLocationPicker(sortAlphabetical, e.NewTextValue);
         }
 
         private void DevicePicker_SelectedIndexChanged(object? sender, EventArgs e)

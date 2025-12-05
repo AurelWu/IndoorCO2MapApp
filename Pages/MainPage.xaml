@@ -5,6 +5,7 @@
              xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
              xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:c="clr-namespace:IndoorCO2MapAppV2.Controls"
              x:Class="IndoorCO2MapAppV2.Pages.MainPage"
              Title="Home">
 
@@ -42,6 +43,7 @@
             <!--SelectedIndexChanged="MonitorTypePicker_SelectedIndexChanged"/> needs to be changed  -->
             <Label Text="{Binding Sensor.SelectedDeviceStatusText}" />
 
+
             <HorizontalStackLayout
                 x:Name="SearchRangeStackLayout"
                 Spacing="5"
@@ -49,7 +51,7 @@
                 <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" LineBreakMode="WordWrap" VerticalOptions="Center" />
                 <StackLayout Orientation="Horizontal" Spacing="10" >
                     <Label Text=" 100m" HorizontalOptions="Start" VerticalOptions="Center" />
-
+            
                     <RadioButton 
                         x:Name="RadioButton100m" 
                         GroupName="SearchRange" 
@@ -59,7 +61,7 @@
                     </RadioButton>
                     
                     <Label Text=" 250m" HorizontalOptions="Start" VerticalOptions="Center" />
-
+            
                     <RadioButton 
                         x:Name="RadioButton250m" 
                         GroupName="SearchRange" 
@@ -68,8 +70,9 @@
                         HorizontalOptions="Start">
                     </RadioButton>
                 </StackLayout>
-            </HorizontalStackLayout>
+            </HorizontalStackLayout> 
 
+            
 
             <Grid x:Name="LocationUpdateGrid" ColumnDefinitions="3*,1*" HorizontalOptions="Fill" ColumnSpacing="10">
                 <Button
@@ -123,6 +126,7 @@
 
             </Grid>
 
+            <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}" SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}" SelectionChanged="OnSortingChanged" IsVisible="{Binding Settings.DisplaySortingModeToggle}" />            <!--
             <HorizontalStackLayout Spacing="0" Padding="0">
                 <Button
  x:Name="DistanceButton"
@@ -141,7 +145,7 @@
  TextColor="Black"
  Clicked="OnSortAlphaClicked"
  WidthRequest="160" />
-            </HorizontalStackLayout>
+            </HorizontalStackLayout>-->
 
             <Entry x:Name="FilterEntry"
 Placeholder="Search by name..."

@@ -20,6 +20,8 @@ namespace IndoorCO2MapAppV2.Controls
         private readonly HorizontalStackLayout _buttonsLayout;
         private readonly List<Button> _buttons = new();
 
+        public event EventHandler<string>? SelectionChanged;
+
         public string Label
         {
             get => (string)GetValue(LabelProperty);
@@ -52,7 +54,11 @@ namespace IndoorCO2MapAppV2.Controls
         private static void OnLabelChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = (LabeledSegmentedControl)bindable;
-            control._labelControl.Text = (string)newValue;
+
+            string text = (string)newValue;
+
+            control._labelControl.Text = text;
+            control._labelControl.IsVisible = !string.IsNullOrWhiteSpace(text); //hides Label if it has empty text
         }
 
         private static void OnItemsChanged(BindableObject bindable, object oldValue, object newValue)
@@ -65,6 +71,7 @@ namespace IndoorCO2MapAppV2.Controls
         {
             var control = (LabeledSegmentedControl)bindable;
             control.UpdateSelection();
+            control.SelectionChanged?.Invoke(control, (string)newValue);
         }
 
         private void UpdateButtons()
