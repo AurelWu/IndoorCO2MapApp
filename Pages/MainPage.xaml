@@ -126,7 +126,10 @@
 
             </Grid>
 
-            <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}" SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}" SelectionChanged="OnSortingChanged" IsVisible="{Binding Settings.DisplaySortingModeToggle}" />            <!--
+            <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}" 
+                                       SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}" 
+                                       SelectionChanged="OnSortingChanged" 
+                                       IsVisible="{Binding Settings.DisplaySortingModeToggle}" />            <!--
             <HorizontalStackLayout Spacing="0" Padding="0">
                 <Button
  x:Name="DistanceButton"
@@ -149,7 +152,7 @@
 
             <Entry x:Name="FilterEntry"
 Placeholder="Search by name..."
-TextChanged="OnLocationFilterChanged" />
+TextChanged="OnLocationFilterChanged" IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
 
             <Button Text="Start Building Recording" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
             <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>

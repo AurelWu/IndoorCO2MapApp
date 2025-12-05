@@ -12,6 +12,6 @@ public class MainPageViewModel
     {
         Sensor = new SensorViewModel();
         BuildingSearch = new BuildingSearchViewModel();
-        Settings = new SettingsViewModel();
+        Settings = SettingsViewModel.Instance;
     }
 }

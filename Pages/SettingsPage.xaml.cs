@@ -13,7 +13,7 @@ namespace IndoorCO2MapAppV2.Pages
         public SettingsPage()
         {
             InitializeComponent();
-            _settingsViewModel = new SettingsViewModel();
+            _settingsViewModel = SettingsViewModel.Instance;
             BindingContext = _settingsViewModel; //
 
         }

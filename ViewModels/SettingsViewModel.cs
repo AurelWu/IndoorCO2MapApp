@@ -10,13 +10,16 @@ namespace IndoorCO2MapAppV2.ViewModels
 
     public class SettingsViewModel : INotifyPropertyChanged
     {
-
+        public static SettingsViewModel Instance { get; } = new SettingsViewModel();
         private const string FileName = "user_settings.json";
 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public SettingsViewModel() { }
+        private void OnPropertyChanged([CallerMemberName] string name = "")
+    => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        private SettingsViewModel() { }
 
 
         // Bindable properties
@@ -73,8 +76,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         }
 
 
-        private void OnPropertyChanged([CallerMemberName] string name = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
     }
 
 }

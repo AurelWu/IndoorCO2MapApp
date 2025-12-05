@@ -54,6 +54,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             string f = filter?.Trim() ?? "";
             bool useFilter = f.Length > 0;
+            if (FilterEntry.IsVisible == false) useFilter = false; // avoids leftover strings during a session if user changed settings to invisibly affect results
 
             foreach (var loc in sorted)
             {
