@@ -44,7 +44,7 @@ namespace IndoorCO2MapAppV2.Pages
             Int64 amount = Random.Shared.NextInt64(5, 31);
 			for (int i = 0; i < amount; i++)
 			{
-				mockData.Add(new CO2Reading((int)Random.Shared.NextInt64(450, 2500), i, DateTime.Now));
+				mockData.Add(new CO2Reading((ushort)Random.Shared.NextInt64(450, 2500), i, DateTime.Now));
 			}
             _currentData = mockData;
             lineChartView.SetData(mockData, TrimSilder.LowerValue, TrimSilder.UpperValue);

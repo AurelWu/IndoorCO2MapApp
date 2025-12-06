@@ -1,7 +1,7 @@
 ﻿namespace IndoorCO2MapAppV2.CO2Monitors
 {
-    internal record CO2Reading(
-        int Ppm,
+    public record CO2Reading(
+        ushort Ppm,
         long RelativeTimeStamp,
         DateTime DateTime
     );

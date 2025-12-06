@@ -4,8 +4,11 @@ using System;
 using System.Collections.Generic;
 using IndoorCO2MapAppV2.CO2Monitors;
 
-namespace IndoorCO2MapAppV2.TransmissionData
+namespace IndoorCO2MapAppV2.Recording
 {
+/// <summary>
+/// Used for Transmitting to the Backend API Gateway - for now its the same as the old one
+/// </summary>
     public class BuildingSubmissionData 
     {
         internal string SensorType { get; set; }

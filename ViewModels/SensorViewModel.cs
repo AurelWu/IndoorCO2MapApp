@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Resources.Strings;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -90,6 +91,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             if (device == null) return;
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();
+            RefreshHistoryAsync(10).SafeFireAndForget(); // used to check if we can successfully get the history (but actual check still TODO), should trigger bonding request on mobiles.
         }
 
         public async Task RefreshLiveCO2Async()
