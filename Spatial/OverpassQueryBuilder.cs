@@ -84,6 +84,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 $"nwr(around:{rString},{latString},{lonString})[leisure=swimming_pool];" +
                 $"nwr(around:{rString},{latString},{lonString})[leisure=sauna];" +
                 $"nwr(around:{rString},{latString},{lonString})[leisure=hackerspace];" +
+                $"nwr(around:{rString},{latString},{lonString})[leisure=escape_game];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=townhall];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=car_rental];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=convention_centre];" +

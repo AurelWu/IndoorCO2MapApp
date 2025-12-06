@@ -20,6 +20,8 @@ namespace IndoorCO2MapAppV2.Recording
 
         public bool IsRecording => ActiveRecording != null;
 
+        public event Action? MeasurementDataUpdated;
+
         private RecordingManager() { }
 
         // ----------------------------------------------------------------------
@@ -46,7 +48,7 @@ namespace IndoorCO2MapAppV2.Recording
             ActiveRecording = rec;
 
             _cts = new CancellationTokenSource();
-            _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            _timer = new PeriodicTimer(TimeSpan.FromSeconds(30)); //updates every 30 seconds.
 
             _ = RunLoopAsync(_cts.Token);
         }
@@ -106,11 +108,12 @@ namespace IndoorCO2MapAppV2.Recording
                 return;
 
             var dateTime = DateTimeOffset.UtcNow.DateTime;
-
+            ActiveRecording.MeasurementData.Clear();
             foreach (var v in hist)
             {
                 ActiveRecording.MeasurementData.Add(new CO2Reading(v, 0, DateTime.Now));
             }
+            MeasurementDataUpdated?.Invoke();
         }
     }
 }

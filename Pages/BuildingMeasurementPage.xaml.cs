@@ -1,5 +1,3 @@
-using System;
-using Microsoft.Maui.Controls;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Recording;
 
@@ -12,9 +10,56 @@ namespace IndoorCO2MapAppV2.Pages
             InitializeComponent();
         }
 
-        private void OnCancelClicked(object sender , EventArgs e)
+        protected override void OnAppearing()
         {
-            CancelMeasurementAsync().SafeFireAndForget();
+            base.OnAppearing();
+
+            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
+
+            // Immediately load initial data (if any)
+            UpdateChart();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+        }
+
+        private void OnMeasurementUpdated()
+        {
+            MainThread.BeginInvokeOnMainThread(UpdateChart);
+        }
+
+        private void UpdateChart()
+        {
+            var rec = RecordingManager.Instance.ActiveRecording;
+            if (rec == null)
+                return;
+
+            var data = rec.MeasurementData;
+            if (data == null || data.Count == 0)
+                return;
+
+            // Update slider range
+            TrimSilder.Maximum = data.Count - 1;
+
+            // Keep trim valid
+            if (TrimSilder.UpperValue > data.Count - 1)
+                TrimSilder.UpperValue = data.Count - 1;
+
+            // Update chart
+            lineChartView.SetData(
+                data,
+                (int)TrimSilder.LowerValue,
+                (int)TrimSilder.UpperValue
+            );
+        }
+
+        private void OnTrimChanged(object sender, EventArgs e)
+        {
+            UpdateChart();
         }
 
         private async Task CancelMeasurementAsync()
@@ -28,10 +73,17 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (answer)
             {
-                RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
-                //TODO set App State instead of just going to Home (maybe going to home should also be part of the App State Change)
+                RecordingManager.Instance
+                    .StopRecordingAsync()
+                    .SafeFireAndForget();
+
                 await NavigateAsync("///home");
             }
+        }
+
+        private void OnCancelClicked(object sender, EventArgs e)
+        {
+            CancelMeasurementAsync().SafeFireAndForget();
         }
     }
 }
