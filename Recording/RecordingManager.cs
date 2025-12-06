@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using IndoorCO2MapAppV2.CO2Monitors;
-
+using IndoorCO2MapAppV2.DebugTools;
 using System.Text.Json;
 
 namespace IndoorCO2MapAppV2.Recording
@@ -28,7 +28,10 @@ namespace IndoorCO2MapAppV2.Recording
         public async Task StartRecordingAsync(string nwrType, long nwrID, string monitorType)
         {
             if (IsRecording)
-                throw new InvalidOperationException("Recording already running.");
+
+            {
+                Logger.WriteToLog("Already recording, overwriting current one with fresh one.");
+            }
 
             var rec = new BuildingRecording
             {

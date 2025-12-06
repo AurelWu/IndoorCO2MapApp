@@ -1,16 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using IndoorCO2MapAppV2.Pages;
+using IndoorCO2MapAppV2.Recording;
 using System.ComponentModel;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
     public partial class MainPageViewModel : ObservableObject
     {
+        public IRelayCommand StartBuildingRecordingCommand { get; }
+
         public SensorViewModel Sensor { get; }
         public BuildingSearchViewModel BuildingSearch { get; }
         public SettingsViewModel Settings { get; }
 
         public MainPageViewModel()
         {
+            StartBuildingRecordingCommand = new AsyncRelayCommand(StartRecordingAsync);
             Sensor = new SensorViewModel();
             BuildingSearch = new BuildingSearchViewModel();
             Settings = SettingsViewModel.Instance;
@@ -31,6 +37,22 @@ namespace IndoorCO2MapAppV2.ViewModels
                     OnPropertyChanged(nameof(CanStartBuildingRecording));
                 }
             };
+
+        }
+
+        private async Task StartRecordingAsync()
+        {
+            if (BuildingSearch.SelectedBuilding == null ||
+                Sensor.SelectedDevice == null ||
+                Sensor.CurrentCO2 <= 0)
+                return;
+
+            await RecordingManager.Instance.StartRecordingAsync(
+                BuildingSearch.SelectedBuilding.Type,
+                BuildingSearch.SelectedBuilding.ID,
+                Sensor.SelectedMonitorType.ToString()
+            );
+            await AppPage.NavigateAsync("///building");
         }
 
         public bool CanStartBuildingRecording =>

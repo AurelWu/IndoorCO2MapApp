@@ -139,12 +139,9 @@
                 Text="{Binding FilterText}"
                 IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
 
-            <Button 
-                Text="Start Building Recording"
-                IsEnabled="{Binding CanStartBuildingRecording}"
-                Clicked="OnNavigateClicked" 
-                CommandParameter="///building"
-                HorizontalOptions="Fill"/>
+            <Button Text="Start Building Recording"
+                Command="{Binding StartBuildingRecordingCommand}"
+                IsEnabled="{Binding CanStartBuildingRecording}" />
             <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
             <!--
             <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
