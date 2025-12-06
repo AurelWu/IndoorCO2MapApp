@@ -80,11 +80,13 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task StartScanAsync(CO2MonitorType filter)
         {
+            _monitorManager.ZeroOutCO2Values();
             await _monitorManager.StartScanAsync(filter);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
+            _monitorManager.ZeroOutCO2Values();
             if (device == null) return;
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();

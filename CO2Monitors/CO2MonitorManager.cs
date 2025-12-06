@@ -74,6 +74,12 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
         }
 
+        public void ZeroOutCO2Values()
+        {
+            CurrentCO2 = 0;
+            Co2History = [];
+        }
+
         public async Task RefreshLiveCO2Async()
         {
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
