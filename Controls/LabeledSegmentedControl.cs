@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace IndoorCO2MapAppV2.Controls
 {
@@ -40,6 +41,20 @@ namespace IndoorCO2MapAppV2.Controls
             set => SetValue(SelectedItemProperty, value);
         }
 
+        public static readonly BindableProperty SelectionChangedCommandProperty =
+    BindableProperty.Create(
+        nameof(SelectionChangedCommand),
+        typeof(ICommand),
+        typeof(LabeledSegmentedControl),
+        default(ICommand));
+
+        public ICommand? SelectionChangedCommand
+        {
+            get => (ICommand?)GetValue(SelectionChangedCommandProperty);
+            set => SetValue(SelectionChangedCommandProperty, value);
+        }
+
+
         public LabeledSegmentedControl()
         {
             Spacing = 4;
@@ -70,9 +85,18 @@ namespace IndoorCO2MapAppV2.Controls
         private static void OnSelectedItemChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = (LabeledSegmentedControl)bindable;
+
             control.UpdateSelection();
+
+            // old event is fine to keep
             control.SelectionChanged?.Invoke(control, (string)newValue);
+
+            // NEW: trigger ICommand
+            if (control.SelectionChangedCommand?.CanExecute(newValue) == true)
+                control.SelectionChangedCommand.Execute(newValue);
         }
+
+
 
         private void UpdateButtons()
         {

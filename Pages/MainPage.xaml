@@ -12,6 +12,7 @@
     <local:AppPage.Resources>
         <ResourceDictionary>
             <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+            <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
             <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
                        TrueText="Fetching Data..."
                        FalseText="Search Buildings"/>
@@ -98,7 +99,7 @@
         ColumnDefinitions="*, Auto" 
         VerticalOptions="Center" 
         HorizontalOptions="Fill">
-
+                                                                
                 <Border
                     BackgroundColor="Transparent"
                     Stroke="{SolidColorBrush #808080}"
@@ -107,10 +108,11 @@
                         <RoundRectangle CornerRadius="4"/>
                     </Border.StrokeShape>
                     <!-- Picker in the first column, takes up remaining space -->
-                    <Picker 
-            x:Name="LocationPicker" 
-            Grid.Column="0" 
-            VerticalOptions="Center" />
+                    <Picker
+                        ItemsSource="{Binding BuildingSearch.Buildings}"
+                        SelectedItem="{Binding BuildingSearch.SelectedBuilding}"
+                        ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}" />
+                        
                 </Border>
                 <!-- Star Icon Toggle Button in the second column, with fixed width -->
                 <ImageButton 
@@ -128,15 +130,16 @@
 
             <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}" 
                                        SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}" 
-                                       SelectionChanged="OnSortingChanged" 
+                                       SelectionChangedCommand="{Binding BuildingSearch.SortModeChangedCommand}"
                                        IsVisible="{Binding Settings.DisplaySortingModeToggle}" />
 
 
             <Entry x:Name="FilterEntry"
-Placeholder="Search by name..."
-TextChanged="OnLocationFilterChanged" IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
+                Placeholder="Search by name..."
+                Text="{Binding FilterText}"
+                IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
 
-            <Button Text="Start Building Recording" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
+            <Button Text="Start Building Recording" IsEnabled="False" Clicked="OnNavigateClicked" CommandParameter="///building" HorizontalOptions="Fill"/>
             <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
             <!--
             <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>

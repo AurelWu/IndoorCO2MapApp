@@ -7,10 +7,10 @@ namespace IndoorCO2MapAppV2.PersistentData
 {
     internal class BuildingRecording
     {
-        long nwrid;
-        string nwrtype;
-        long recordingStart;
-        List<CO2Reading> measurementData;
-        Dictionary<string, string> additionalDataByParameter;
+        long nwrid = 0;
+        string nwrtype = "";
+        long recordingStar = 0;
+        List<CO2Reading> measurementData = [];
+        Dictionary<string, string> additionalDataByParameter = [];
     }
 }

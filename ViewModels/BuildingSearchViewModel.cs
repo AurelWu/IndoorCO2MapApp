@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -10,31 +10,31 @@ namespace IndoorCO2MapAppV2.ViewModels
 {
     public partial class BuildingSearchViewModel : ObservableObject
     {
-
         private readonly OverpassDataFetcher _fetcher = OverpassDataFetcher.Instance;
         private readonly ILocationService _locationService;
-
         private readonly LocationStore _locationStore = LocationStore.Instance;
 
         public BuildingSearchViewModel()
         {
             _locationService = LocationServicePlatformProvider.CreateOrUse();
-
             Range = 100;
 
-            // reactive fetch state
+            // React to Overpass fetch state
             FetchState.PropertyChanged += (_, __) =>
             {
                 OnPropertyChanged(nameof(FetchState));
             };
         }
 
-
         public OverpassFetchState FetchState => _fetcher.State;
 
         // ---------------------------
         // Bindable properties
         // ---------------------------
+
+
+        [ObservableProperty]
+        private LocationData? selectedBuilding;
 
         [ObservableProperty]
         private double? latitude;
@@ -48,21 +48,32 @@ namespace IndoorCO2MapAppV2.ViewModels
         [ObservableProperty]
         private string status = "";
 
+        // User-entered filter text
+        [ObservableProperty]
+        private string filterText = "";
+
+        // Sorting toggle (true = alphabetical, false = by distance)
+        [ObservableProperty]
+        private bool sortAlphabetical;
+
+        // Picker item source
+        public ObservableCollection<LocationData> Buildings { get; } = new();
+
         public bool HasValidGPS =>
             Latitude is double lat &&
             Longitude is double lon &&
             lat != 0 && lon != 0;
 
-        // This collection is used for binding to the picker        
-        public ObservableCollection<LocationData> Buildings { get; } = new();
-
+        // ---------------------------
+        // GPS
+        // ---------------------------
 
         public async Task GetGpsAsync()
         {
 #if WINDOWS
             // Fake coordinates for desktop debugging
-            Latitude = 52.520008;   // somewhere in Berlin
-            Longitude = 13.404954;
+            Latitude = 52.521006;
+            Longitude = 13.404944;
             Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
             OnPropertyChanged(nameof(HasValidGPS));
             return;
@@ -84,6 +95,10 @@ namespace IndoorCO2MapAppV2.ViewModels
             OnPropertyChanged(nameof(HasValidGPS));
         }
 
+        // ---------------------------
+        // Fetch buildings from Overpass
+        // ---------------------------
+
         public async Task SearchBuildingsAsync()
         {
             await GetGpsAsync();
@@ -92,7 +107,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                 Status = "No valid GPS data yet.";
                 return;
             }
-            
+
             Status = "Fetching buildings...";
 
             string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(
@@ -114,17 +129,63 @@ namespace IndoorCO2MapAppV2.ViewModels
                 json,
                 Latitude.Value,
                 Longitude.Value
-            ); //this updates the locationStore
+            );
 
-            // UPDATE LOCAL OBSERVABLE COLLECTION FOR UI
-            Buildings.Clear();
-            foreach (var loc in _locationStore.BuildingLocationData)
-            {
-                if (loc != null)
-                    Buildings.Add(loc);
-            }
+            // Now refresh UI list using filter + sorting
+            RefreshBuildings();
 
             Status = $"Parsed {Buildings.Count} buildings.";
         }
+
+        // ---------------------------
+        // Filtering + Sorting
+        // ---------------------------
+
+        private void RefreshBuildings()
+        {
+            if (_locationStore.BuildingLocationData == null)
+                return;
+
+            IEnumerable<LocationData> data = _locationStore.BuildingLocationData;
+
+            // Sorting
+            if (SortAlphabetical)
+            {
+                data = data.OrderBy(b => b.Name ?? "");
+            }
+            else
+            {
+                data = data.OrderBy(b => b.Distance);
+            }
+
+            // Filtering
+            string ft = FilterText?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(ft))
+            {
+                ft = Helpers.RemoveDiacritics(ft);
+                data = data.Where(b =>
+                    !string.IsNullOrWhiteSpace(b.Name) &&
+                    Helpers.RemoveDiacritics(b.Name)
+                        .Contains(ft, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Update observable collection
+            Buildings.Clear();
+            foreach (var b in data)
+                Buildings.Add(b);
+
+            // Auto-select first entry
+            SelectedBuilding = Buildings.FirstOrDefault();
+        }
+
+        // Reactive updates
+        partial void OnSortAlphabeticalChanged(bool value) => RefreshBuildings();
+        partial void OnFilterTextChanged(string value) => RefreshBuildings();
+
+        public ICommand SortModeChangedCommand => new Command<string>(mode =>
+        {
+            SortAlphabetical = (mode == Localisation.Sort_Alphabetical);
+            RefreshBuildings();
+        });
     }
 }

@@ -72,7 +72,7 @@ namespace IndoorCO2MapAppV2.TransmissionData
             //AdditionalNotes = MainPage.MainPageSingleton.GetNotesEditorText();
 
 
-            json["d"] = "TestRunNewAPP" + System.Random.Shared.Next(0, 100000);
+            json["d"] = "TestRunNewApp" + System.Random.Shared.Next(0, 100000);
             json["p"] = NwrType;
             json["i"] = NwrID;
             json["n"] = NwrName;
