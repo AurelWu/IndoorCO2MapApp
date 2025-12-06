@@ -1,20 +1,41 @@
-﻿using IndoorCO2MapAppV2.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
-public class MainPageViewModel
+namespace IndoorCO2MapAppV2.ViewModels
 {
-    //Idea is to compose the page ViewModels out of smaller Building Blocks to avoid duplication, maybe we should give the subcomponents other names to differentiate better
-    public SensorViewModel Sensor { get; }
-    public BuildingSearchViewModel BuildingSearch { get; }
-
-    public SettingsViewModel Settings { get; }
-
-    public MainPageViewModel()
+    public partial class MainPageViewModel : ObservableObject
     {
-        Sensor = new SensorViewModel();
-        BuildingSearch = new BuildingSearchViewModel();
-        Settings = SettingsViewModel.Instance;
+        public SensorViewModel Sensor { get; }
+        public BuildingSearchViewModel BuildingSearch { get; }
+        public SettingsViewModel Settings { get; }
 
+        public MainPageViewModel()
+        {
+            Sensor = new SensorViewModel();
+            BuildingSearch = new BuildingSearchViewModel();
+            Settings = SettingsViewModel.Instance;
 
+            Sensor.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Sensor.SelectedDevice) ||
+                    e.PropertyName == nameof(Sensor.CurrentCO2))
+                {
+                    OnPropertyChanged(nameof(CanStartBuildingRecording));
+                }
+            };
+
+            BuildingSearch.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(BuildingSearch.SelectedBuilding))
+                {
+                    OnPropertyChanged(nameof(CanStartBuildingRecording));
+                }
+            };
+        }
+
+        public bool CanStartBuildingRecording =>
+            BuildingSearch.SelectedBuilding != null &&
+            Sensor.SelectedDevice != null &&
+            Sensor.CurrentCO2 > 0;
     }
-
 }

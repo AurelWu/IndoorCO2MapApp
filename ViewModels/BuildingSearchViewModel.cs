@@ -182,6 +182,8 @@ namespace IndoorCO2MapAppV2.ViewModels
         partial void OnSortAlphabeticalChanged(bool value) => RefreshBuildings();
         partial void OnFilterTextChanged(string value) => RefreshBuildings();
 
+
+
         public ICommand SortModeChangedCommand => new Command<string>(mode =>
         {
             SortAlphabetical = (mode == Localisation.Sort_Alphabetical);
