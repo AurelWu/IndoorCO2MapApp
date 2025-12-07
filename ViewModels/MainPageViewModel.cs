@@ -50,6 +50,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             await RecordingManager.Instance.StartRecordingAsync(
                 BuildingSearch.SelectedBuilding.Type,
                 BuildingSearch.SelectedBuilding.ID,
+                BuildingSearch.SelectedBuilding.Name,
                 Sensor.SelectedMonitorType.ToString()
             );
             await AppPage.NavigateAsync("///building");

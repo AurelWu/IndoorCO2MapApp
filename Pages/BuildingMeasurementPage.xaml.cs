@@ -1,5 +1,6 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Recording;
+using IndoorCO2MapAppV2.Resources.Strings;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -13,11 +14,11 @@ namespace IndoorCO2MapAppV2.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
+            
 
-            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
-
-            // Immediately load initial data (if any)
+            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;            
             UpdateChart();
+            MeasuredLocationLabel.Text = Localisation.RecordingLocationLabel + RecordingManager.Instance.ActiveRecording?.LocationName ?? "ID: " + RecordingManager.Instance.ActiveRecording!.NwrType + RecordingManager.Instance.ActiveRecording.NwrId.ToString();
         }
 
         protected override void OnDisappearing()
@@ -29,6 +30,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnMeasurementUpdated()
         {
+            //MeasuredLocationLabel.Text = Localisation.RecordingLocationLabel + RecordingManager.Instance.ActiveRecording?.LocationName ?? "ID: " + RecordingManager.Instance.ActiveRecording!.NwrType + RecordingManager.Instance.ActiveRecording.NwrId.ToString();
             MainThread.BeginInvokeOnMainThread(UpdateChart);
         }
 
@@ -84,6 +86,11 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnCancelClicked(object sender, EventArgs e)
         {
             CancelMeasurementAsync().SafeFireAndForget();
+        }
+
+        private void OnSubmitRecordingClicked(object sender, EventArgs e)
+        {
+            //check if 5 data points - if less then do nothing (button should be disabled anyways but should still do sanity check here - and eventually provide feedback even if button should not be in state and tell itself)
         }
     }
 }

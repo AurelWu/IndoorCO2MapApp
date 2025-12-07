@@ -61,6 +61,15 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cancel Recording ähnelt.
+        /// </summary>
+        internal static string CancelRecordingButton {
+            get {
+                return ResourceManager.GetString("CancelRecordingButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die CO2 Levels:  ähnelt.
         /// </summary>
         internal static string CO2LevelsLabel {
@@ -93,6 +102,15 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string NoSensorFoundStatusLabel {
             get {
                 return ResourceManager.GetString("NoSensorFoundStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Location:  ähnelt.
+        /// </summary>
+        internal static string RecordingLocationLabel {
+            get {
+                return ResourceManager.GetString("RecordingLocationLabel", resourceCulture);
             }
         }
         
@@ -147,6 +165,15 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string Sort_Distance {
             get {
                 return ResourceManager.GetString("Sort_Distance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die SubmitRecording ähnelt.
+        /// </summary>
+        internal static string SubmitRecordingButton {
+            get {
+                return ResourceManager.GetString("SubmitRecordingButton", resourceCulture);
             }
         }
     }

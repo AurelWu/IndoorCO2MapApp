@@ -27,7 +27,7 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         // START RECORDING
         // ----------------------------------------------------------------------
-        public async Task StartRecordingAsync(string nwrType, long nwrID, string monitorType)
+        public async Task StartRecordingAsync(string nwrType, long nwrID, string locationName, string monitorType)
         {
             if (IsRecording)
 
@@ -39,6 +39,7 @@ namespace IndoorCO2MapAppV2.Recording
             {
                 NwrId = nwrID,
                 NwrType = nwrType,
+                LocationName = locationName,
                 RecordingStart = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 MeasurementData = new(),
                 CO2MonitorType = monitorType,

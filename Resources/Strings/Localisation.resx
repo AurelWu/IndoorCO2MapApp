@@ -147,4 +147,13 @@
   <data name="Sort_Distance" xml:space="preserve">
     <value>Distance</value>
   </data>
+  <data name="RecordingLocationLabel" xml:space="preserve">
+    <value>Location: </value>
+  </data>
+  <data name="CancelRecordingButton" xml:space="preserve">
+    <value>Cancel Recording</value>
+  </data>
+  <data name="SubmitRecordingButton" xml:space="preserve">
+    <value>SubmitRecording</value>
+  </data>
 </root>

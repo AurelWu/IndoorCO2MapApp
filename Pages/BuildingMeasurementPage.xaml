@@ -2,14 +2,16 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
                xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
                x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage">
 
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
+    <Label x:Name="MeasuredLocationLabel" Text="[ReplacedByLocationName]"/>
 
-    <StackLayout>
+            <StackLayout>
         <controls:LineChartView x:Name="lineChartView"
                              HeightRequest="150"
                              WidthRequest="400" />
@@ -29,10 +31,13 @@
      WidthRequest="375"
      HeightRequest="60"/>
 
+            <Button Text="{x:Static t:Localisation.SubmitRecordingButton}"
+            Clicked="OnSubmitRecordingClicked"
+            HorizontalOptions="Fill" />
 
-    <Button Text="Cancel"
-                Clicked="OnCancelClicked"
-                HorizontalOptions="Fill" />
+            <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
+            Clicked="OnCancelClicked"
+            HorizontalOptions="Fill" />
 
     </VerticalStackLayout>
     </ScrollView>

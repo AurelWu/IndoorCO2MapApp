@@ -10,6 +10,8 @@ namespace IndoorCO2MapAppV2.Recording
         public string CO2MonitorType { get; set; } = "";
         public long NwrId { get; set; }
         public string NwrType { get; set; } = "";
+
+        public string LocationName { get; set; } = ""; //only used for UI purposes
         public long RecordingStart { get; set; }
 
         public List<CO2Reading> MeasurementData { get; set; } = new();
