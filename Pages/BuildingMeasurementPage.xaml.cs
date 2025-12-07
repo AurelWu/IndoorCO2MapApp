@@ -1,3 +1,4 @@
+﻿using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
@@ -18,7 +19,8 @@ namespace IndoorCO2MapAppV2.Pages
 
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;            
             UpdateChart();
-            MeasuredLocationLabel.Text = Localisation.RecordingLocationLabel + RecordingManager.Instance.ActiveRecording?.LocationName ?? "ID: " + RecordingManager.Instance.ActiveRecording!.NwrType + RecordingManager.Instance.ActiveRecording.NwrId.ToString();
+            UpdateSubmitButtonState();
+            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
         }
 
         protected override void OnDisappearing()
@@ -29,13 +31,13 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
         private void OnMeasurementUpdated()
-        {
-            //MeasuredLocationLabel.Text = Localisation.RecordingLocationLabel + RecordingManager.Instance.ActiveRecording?.LocationName ?? "ID: " + RecordingManager.Instance.ActiveRecording!.NwrType + RecordingManager.Instance.ActiveRecording.NwrId.ToString();
+        {            
             MainThread.BeginInvokeOnMainThread(UpdateChart);
         }
 
         private void UpdateChart()
         {
+            UpdateSubmitButtonState();
             var rec = RecordingManager.Instance.ActiveRecording;
             if (rec == null)
                 return;
@@ -57,11 +59,14 @@ namespace IndoorCO2MapAppV2.Pages
                 (int)TrimSilder.LowerValue,
                 (int)TrimSilder.UpperValue
             );
+
+            SubmitButton.IsEnabled = data.Count >= 5;
         }
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
             UpdateChart();
+            UpdateSubmitButtonState();
         }
 
         private async Task CancelMeasurementAsync()
@@ -88,9 +93,74 @@ namespace IndoorCO2MapAppV2.Pages
             CancelMeasurementAsync().SafeFireAndForget();
         }
 
-        private void OnSubmitRecordingClicked(object sender, EventArgs e)
+        private async void OnSubmitRecordingClicked(object sender, EventArgs e)
         {
-            //check if 5 data points - if less then do nothing (button should be disabled anyways but should still do sanity check here - and eventually provide feedback even if button should not be in state and tell itself)
+            var rec = RecordingManager.Instance.ActiveRecording;
+
+            if (rec == null)
+            {
+                await DisplayAlert("Error", "No recording active.", "OK");
+                return;
+            }
+
+
+
+            int trimStart = (int)TrimSilder.LowerValue;
+            int trimEnd = (int)TrimSilder.UpperValue;
+
+            var trimmed = rec.MeasurementData
+                .Skip(trimStart)
+                .Take(trimEnd - trimStart + 1)
+                .ToList();
+
+            // Stub: this is where submission later goes
+            await SubmitRecordingStubAsync(trimmed);
+
+            //await DisplayAlert(
+            //    Localisation.SubmitRecordingSuccessTitle,
+            //    Localisation.SubmitRecordingSuccessMessage,
+            //    "OK"
+            //);
+
+            // Stop recording and go home
+            RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
+            await NavigateAsync("///home");
+        }
+
+        private Task SubmitRecordingStubAsync(List<CO2Reading> trimmed)
+        {
+            // TODO: implement actual upload later
+            System.Diagnostics.Debug.WriteLine($"Submitting {trimmed.Count} data points...");
+            return Task.CompletedTask;
+        }
+
+        private void UpdateSubmitButtonState()
+        {
+            var rec = RecordingManager.Instance.ActiveRecording;
+
+            if (TrimSilder == null) return;
+            int trimStart = (int)TrimSilder.LowerValue;
+            int trimEnd = (int)TrimSilder.UpperValue;
+
+            var trimmed = rec.MeasurementData
+                .Skip(trimStart)
+                .Take(trimEnd - trimStart + 1)
+                .ToList();
+
+
+            if (trimmed.Count < 5)
+            {
+                SubmitButton.IsEnabled = false;
+                SubmitButton.Text = string.Format(
+                    Localisation.SubmitRecordingButtonNeedData,
+                    trimmed.Count
+                );
+            }
+            else
+            {
+                SubmitButton.IsEnabled = true;
+                SubmitButton.Text = Localisation.SubmitRecordingButton;
+            }
         }
     }
 }

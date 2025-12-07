@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Resources.Strings;
 using System.Text.Json;
 
 namespace IndoorCO2MapAppV2.Recording
@@ -115,6 +116,25 @@ namespace IndoorCO2MapAppV2.Recording
                 ActiveRecording.MeasurementData.Add(new CO2Reading(v, 0, DateTime.Now));
             }
             MeasurementDataUpdated?.Invoke();
+        }
+
+        // ----------------------------------------------------------------------
+        // UI Helper Methods
+        // ----------------------------------------------------------------------
+        public string CurrentLocationDisplay
+        {
+            get
+            {
+                if (ActiveRecording == null)
+                    return "[No Recording]";
+
+                // Prefer user-friendly name if available
+                if (!string.IsNullOrWhiteSpace(ActiveRecording.LocationName))
+                    return $"Location: {Localisation.RecordingLocationLabel}{ActiveRecording.LocationName}";
+
+                // Otherwise fall back to OSM type + ID
+                return $"Location ID: {ActiveRecording.NwrType} {ActiveRecording.NwrId}";
+            }
         }
     }
 }

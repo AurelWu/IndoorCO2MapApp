@@ -169,11 +169,20 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die SubmitRecording ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Submit Recording ähnelt.
         /// </summary>
         internal static string SubmitRecordingButton {
             get {
                 return ResourceManager.GetString("SubmitRecordingButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0}/5 data points needed to submit ähnelt.
+        /// </summary>
+        internal static string SubmitRecordingButtonNeedData {
+            get {
+                return ResourceManager.GetString("SubmitRecordingButtonNeedData", resourceCulture);
             }
         }
     }

@@ -154,6 +154,9 @@
     <value>Cancel Recording</value>
   </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
-    <value>SubmitRecording</value>
+    <value>Submit Recording</value>
+  </data>
+  <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
+    <value>{0}/5 data points needed to submit</value>
   </data>
 </root>

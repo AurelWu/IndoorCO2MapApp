@@ -31,9 +31,10 @@
      WidthRequest="375"
      HeightRequest="60"/>
 
-            <Button Text="{x:Static t:Localisation.SubmitRecordingButton}"
-            Clicked="OnSubmitRecordingClicked"
-            HorizontalOptions="Fill" />
+            <Button x:Name="SubmitButton"
+                    Text="{x:Static t:Localisation.SubmitRecordingButton}"
+                    Clicked="OnSubmitRecordingClicked"
+                    HorizontalOptions="Fill" />
 
             <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
             Clicked="OnCancelClicked"
