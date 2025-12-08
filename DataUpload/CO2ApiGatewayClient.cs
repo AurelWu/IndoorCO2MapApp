@@ -10,8 +10,6 @@ using IndoorCO2MapAppV2.DebugTools;
 
 namespace IndoorCO2MapAppV2.DataUpload
 {
-    internal class CO2ApiGatewayClient
-    {
         public class Co2ApiGatewayClient
         {
             private static readonly HttpClient client = new()
@@ -94,5 +92,4 @@ namespace IndoorCO2MapAppV2.DataUpload
                 }
             }
         }
-    }
 }

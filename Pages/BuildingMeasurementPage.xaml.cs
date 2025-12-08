@@ -2,6 +2,9 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
+using IndoorCO2MapAppV2.DataUpload;
+using IndoorCO2MapAppV2.Enumerations;
+
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -20,7 +23,7 @@ namespace IndoorCO2MapAppV2.Pages
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;            
             UpdateChart();
             UpdateSubmitButtonState();
-            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
+            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;            
         }
 
         protected override void OnDisappearing()
@@ -47,17 +50,17 @@ namespace IndoorCO2MapAppV2.Pages
                 return;
 
             // Update slider range
-            TrimSilder.Maximum = data.Count - 1;
+            TrimSlider.Maximum = data.Count - 1;
 
             // Keep trim valid
-            if (TrimSilder.UpperValue > data.Count - 1)
-                TrimSilder.UpperValue = data.Count - 1;
+            if (TrimSlider.UpperValue > data.Count - 1)
+                TrimSlider.UpperValue = data.Count - 1;
 
             // Update chart
             lineChartView.SetData(
                 data,
-                (int)TrimSilder.LowerValue,
-                (int)TrimSilder.UpperValue
+                (int)TrimSlider.LowerValue,
+                (int)TrimSlider.UpperValue
             );
 
             SubmitButton.IsEnabled = data.Count >= 5;
@@ -95,52 +98,37 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async void OnSubmitRecordingClicked(object sender, EventArgs e)
         {
-            var rec = RecordingManager.Instance.ActiveRecording;
-
-            if (rec == null)
-            {
-                await DisplayAlert("Error", "No recording active.", "OK");
-                return;
-            }
-
-
-
-            int trimStart = (int)TrimSilder.LowerValue;
-            int trimEnd = (int)TrimSilder.UpperValue;
-
-            var trimmed = rec.MeasurementData
-                .Skip(trimStart)
-                .Take(trimEnd - trimStart + 1)
-                .ToList();
-
-            // Stub: this is where submission later goes
-            await SubmitRecordingStubAsync(trimmed);
-
-            //await DisplayAlert(
-            //    Localisation.SubmitRecordingSuccessTitle,
-            //    Localisation.SubmitRecordingSuccessMessage,
-            //    "OK"
-            //);
-
-            // Stop recording and go home
-            RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
-            await NavigateAsync("///home");
+           SubmitRecordingAsync().SafeFireAndForget();
         }
 
-        private Task SubmitRecordingStubAsync(List<CO2Reading> trimmed)
+        private async Task SubmitRecordingAsync()
         {
-            // TODO: implement actual upload later
-            System.Diagnostics.Debug.WriteLine($"Submitting {trimmed.Count} data points...");
-            return Task.CompletedTask;
+            var rec = RecordingManager.Instance.ActiveRecording;
+
+            var builder = new APISubmissionBuilder(
+                rec,
+                trimMin: (int)TrimSlider.LowerValue,
+                trimMax: (int)TrimSlider.UpperValue
+            );
+
+            var submission = builder.Build();
+
+            string json = submission.ToJson(
+                (int)TrimSlider.LowerValue,
+                (int)TrimSlider.UpperValue
+            );
+
+            await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
+            //display success message and return to home
         }
 
         private void UpdateSubmitButtonState()
         {
             var rec = RecordingManager.Instance.ActiveRecording;
 
-            if (TrimSilder == null) return;
-            int trimStart = (int)TrimSilder.LowerValue;
-            int trimEnd = (int)TrimSilder.UpperValue;
+            if (TrimSlider == null) return;
+            int trimStart = (int)TrimSlider.LowerValue;
+            int trimEnd = (int)TrimSlider.UpperValue;
 
             var trimmed = rec.MeasurementData
                 .Skip(trimStart)

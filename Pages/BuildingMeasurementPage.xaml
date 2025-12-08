@@ -18,7 +18,7 @@
     </StackLayout>
 
     <controls:RangeSlider
-     x:Name="TrimSilder"
+     x:Name="TrimSlider"
      RangeChanged="OnTrimChanged"
      Minimum="0"
      Maximum="20"
