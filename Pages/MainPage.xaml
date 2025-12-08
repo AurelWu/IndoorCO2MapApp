@@ -11,6 +11,7 @@
 
     <local:AppPage.Resources>
         <ResourceDictionary>
+            <ui:ExpandButtonTextConverter x:Key="ExpandButtonTextConverter"/>
             <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
             <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
             <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
@@ -143,10 +144,10 @@
                 Command="{Binding StartBuildingRecordingCommand}"
                 IsEnabled="{Binding CanStartBuildingRecording}" />
             <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
+            <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
             <!--
             <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
-            <Button Text="Map" Clicked="OnNavigateClicked" CommandParameter="///map" HorizontalOptions="Fill"/>
-            <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
+            <Button Text="Map" Clicked="OnNavigateClicked" CommandParameter="///map" HorizontalOptions="Fill"/>            
             <Button Text="Debug Menu" Clicked="OnNavigateClicked" CommandParameter="///debugMainMenu" HorizontalOptions="Fill"/>
             -->
 

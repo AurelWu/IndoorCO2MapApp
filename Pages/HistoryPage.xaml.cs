@@ -1,4 +1,5 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
 
 namespace IndoorCO2MapAppV2.Pages
@@ -8,6 +9,7 @@ namespace IndoorCO2MapAppV2.Pages
         public HistoryPage()
         {
             InitializeComponent();
+            BindingContext = new HistoryViewModel();
         }      
     }
 }

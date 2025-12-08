@@ -72,7 +72,6 @@ public partial class RangeSlider : ContentView
         UpdateTrackHeight();
         UpdateTrackColors();
 
-        // Set explicit layout flags for cross-platform consistency
         AbsoluteLayout.SetLayoutFlags(_track, AbsoluteLayoutFlags.None);
         AbsoluteLayout.SetLayoutFlags(_highlight, AbsoluteLayoutFlags.None);
         AbsoluteLayout.SetLayoutFlags(_lowerThumb, AbsoluteLayoutFlags.None);
@@ -83,17 +82,9 @@ public partial class RangeSlider : ContentView
         _layout.Children.Add(_lowerThumb);
         _layout.Children.Add(_upperThumb);
 
-        // Listen to layout's size changes for reliable initialization
-        _layout.SizeChanged += (s, e) =>
-        {
-            if (_layout.Width > 0 && _layout.Height > 0 && !_isInitialized)
-            {
-                _isInitialized = true;
-                UpdateLayoutPositions();
-            }
-        };
-
         Content = _layout;
+
+        Loaded += (s, e) => UpdateLayoutPositions(); // <<< first layout after real width is known
 
         // Gesture recognizers
         var lowerPan = new PanGestureRecognizer();
@@ -341,26 +332,15 @@ public partial class RangeSlider : ContentView
 
     private void UpdateLayoutPositions()
     {
-        // Must check both ContentView size and internal layout size
-        if (_isDragging || _layout.Width <= 0 || _layout.Height <= 0)
-            return;
+        if (this.Width <= 0 || this.Height <= 0) return;
 
-        // Force initialization if we have valid dimensions
-        if (!_isInitialized && _layout.Width > 0 && _layout.Height > 0)
-        {
-            _isInitialized = true;
-        }
-
-        if (!_isInitialized) return;
-
-        double trackWidth = _layout.Width - ThumbSize;
+        double trackWidth = this.Width - ThumbSize;
         double lowerPos = ValueToPosition(LowerValue, trackWidth);
         double upperPos = ValueToPosition(UpperValue, trackWidth);
-        double centerY = _layout.Height / 2 - ThumbSize / 2;
-        double trackCenterY = _layout.Height / 2 - TrackHeight / 2;
+        double centerY = this.Height / 2 - ThumbSize / 2;
+        double trackCenterY = this.Height / 2 - TrackHeight / 2;
 
-        // Update all elements
-        AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, trackCenterY, _layout.Width, TrackHeight));
+        AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, trackCenterY, this.Width, TrackHeight));
         AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lowerPos + ThumbSize / 2, trackCenterY, upperPos - lowerPos, TrackHeight));
         AbsoluteLayout.SetLayoutBounds(_lowerThumb, new Rect(lowerPos, centerY, ThumbSize, ThumbSize));
         AbsoluteLayout.SetLayoutBounds(_upperThumb, new Rect(upperPos, centerY, ThumbSize, ThumbSize));

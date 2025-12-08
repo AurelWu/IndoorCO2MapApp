@@ -2,8 +2,21 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+             xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
              x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
              Title="History">
+
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:ExpandButtonTextConverter x:Key="ExpandButtonTextConverter"/>
+            <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+            <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
+            <ui:UnixTimeToDateTimeConverter x:Key="UnixTimeToDateTimeConverter"/>
+            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
+                   TrueText="Fetching Data..."
+                   FalseText="Search Buildings"/>
+        </ResourceDictionary>
+    </local:AppPage.Resources>
 
     <VerticalStackLayout Padding="30" Spacing="25">
 
@@ -12,6 +25,36 @@
                HorizontalOptions="Center" />
 
         <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+
+        <CollectionView x:Name="RecordingsCollection"
+                Margin="10"
+                ItemsSource="{Binding Recordings}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout>
+                        <Grid Padding="5" ColumnDefinitions="*,*,*">
+                            <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}" Grid.Column="0"/>
+                            <Label Text="{Binding LocationName}" Grid.Column="1"/>
+                            <Label Text="{Binding AvgCO2}" Grid.Column="2"/>
+                        </Grid>
+
+                        <!-- Expandable details -->
+                        <Label Text="{Binding Values}" 
+                       IsVisible="{Binding IsExpanded}" 
+                       LineBreakMode="WordWrap"
+                       FontSize="12"
+                       Margin="10,0,0,10"/>
+
+                        <Button Text="{Binding IsExpanded, Converter={StaticResource ExpandButtonTextConverter}}"
+                        Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
+                        CommandParameter="{Binding .}"
+                        FontSize="12"
+                        HorizontalOptions="Start"/>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
 
     </VerticalStackLayout>
 

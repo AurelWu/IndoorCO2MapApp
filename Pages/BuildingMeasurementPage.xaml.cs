@@ -4,6 +4,7 @@ using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.DataUpload;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.PersistentData;
 
 
 namespace IndoorCO2MapAppV2.Pages
@@ -31,6 +32,18 @@ namespace IndoorCO2MapAppV2.Pages
             base.OnDisappearing();
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+
+            double targetWidth = width * 0.80;      // 80% of screen width
+            double sliderWidth = targetWidth - 25;  // minus 25px for the RangeSlider
+
+            lineChartView.WidthRequest = targetWidth;
+            TrimSlider.WidthRequest = sliderWidth;
+            TrimSlider.ForceLayout();
         }
 
         private void OnMeasurementUpdated()
@@ -119,6 +132,22 @@ namespace IndoorCO2MapAppV2.Pages
             );
 
             await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
+
+            var activeRecording = RecordingManager.Instance!.ActiveRecording!;
+
+            var persistentRecording = new PersistentData.PersistentRecording
+            {
+                DateTime = activeRecording.RecordingStart,
+                LocationName = activeRecording.LocationName,
+                NWRId = activeRecording.NwrId,
+                NWRType = activeRecording.NwrType,
+                AvgCO2 = activeRecording.MeasurementData.Average(x => x.Ppm),
+                Values = string.Join(";", activeRecording.MeasurementData.Select(x=>x.Ppm))
+            };
+
+            await App.Database.SaveRecordingAsync(persistentRecording);
+
+
             //display success message and return to home
         }
 
