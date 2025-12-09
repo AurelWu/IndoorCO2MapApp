@@ -36,13 +36,6 @@
                     Clicked="OnSubmitRecordingClicked"
                     HorizontalOptions="Fill" />
 
-            <Label x:Name="SubmitStatusLabel"
-                    Text=""
-                    TextColor="Gray"
-                    HorizontalOptions="Center"
-                    Margin="0,5,0,0"
-                    IsVisible="False" />
-
             <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
             Clicked="OnCancelClicked"
             HorizontalOptions="Fill" />

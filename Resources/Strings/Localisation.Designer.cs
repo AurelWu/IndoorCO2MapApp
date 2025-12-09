@@ -133,7 +133,7 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Fetching Data... ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Retrieving Location Data... ähnelt.
         /// </summary>
         internal static string SearchBuildingButtonLabel_Searching {
             get {

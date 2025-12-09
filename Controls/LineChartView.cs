@@ -28,6 +28,17 @@ namespace IndoorCO2MapAppV2.Controls
             Invalidate(); // Force the view to redraw with the new data
         }
 
+        /// <summary>
+        /// Clears the chart completely.
+        /// </summary>
+        public void Clear()
+        {
+            _drawable.Data = Array.Empty<int>();
+            _drawable._trimStart = 0;
+            _drawable._trimEnd = 0;
+            Invalidate(); // Redraw empty chart
+        }
+
         private void UpdateThemeColor()
         {
             // Retrieve the theme color from the resources
@@ -172,11 +183,6 @@ namespace IndoorCO2MapAppV2.Controls
                 canvas.StrokeSize = 2;
                 canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, height - paddingBottom); // Y-axis
                 canvas.DrawLine(paddingLeft, height - paddingBottom, width - paddingRight, height - paddingBottom); // X-axis
-
-
-
-
-
 
             }
 

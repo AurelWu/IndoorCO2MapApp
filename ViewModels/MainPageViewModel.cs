@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.Recording;
+using IndoorCO2MapAppV2.Spatial;
 using System.ComponentModel;
 
 namespace IndoorCO2MapAppV2.ViewModels
@@ -14,14 +15,17 @@ namespace IndoorCO2MapAppV2.ViewModels
         public BuildingSearchViewModel BuildingSearch { get; }
         public SettingsViewModel Settings { get; }
 
+        public OverpassFetchState FetchState { get; }
+
         public MainPageViewModel()
         {
             StartBuildingRecordingCommand = new AsyncRelayCommand(StartRecordingAsync);
             Sensor = new SensorViewModel();
             BuildingSearch = new BuildingSearchViewModel();
             Settings = SettingsViewModel.Instance;
+            FetchState = OverpassDataFetcher.Instance.State;
 
-            Sensor.PropertyChanged += (s, e) =>
+        Sensor.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(Sensor.SelectedDevice) ||
                     e.PropertyName == nameof(Sensor.CurrentCO2))

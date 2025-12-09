@@ -139,7 +139,7 @@
     <value>Search Buildings</value>
   </data>
   <data name="SearchBuildingButtonLabel_Searching" xml:space="preserve">
-    <value>Fetching Data...</value>
+    <value>Retrieving Location Data...</value>
   </data>
   <data name="Sort_Alphabetical" xml:space="preserve">
     <value>Alphabetical</value>

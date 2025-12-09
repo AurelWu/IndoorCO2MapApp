@@ -112,7 +112,11 @@ namespace IndoorCO2MapAppV2.Recording
                 return;
 
             var dateTime = DateTimeOffset.UtcNow.DateTime;
-            ActiveRecording.MeasurementData.Clear();
+            if(ActiveRecording!= null && ActiveRecording.MeasurementData!= null)
+            {
+                ActiveRecording.MeasurementData.Clear();
+            }
+            if (ActiveRecording == null) return;
             foreach (var v in hist)
             {
                 ActiveRecording.MeasurementData.Add(new CO2Reading(v, 0, DateTime.Now));

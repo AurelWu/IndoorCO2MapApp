@@ -6,11 +6,12 @@ using IndoorCO2MapAppV2.DataUpload;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.PersistentData;
 
-
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class BuildingMeasurementPage : AppPage
     {
+        private CancellationTokenSource _trimCts;
+
         public BuildingMeasurementPage()
         {
             InitializeComponent();
@@ -19,18 +20,24 @@ namespace IndoorCO2MapAppV2.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            
 
-            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;            
-            UpdateChart();
-            UpdateSubmitButtonState();
-            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;            
+            RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
+
+            // Clears chart so previous recording doesn't show
+            lineChartView.Clear();
+
+            // UI-safe async initialization
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
+                await UpdateChartAsync();
+            });
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
         }
 
@@ -38,8 +45,8 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnSizeAllocated(width, height);
 
-            double targetWidth = width * 0.80;      // 80% of screen width
-            double sliderWidth = targetWidth - 25;  // minus 25px for the RangeSlider
+            double targetWidth = width * 0.80;
+            double sliderWidth = targetWidth - 25;
 
             lineChartView.WidthRequest = targetWidth;
             TrimSlider.WidthRequest = sliderWidth;
@@ -47,42 +54,54 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
         private void OnMeasurementUpdated()
-        {            
-            MainThread.BeginInvokeOnMainThread(UpdateChart);
+        {
+            MainThread.BeginInvokeOnMainThread(async () => await UpdateChartAsync());
         }
 
-        private void UpdateChart()
+        private async Task UpdateChartAsync()
         {
-            UpdateSubmitButtonState();
             var rec = RecordingManager.Instance.ActiveRecording;
-            if (rec == null)
+            if (rec == null || rec.MeasurementData == null || rec.MeasurementData.Count == 0)
+            {
+                await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
                 return;
+            }
 
             var data = rec.MeasurementData;
-            if (data == null || data.Count == 0)
-                return;
 
-            // Update slider range
-            TrimSlider.Maximum = data.Count - 1;
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                TrimSlider.Maximum = data.Count - 1;
+                if (TrimSlider.UpperValue > data.Count - 1)
+                    TrimSlider.UpperValue = data.Count - 1;
 
-            // Keep trim valid
-            if (TrimSlider.UpperValue > data.Count - 1)
-                TrimSlider.UpperValue = data.Count - 1;
+                lineChartView.SetData(
+                    data,
+                    (int)TrimSlider.LowerValue,
+                    (int)TrimSlider.UpperValue
+                );
+            });
 
-            // Update chart
-            lineChartView.SetData(
-                data,
-                (int)TrimSlider.LowerValue,
-                (int)TrimSlider.UpperValue
-            );
-
-            SubmitButton.IsEnabled = data.Count >= 5;
+            UpdateSubmitButtonState();
         }
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
-            UpdateChart();
-            UpdateSubmitButtonState();
+            // debounce rapid slider changes
+            _trimCts?.Cancel();
+            _trimCts = new CancellationTokenSource();
+            var token = _trimCts.Token;
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+                    await Task.Delay(150, token);
+                    if (!token.IsCancellationRequested)
+                        await UpdateChartAsync();
+                }
+                catch (TaskCanceledException) { }
+            });
         }
 
         private async Task CancelMeasurementAsync()
@@ -96,10 +115,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (answer)
             {
-                RecordingManager.Instance
-                    .StopRecordingAsync()
-                    .SafeFireAndForget();
-
+                RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
                 await NavigateAsync("///home");
             }
         }
@@ -109,27 +125,22 @@ namespace IndoorCO2MapAppV2.Pages
             CancelMeasurementAsync().SafeFireAndForget();
         }
 
-        private async void OnSubmitRecordingClicked(object sender, EventArgs e)
+        private void OnSubmitRecordingClicked(object sender, EventArgs e)
         {
-           SubmitRecordingAsync().SafeFireAndForget();
+            SubmitRecordingAsync().SafeFireAndForget();
         }
 
         private async Task SubmitRecordingAsync()
         {
-            // Disable button during submission
-            SubmitButton.IsEnabled = false;
+            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
 
-            // Option A: Text below button
-            SubmitStatusLabel.Text = "Submitting...";
-            SubmitStatusLabel.IsVisible = true;
-
-            // Option B: Change button text
             string originalButtonText = SubmitButton.Text;
-            SubmitButton.Text = "Submitting...";
+            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting...");
 
             try
             {
                 var rec = RecordingManager.Instance.ActiveRecording;
+                if (rec == null) return;
 
                 var builder = new APISubmissionBuilder(
                     rec,
@@ -138,38 +149,32 @@ namespace IndoorCO2MapAppV2.Pages
                 );
 
                 var submission = builder.Build();
-
                 string json = submission.ToJson();
 
                 await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
 
-                var activeRecording = RecordingManager.Instance!.ActiveRecording!;
-
-                var persistentRecording = new PersistentData.PersistentRecording
+                var persistentRecording = new PersistentRecording
                 {
-                    DateTime = activeRecording.RecordingStart,
-                    LocationName = activeRecording.LocationName,
-                    NWRId = activeRecording.NwrId,
-                    NWRType = activeRecording.NwrType,
-                    AvgCO2 = activeRecording.MeasurementData.Average(x => x.Ppm),
-                    Values = string.Join(";", activeRecording.MeasurementData.Select(x => x.Ppm))
+                    DateTime = rec.RecordingStart,
+                    LocationName = rec.LocationName,
+                    NWRId = rec.NwrId,
+                    NWRType = rec.NwrType,
+                    AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
+                    Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm))
                 };
 
                 await App.Database.SaveRecordingAsync(persistentRecording);
 
-                // Success dialog
                 await DisplayAlertAsync(
                     "Upload Complete",
                     "Your measurement was successfully submitted.",
                     "OK"
                 );
 
-                // Navigate to home
                 await NavigateAsync("///home");
             }
             catch (Exception ex)
             {
-                // Failure dialog
                 await DisplayAlertAsync(
                     "Upload Failed",
                     $"Something went wrong while submitting your data.\n\nDetails: {ex.Message}",
@@ -178,19 +183,23 @@ namespace IndoorCO2MapAppV2.Pages
             }
             finally
             {
-                // Reset UI
-                SubmitButton.Text = originalButtonText;
-                SubmitStatusLabel.IsVisible = false;
-                SubmitButton.IsEnabled = true;
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    SubmitButton.Text = originalButtonText;
+                    SubmitButton.IsEnabled = true;
+                });
             }
         }
-
 
         private void UpdateSubmitButtonState()
         {
             var rec = RecordingManager.Instance.ActiveRecording;
+            if (rec == null || rec.MeasurementData == null || TrimSlider == null)
+            {
+                SubmitButton.IsEnabled = false;
+                return;
+            }
 
-            if (TrimSlider == null) return;
             int trimStart = (int)TrimSlider.LowerValue;
             int trimEnd = (int)TrimSlider.UpperValue;
 
@@ -199,20 +208,33 @@ namespace IndoorCO2MapAppV2.Pages
                 .Take(trimEnd - trimStart + 1)
                 .ToList();
 
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (trimmed.Count < 5)
+                {
+                    SubmitButton.IsEnabled = false;
+                    SubmitButton.Text = string.Format(
+                        Localisation.SubmitRecordingButtonNeedData,
+                        trimmed.Count
+                    );
+                }
+                else
+                {
+                    SubmitButton.IsEnabled = true;
+                    SubmitButton.Text = Localisation.SubmitRecordingButton;
+                }
+            });
+        }
 
-            if (trimmed.Count < 5)
+        private void ClearChart()
+        {
+            // Make sure this runs on the main thread
+            MainThread.BeginInvokeOnMainThread(() =>
             {
+                lineChartView.Clear(); // <-- your chart control should have a Clear() or similar method
                 SubmitButton.IsEnabled = false;
-                SubmitButton.Text = string.Format(
-                    Localisation.SubmitRecordingButtonNeedData,
-                    trimmed.Count
-                );
-            }
-            else
-            {
-                SubmitButton.IsEnabled = true;
-                SubmitButton.Text = Localisation.SubmitRecordingButton;
-            }
+                SubmitButton.Text = Localisation.SubmitRecordingButtonNeedData.Replace("{0}", "0");
+            });
         }
     }
 }
