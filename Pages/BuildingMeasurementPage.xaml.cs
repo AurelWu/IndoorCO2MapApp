@@ -116,40 +116,75 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async Task SubmitRecordingAsync()
         {
-            var rec = RecordingManager.Instance.ActiveRecording;
+            // Disable button during submission
+            SubmitButton.IsEnabled = false;
 
-            var builder = new APISubmissionBuilder(
-                rec,
-                trimMin: (int)TrimSlider.LowerValue,
-                trimMax: (int)TrimSlider.UpperValue
-            );
+            // Option A: Text below button
+            SubmitStatusLabel.Text = "Submitting...";
+            SubmitStatusLabel.IsVisible = true;
 
-            var submission = builder.Build();
+            // Option B: Change button text
+            string originalButtonText = SubmitButton.Text;
+            SubmitButton.Text = "Submitting...";
 
-            string json = submission.ToJson(
-                (int)TrimSlider.LowerValue,
-                (int)TrimSlider.UpperValue
-            );
-
-            await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
-
-            var activeRecording = RecordingManager.Instance!.ActiveRecording!;
-
-            var persistentRecording = new PersistentData.PersistentRecording
+            try
             {
-                DateTime = activeRecording.RecordingStart,
-                LocationName = activeRecording.LocationName,
-                NWRId = activeRecording.NwrId,
-                NWRType = activeRecording.NwrType,
-                AvgCO2 = activeRecording.MeasurementData.Average(x => x.Ppm),
-                Values = string.Join(";", activeRecording.MeasurementData.Select(x=>x.Ppm))
-            };
+                var rec = RecordingManager.Instance.ActiveRecording;
 
-            await App.Database.SaveRecordingAsync(persistentRecording);
+                var builder = new APISubmissionBuilder(
+                    rec,
+                    trimMin: (int)TrimSlider.LowerValue,
+                    trimMax: (int)TrimSlider.UpperValue
+                );
 
+                var submission = builder.Build();
 
-            //display success message and return to home
+                string json = submission.ToJson();
+
+                await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
+
+                var activeRecording = RecordingManager.Instance!.ActiveRecording!;
+
+                var persistentRecording = new PersistentData.PersistentRecording
+                {
+                    DateTime = activeRecording.RecordingStart,
+                    LocationName = activeRecording.LocationName,
+                    NWRId = activeRecording.NwrId,
+                    NWRType = activeRecording.NwrType,
+                    AvgCO2 = activeRecording.MeasurementData.Average(x => x.Ppm),
+                    Values = string.Join(";", activeRecording.MeasurementData.Select(x => x.Ppm))
+                };
+
+                await App.Database.SaveRecordingAsync(persistentRecording);
+
+                // Success dialog
+                await DisplayAlertAsync(
+                    "Upload Complete",
+                    "Your measurement was successfully submitted.",
+                    "OK"
+                );
+
+                // Navigate to home
+                await NavigateAsync("///home");
+            }
+            catch (Exception ex)
+            {
+                // Failure dialog
+                await DisplayAlertAsync(
+                    "Upload Failed",
+                    $"Something went wrong while submitting your data.\n\nDetails: {ex.Message}",
+                    "OK"
+                );
+            }
+            finally
+            {
+                // Reset UI
+                SubmitButton.Text = originalButtonText;
+                SubmitStatusLabel.IsVisible = false;
+                SubmitButton.IsEnabled = true;
+            }
         }
+
 
         private void UpdateSubmitButtonState()
         {

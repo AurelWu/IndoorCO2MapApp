@@ -44,53 +44,39 @@ namespace IndoorCO2MapAppV2.Recording
             MeasurementData = new List<CO2Reading>();
         }
 
-        public string ToJson(int rangeSliderMin, int rangeSliderMax)
+        public string ToJson()
         {
-            JObject json = new JObject();
-            int arraySize = ((rangeSliderMax + 1) - rangeSliderMin);
-            string[] ppmArray = new string[arraySize];
-            string[] timestampArray = new string[arraySize];
+            int count = MeasurementData.Count;
 
-            if (rangeSliderMin + 1 > MeasurementData.Count)
+            string[] ppmArray = new string[count];
+            string[] timestampArray = new string[count];
+
+            for (int i = 0; i < count; i++)
             {
-                throw new IndexOutOfRangeException("RangeSliderMin +1 > SensorData Array - this should not happen");
+                ppmArray[i] = MeasurementData[i].Ppm.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                timestampArray[i] = MeasurementData[i].RelativeTimeStamp.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            if (rangeSliderMax > MeasurementData.Count)
+            JObject json = new JObject
             {
-                throw new IndexOutOfRangeException("RangeSliderMax +1 > SensorData Array - this should not happen");
-            }
-
-            int arrayIndex = 0;
-            for (int i = rangeSliderMin; i <= rangeSliderMax; i++)
-            {
-                CO2Reading data = MeasurementData[i];
-                ppmArray[arrayIndex] = data.Ppm.ToString();
-                timestampArray[arrayIndex] = data.RelativeTimeStamp.ToString();
-                arrayIndex++;
-            }
-
-            //OpenWindowsDoors = MainPage.hasOpenWindowsDoors;
-            //VentilationSystem = MainPage.hasVentilationSystem;
-            //AdditionalNotes = MainPage.MainPageSingleton.GetNotesEditorText();
-
-
-            json["d"] = "TestRunNewApp" + System.Random.Shared.Next(0, 100000);
-            json["p"] = NwrType;
-            json["i"] = NwrID;
-            json["n"] = NwrName;
-            json["b"] = StartTime;
-            json["x"] = NwrLongitude; // x = lon
-            json["y"] = NwrLatitude; // y = lat
-            json["w"] = OpenWindowsDoors;
-            json["v"] = VentilationSystem;
-            json["o"] = OccupancyLevel;
-            json["a"] = AdditionalNotes;
-            json["c"] = string.Join(";", ppmArray);
-            json["t"] = string.Join(";", timestampArray);
+                ["d"] = "TestRunNewApp" + Random.Shared.Next(0, 100000),
+                ["p"] = NwrType,
+                ["i"] = NwrID,
+                ["n"] = NwrName,
+                ["b"] = StartTime,
+                ["x"] = NwrLongitude,
+                ["y"] = NwrLatitude,
+                ["w"] = OpenWindowsDoors,
+                ["v"] = VentilationSystem,
+                ["o"] = OccupancyLevel,
+                ["a"] = AdditionalNotes,
+                ["c"] = string.Join(";", ppmArray),
+                ["t"] = string.Join(";", timestampArray)
+            };
 
             return json.ToString();
         }
+
     }
 
     public static class Converter

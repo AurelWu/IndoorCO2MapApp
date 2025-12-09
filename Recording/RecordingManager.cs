@@ -43,7 +43,7 @@ namespace IndoorCO2MapAppV2.Recording
                 LocationName = locationName,
                 Latitude = latitude,
                 Longitude =longitude,
-                RecordingStart = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                RecordingStart = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 MeasurementData = new(),
                 CO2MonitorType = monitorType,
                 AdditionalDataByParameter = new()
@@ -98,8 +98,8 @@ namespace IndoorCO2MapAppV2.Recording
             if (ActiveRecording == null)
                 return;
 
-            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            long minutes = (now - ActiveRecording.RecordingStart) / 60;
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long minutes = (now - ActiveRecording.RecordingStart) / 60000;
 
             if (minutes < 1)
                 return;

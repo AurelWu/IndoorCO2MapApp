@@ -14,7 +14,7 @@ namespace IndoorCO2MapAppV2.UIUtility
             if (value is long unixTime)
             {
                 // Unix time is seconds since 1970-01-01
-                return DateTimeOffset.FromUnixTimeSeconds(unixTime).ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+                return DateTimeOffset.FromUnixTimeMilliseconds(unixTime).ToLocalTime().ToString("yyyy-MM-dd HH:mm");
             }
             else if (value is DateTime dt)
             {
