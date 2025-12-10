@@ -75,6 +75,19 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.DisplayBuildingFilterInputField = value; OnPropertyChanged(); }
         }
 
+        public string SensorFilter
+        {
+            get => UserSettings.Instance.SensorFilter ?? string.Empty;
+            set
+            {
+                if (UserSettings.Instance.SensorFilter != value)
+                {
+                    UserSettings.Instance.SensorFilter = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
 
     }

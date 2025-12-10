@@ -18,6 +18,15 @@ namespace IndoorCO2MapAppV2.PersistentData
 
         public UserSettings() { }
 
+        private string _sensorFilter = string.Empty;
+        public string SensorFilter
+        {
+            get => _sensorFilter;
+            set => SetProperty(ref _sensorFilter, value);
+        }
+
+
+
         private bool _sortBuildingsAlphabetical = true;
         public bool SortBuildingsAlphabetical
         {

@@ -80,6 +80,7 @@ namespace IndoorCO2MapAppV2.Pages
             RefreshSensorListAsync().SafeFireAndForget();
         }
 
+        //TODO: add filter from settings (not just type but also explicit string)
         private async Task RefreshSensorListAsync()
         {
             await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);

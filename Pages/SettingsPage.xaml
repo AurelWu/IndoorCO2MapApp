@@ -8,7 +8,7 @@
 
     <VerticalStackLayout Padding="30" Spacing="25">
 
-        <Label Text="Hello World — Settings"
+        <Label Text="Settings"
                FontSize="24"
                HorizontalOptions="Center" />    
         
@@ -16,6 +16,14 @@
         <Button Text="Sensor Debug" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
         <Button Text="Overpass Debug" Clicked="OnNavigateClicked" CommandParameter="///overpassDebug" HorizontalOptions="Fill"/>
         <Button Text="Building Recording Debug" Clicked="OnNavigateClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
+
+        <VerticalStackLayout Padding="10" Spacing="10">
+            <Label Text="Sensor Filter:" />
+            <Entry
+        Text="{Binding SensorFilter}"
+        Placeholder="Only show Sensors containing this string."
+        ClearButtonVisibility="WhileEditing" />
+        </VerticalStackLayout>
 
         <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
         <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
