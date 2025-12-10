@@ -4,48 +4,55 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:util="clr-namespace:IndoorCO2MapAppV2.UIUtility"
-    xmlns:pages="clr-namespace:IndoorCO2MapAppV2.Pages"
     xmlns:vm="clr-namespace:IndoorCO2MapAppV2.ViewModels">
+
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <util:BooleanToColorConverter x:Key="BooleanToColorConverter" />
+            <util:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.ControlTemplate>
         <ControlTemplate>
-            <Grid RowDefinitions="Auto,*" 
-                  BindingContext="{x:Static vm:StatusViewModel.Instance}">
-
-                <!-- Top status bar -->
-                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                    <ImageButton 
-                        Source="gps_icon_v2.png"
-                        BackgroundColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
-                        Clicked="OnRequestGPSEnableDialog"
-                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton 
-                        Source="gps_icon_permission.png"
-                        BackgroundColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
-                        Clicked="OnRequestGPSPermissionDialog"
-                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton 
-                        Source="bluetoothstatus.png"
-                        BackgroundColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
-                        Clicked="OnRequestBluetoothEnableDialog"
-                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
-                    <ImageButton 
-                        Source="bluetoothscan.png"
-                        BackgroundColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
-                        Clicked="OnRequestBluetoothPermissionsDialog"
-                        Aspect="AspectFit" WidthRequest="75" HeightRequest="75" />
+            <Grid x:Name="RootGrid" RowDefinitions="Auto,*"
+                BindingContext="{x:Static vm:StatusViewModel.Instance}">
+                <!-- LARGE BAR -->
+                <HorizontalStackLayout x:Name="LargeBar"
+                                       Spacing="10"
+                                       HorizontalOptions="Center"
+                                       Padding="10">
+                    <ImageButton Source="gps_icon_v2.png"
+                                 BackgroundColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                                 Clicked="OnRequestGPSEnableDialog"
+                                 WidthRequest="75" HeightRequest="75"/>
+                    <ImageButton Source="gps_icon_permission.png"
+                                 BackgroundColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                                 Clicked="OnRequestGPSPermissionDialog"
+                                 WidthRequest="75" HeightRequest="75"/>
+                    <ImageButton Source="bluetoothstatus.png"
+                                 BackgroundColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                                 Clicked="OnRequestBluetoothEnableDialog"
+                                 WidthRequest="75" HeightRequest="75"/>
+                    <ImageButton Source="bluetoothscan.png"
+                                 BackgroundColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                                 Clicked="OnRequestBluetoothPermissionsDialog"
+                                 WidthRequest="75" HeightRequest="75"/>
                 </HorizontalStackLayout>
 
+                <!-- SMALL BAR -->
+                <Grid x:Name="SmallBar"
+                      BackgroundColor="Green"
+                      Padding="8"
+                      IsVisible="False">
+                    <Label Text="Bluetooth and GPS ready"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
 
-                <!-- Child page content -->
-                <ContentPresenter Grid.Row="1" />
-
+                <!-- CHILD PAGE CONTENT -->
+                <ContentPresenter Grid.Row="1"/>
             </Grid>
         </ControlTemplate>
     </ContentPage.ControlTemplate>
