@@ -15,6 +15,7 @@ namespace IndoorCO2MapAppV2.Pages
     public partial class MainPage : AppPage
     {
         private readonly MainPageViewModel _mainPageViewModel;
+        private bool _initialRefreshDone = false;
 
         private bool sortAlphabetical = false;                                                                                          
 
@@ -38,8 +39,19 @@ namespace IndoorCO2MapAppV2.Pages
 
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
 
-       
+            // Optional: prevent multiple auto-refreshes if navigating back & forth
+            if (!_initialRefreshDone)
+            {
+                _initialRefreshDone = true;
+
+                // Call the same method the button uses
+                OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
+            }
+        }
 
         private void OnSearchRangeChanged(object sender, CheckedChangedEventArgs e)
         {

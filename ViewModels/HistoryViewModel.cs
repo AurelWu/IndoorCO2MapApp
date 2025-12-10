@@ -57,10 +57,20 @@ namespace IndoorCO2MapAppV2.ViewModels
 
 
 
-            LoadRecordings();
+            LoadRecordingsAsync();
         }
 
-        private async void LoadRecordings()
+        public async Task ReloadRecordingsAsync()
+        {
+            var all = await App.Database.GetAllRecordingsAsync();
+            Recordings.Clear();
+            foreach (var r in all)
+            {
+                Recordings.Add(new CO2RecordingItem(r));
+            }
+        }
+
+        private async Task LoadRecordingsAsync()
         {
             var all = await App.Database.GetAllRecordingsAsync();
             Recordings.Clear();

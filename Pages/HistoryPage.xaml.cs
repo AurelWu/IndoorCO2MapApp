@@ -10,6 +10,16 @@ namespace IndoorCO2MapAppV2.Pages
         {
             InitializeComponent();
             BindingContext = new HistoryViewModel();
-        }      
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (BindingContext is HistoryViewModel vm)
+            {
+                vm.ReloadRecordingsAsync().SafeFireAndForget();
+            }
+        }
     }
 }
