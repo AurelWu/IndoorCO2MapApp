@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-             xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
-             x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
-             Title="History">
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+              xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+              x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
+              Title="History">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -13,49 +13,78 @@
             <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
             <ui:UnixTimeToDateTimeConverter x:Key="UnixTimeToDateTimeConverter"/>
             <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
-                   TrueText="Fetching Data..."
-                   FalseText="Search Buildings"/>
+                                      TrueText="Fetching Data..."
+                                      FalseText="Search Buildings"/>
         </ResourceDictionary>
     </local:AppPage.Resources>
 
-    <VerticalStackLayout Padding="30" Spacing="25">
+    <!-- ⭐ BEST PRACTICE ⭐ -->
+    <!-- Use a Grid: top is fixed UI, bottom is the scrollable CollectionView -->
+    <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="20">
 
-        <Label Text="Hello World — History"
-               FontSize="24"
-               HorizontalOptions="Center" />
+        <!-- Top UI (fixed area) -->
+        <VerticalStackLayout Grid.Row="0" Spacing="20">
 
-        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+            <Label Text="History"
+                   FontSize="24"
+                   HorizontalOptions="Center" />
 
-        <CollectionView x:Name="RecordingsCollection"
-                Margin="10"
-                ItemsSource="{Binding Recordings}">
+            <Button Text="Main Menu"
+                    Clicked="OnNavigateClicked"
+                    CommandParameter="///home"
+                    HorizontalOptions="Fill" />
+
+            <!-- Backup + Import -->
+            <HorizontalStackLayout Spacing="15">
+                <Button Text="Export Data"
+                        Command="{Binding ExportCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        CornerRadius="8" />
+
+                <Button Text="Import Data"
+                        Command="{Binding ImportCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="8" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <!-- Scrollable recordings list -->
+        <CollectionView Grid.Row="1"
+                        x:Name="RecordingsCollection"
+                        Margin="0,10,0,0"
+                        ItemsSource="{Binding Recordings}">
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout>
+
                         <Grid Padding="5" ColumnDefinitions="*,*,*">
-                            <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}" Grid.Column="0"/>
+                            <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}"
+                                   Grid.Column="0"/>
                             <Label Text="{Binding LocationName}" Grid.Column="1"/>
                             <Label Text="{Binding AvgCO2}" Grid.Column="2"/>
                         </Grid>
 
                         <!-- Expandable details -->
                         <Label Text="{Binding Values}" 
-                       IsVisible="{Binding IsExpanded}" 
-                       LineBreakMode="WordWrap"
-                       FontSize="12"
-                       Margin="10,0,0,10"/>
+                               IsVisible="{Binding IsExpanded}" 
+                               LineBreakMode="WordWrap"
+                               FontSize="12"
+                               Margin="10,0,0,10"/>
 
                         <Button Text="{Binding IsExpanded, Converter={StaticResource ExpandButtonTextConverter}}"
-                        Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
-                        CommandParameter="{Binding .}"
-                        FontSize="12"
-                        HorizontalOptions="Start"/>
+                                Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
+                                CommandParameter="{Binding .}"
+                                FontSize="12"
+                                HorizontalOptions="Start"/>
                     </StackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+
         </CollectionView>
 
-
-    </VerticalStackLayout>
+    </Grid>
 
 </local:AppPage>

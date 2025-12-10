@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
 using IndoorCO2MapAppV2.PersistentData;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Windows.Input;
-
     public class HistoryViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<CO2RecordingItem> Recordings { get; set; } = new();
 
         public ICommand ToggleExpandCommand { get; }
+        public ICommand ExportCommand { get; }
+        public ICommand ImportCommand { get; }
 
         public HistoryViewModel()
         {
@@ -21,6 +20,42 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 item.IsExpanded = !item.IsExpanded;
             });
+
+            ExportCommand = new Command(async () =>
+            {
+                bool result = await App.BackupService.ExportDatabaseAsync();
+                await App.Current.MainPage.DisplayAlertAsync(
+                    "Export",
+                    result ? "Export completed!" : "Export failed.",
+                    "OK"
+                );
+            });
+
+            ImportCommand = new Command(async () =>
+            {
+                bool result = await App.BackupService.ImportDatabaseAsync();
+
+                if (result)
+                {
+                    // Import succeeded → tell user to restart app
+                    await App.Current.MainPage.DisplayAlertAsync(
+                        "Import Successful",
+                        "Database imported successfully. Please restart the app to load the new database.",
+                        "OK"
+                    );
+                }
+                else
+                {
+                    // Import failed → notify user
+                    await App.Current.MainPage.DisplayAlertAsync(
+                        "Import Failed",
+                        "Could not import the database. Please try again.",
+                        "OK"
+                    );
+                }
+            });
+
+
 
             LoadRecordings();
         }
@@ -38,13 +73,18 @@ namespace IndoorCO2MapAppV2.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
+
     public class CO2RecordingItem : PersistentRecording, INotifyPropertyChanged
     {
         private bool _isExpanded;
         public bool IsExpanded
         {
             get => _isExpanded;
-            set { _isExpanded = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded))); }
+            set
+            {
+                _isExpanded = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
+            }
         }
 
         public CO2RecordingItem(PersistentRecording r)
@@ -54,10 +94,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             LocationName = r.LocationName;
             AvgCO2 = r.AvgCO2;
             Values = r.Values;
-            IsExpanded = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
-
 }
