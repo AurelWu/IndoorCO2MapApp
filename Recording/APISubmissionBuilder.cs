@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.Recording;
 using System;
 using System.Collections.Generic;
+using IndoorCO2MapAppV2.Enumerations;
 
 namespace IndoorCO2MapAppV2.Recording
 {
@@ -14,8 +15,8 @@ namespace IndoorCO2MapAppV2.Recording
         // Additional metadata for submission
         private string _occupancy = "undefined";
         private string _notes = "";
-        private bool _openWindowsDoors = false;
-        private bool _ventilationSystem = false;
+        private TriState _openWindowsDoors = TriState.Unknown;
+        private TriState _ventilationSystem = TriState.Unknown;
 
         public APISubmissionBuilder(BuildingRecording recording, int trimMin, int trimMax)
         {
@@ -41,8 +42,8 @@ namespace IndoorCO2MapAppV2.Recording
 
             submission.OccupancyLevel = _occupancy;
             submission.AdditionalNotes = _notes;
-            submission.OpenWindowsDoors = _openWindowsDoors;
-            submission.VentilationSystem = _ventilationSystem;
+            submission.OpenWindowsDoors = _openWindowsDoors == TriState.Yes; //TODO: currently backend expects bools, so we can't submit "unknown" yet so for now we do this, but at some point we should change that!
+            submission.VentilationSystem = _ventilationSystem == TriState.Yes; //TODO: currently backend expects bools, so we can't submit "unknown" yet so for now we do this, but at some point we should change that!
 
             ApplyTrimmedMeasurements(submission);
 
@@ -60,6 +61,30 @@ namespace IndoorCO2MapAppV2.Recording
                 var m = source[i];
                 submission.MeasurementData.Add(m);
             }
+        }
+
+        public APISubmissionBuilder WithOpenWindowsDoors(TriState value)
+        {
+            _openWindowsDoors = value;
+            return this;
+        }
+
+        public APISubmissionBuilder WithVentilationSystem(TriState value)
+        {
+            _ventilationSystem = value;
+            return this;
+        }
+
+        public APISubmissionBuilder WithOccupancy(string occupancy)
+        {
+            _occupancy = occupancy;
+            return this;
+        }
+
+        public APISubmissionBuilder WithNotes(string notes)
+        {
+            _notes = notes;
+            return this;
         }
     }
 }

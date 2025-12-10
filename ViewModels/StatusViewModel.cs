@@ -71,7 +71,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         // Private constructor for singleton
         private StatusViewModel()
         {
-            _statusTimer = new System.Timers.Timer(1000); // every second
+            _statusTimer = new System.Timers.Timer(1000); 
             _statusTimer.Elapsed += StatusTimer_Elapsed;
             _statusTimer.AutoReset = true;
             _statusTimer.Start();
@@ -79,7 +79,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private void StatusTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            // Ensure UI updates on main thread
+            // continuous updates on main thread
             MainThread.BeginInvokeOnMainThread(UpdateStatus);
         }
 

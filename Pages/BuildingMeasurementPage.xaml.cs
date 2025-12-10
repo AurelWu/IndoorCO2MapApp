@@ -12,6 +12,9 @@ namespace IndoorCO2MapAppV2.Pages
     {
         private CancellationTokenSource _trimCts;
 
+        private TriState _doorsWindowsState = TriState.Unknown;
+        private TriState _ventilationState = TriState.Unknown;
+
         public BuildingMeasurementPage()
         {
             InitializeComponent();
@@ -148,7 +151,10 @@ namespace IndoorCO2MapAppV2.Pages
                     trimMax: (int)TrimSlider.UpperValue
                 );
 
-                var submission = builder.Build();
+                var submission = builder
+                    .WithOpenWindowsDoors(_doorsWindowsState)
+                    .WithVentilationSystem(_ventilationState)
+                    .Build();
                 string json = submission.ToJson();
 
                 await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
@@ -235,6 +241,28 @@ namespace IndoorCO2MapAppV2.Pages
                 SubmitButton.IsEnabled = false;
                 SubmitButton.Text = Localisation.SubmitRecordingButtonNeedData.Replace("{0}", "0");
             });
+        }
+
+        private void OnDoorsWindowsChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (!e.Value) return; // Only handle when a RadioButton becomes checked
+
+            if (sender is RadioButton rb && rb.Value is TriState state)
+            {
+                _doorsWindowsState = state;
+                System.Diagnostics.Debug.WriteLine($"Doors/Windows: {_doorsWindowsState}");
+            }
+        }
+
+        private void OnVentilationChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (!e.Value) return;
+
+            if (sender is RadioButton rb && rb.Value is TriState state)
+            {
+                _ventilationState = state;
+                System.Diagnostics.Debug.WriteLine($"Ventilation: {_ventilationState}");
+            }
         }
     }
 }

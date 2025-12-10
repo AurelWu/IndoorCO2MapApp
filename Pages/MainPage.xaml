@@ -59,6 +59,7 @@
                         GroupName="SearchRange" 
                         VerticalOptions="Center" 
                         CheckedChanged="OnSearchRangeChanged"
+                        IsChecked="True"
                         HorizontalOptions="Start">
                     </RadioButton>
                     

@@ -4,6 +4,7 @@
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
                xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
                xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
+               xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
                x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage">
 
     <ScrollView>
@@ -30,6 +31,60 @@
      HighlightColor="DodgerBlue"
      WidthRequest="375"
      HeightRequest="60"/>
+
+            <VerticalStackLayout Padding="30" Spacing="20">
+
+                <!-- Doors/Windows -->
+                <Label Text="Open Doors / Windows" FontAttributes="Bold" />
+
+                <HorizontalStackLayout Spacing="5">
+                    <RadioButton
+            Content="No data"
+            IsChecked="True"
+            GroupName="DoorsWindowsGroup"
+            Value="{x:Static enums:TriState.Unknown}"
+            CheckedChanged="OnDoorsWindowsChanged" />
+
+                    <RadioButton
+            Content="Yes"
+            GroupName="DoorsWindowsGroup"
+            Value="{x:Static enums:TriState.Yes}"
+            CheckedChanged="OnDoorsWindowsChanged" />
+
+                    <RadioButton
+            Content="No"
+            GroupName="DoorsWindowsGroup"
+            Value="{x:Static enums:TriState.No}"
+            CheckedChanged="OnDoorsWindowsChanged" />
+                </HorizontalStackLayout>
+
+
+                <!-- Ventilation System -->
+                <Label Text="Ventilation System" FontAttributes="Bold" />
+
+                <HorizontalStackLayout Spacing="5">
+                    <RadioButton
+            Content="No data"
+            GroupName="VentilationGroup"
+            IsChecked="True"
+            Value="{x:Static enums:TriState.Unknown}"
+            CheckedChanged="OnVentilationChanged" />
+
+                    <RadioButton
+            Content="Yes"
+            GroupName="VentilationGroup"
+            Value="{x:Static enums:TriState.Yes}"
+            CheckedChanged="OnVentilationChanged" />
+
+                    <RadioButton
+            Content="No"
+            GroupName="VentilationGroup"
+            Value="{x:Static enums:TriState.No}"
+            CheckedChanged="OnVentilationChanged" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+
 
             <Button x:Name="SubmitButton"
                     Text="{x:Static t:Localisation.SubmitRecordingButton}"
