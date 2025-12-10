@@ -13,6 +13,8 @@
             _instance = new BluetoothHelperAndroid();
 #elif IOS
             _instance = new BluetoothHelperApple();
+#elif MACCATALYST
+            _instance = new BluetoothHelperMacCatalyst();
 #else
             _instance = new BluetoothHelperDefault();
 #endif
