@@ -5,6 +5,7 @@ using IndoorCO2MapAppV2.Utility;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using IndoorCO2MapAppV2.DebugTools;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
@@ -125,11 +126,23 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             Status = "Fetch OK, parsing...";
 
-            OverpassDataParser.ParseBuildingLocationOverpassResponse(
+            var result = OverpassDataParser.ParseBuildingLocationOverpassResponse( //that method already puts it in location store
                 json,
                 Latitude.Value,
                 Longitude.Value
             );
+
+            foreach (var location in result)
+            {
+                try
+                {
+                    await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
+                }
+            }
 
             // Now refresh UI list using filter + sorting
             RefreshBuildings();
@@ -141,7 +154,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         // Filtering + Sorting
         // ---------------------------
 
-        private void RefreshBuildings()
+        public void RefreshBuildings()
         {
             if (_locationStore.BuildingLocationData == null)
                 return;

@@ -100,5 +100,35 @@ namespace IndoorCO2MapAppV2.Pages
         {
             SearchBuildingsAsync().SafeFireAndForget();
         }
+
+        private void OnGetCachedLocationsClicked(object sender, EventArgs e)
+        {
+            LoadCachedLocationsAsync().SafeFireAndForget();
+        }
+
+        private async Task LoadCachedLocationsAsync()
+        {
+            await _mainPageViewModel.BuildingSearch.GetGpsAsync();
+            // Make sure we have user location for distance calculation
+            if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
+            {
+                _mainPageViewModel.BuildingSearch.Status = "No valid GPS data yet.";
+                return;
+            }
+
+            double userLat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
+            double userLon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
+
+            // Load cached locations from SQLite
+            var cachedLocations = await App.LocationCacheDb.GetAllAsync(userLat, userLon);
+
+            // Update the LocationStore
+            LocationStore.Instance.SetBuildingLocations(cachedLocations);
+
+            // Refresh UI list
+            _mainPageViewModel.BuildingSearch.RefreshBuildings();
+
+            
+        }
     }
 }

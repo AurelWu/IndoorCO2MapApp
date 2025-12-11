@@ -62,7 +62,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task ReloadRecordingsAsync()
         {
-            var all = await App.Database.GetAllRecordingsAsync();
+            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
             Recordings.Clear();
             foreach (var r in all)
             {
@@ -72,7 +72,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private async Task LoadRecordingsAsync()
         {
-            var all = await App.Database.GetAllRecordingsAsync();
+            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
             Recordings.Clear();
             foreach (var r in all)
             {

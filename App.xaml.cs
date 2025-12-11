@@ -1,22 +1,29 @@
 ﻿using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Spatial;
 
 namespace IndoorCO2MapAppV2
 {
     public partial class App : Application
     {
-        public static LocalDatabase Database { get; private set; }
+        public static LocalDatabase HistoryDatabase { get; private set; }
+        public static LocationCacheDatabase LocationCacheDb { get; private set; }
         public static DatabaseBackupService BackupService { get; private set; }
 
-        public static string DBPath { get; private set; }
+        public static string historyDBPath { get; private set; }
+        public static string locationCacheDbPath { get; private set; }
+
         public App()
         {
             InitializeComponent();
 
-            DBPath = Path.Combine(FileSystem.AppDataDirectory, "co2data.db3");
+            historyDBPath = Path.Combine(FileSystem.AppDataDirectory, "co2data.db3");
+            locationCacheDbPath = Path.Combine(FileSystem.AppDataDirectory, "location_cache.db3");
             BackupService = new DatabaseBackupService();
             DatabaseBackupService.ApplyStagedImport();
 
-            Database = new LocalDatabase(DBPath);
+            HistoryDatabase = new LocalDatabase(historyDBPath);
+
+            LocationCacheDb = new LocationCacheDatabase(locationCacheDbPath);
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
@@ -26,7 +33,7 @@ namespace IndoorCO2MapAppV2
 
         public static void ImportDB(LocalDatabase db)
         {
-            Database = db;
+            HistoryDatabase = db;
         }
     }
 }

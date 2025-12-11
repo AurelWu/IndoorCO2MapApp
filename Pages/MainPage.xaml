@@ -88,6 +88,7 @@
                 <Button
                 x:Name="GetCachedLocationsButton"
                 Text="Get Cached Locations"
+                Clicked="OnGetCachedLocationsClicked"
                 HorizontalOptions="Fill"
                 Grid.Column="1" />
             </Grid>

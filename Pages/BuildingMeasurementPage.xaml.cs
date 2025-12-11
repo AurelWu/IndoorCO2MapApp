@@ -173,7 +173,7 @@ namespace IndoorCO2MapAppV2.Pages
                     Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm))
                 };
 
-                await App.Database.SaveRecordingAsync(persistentRecording);
+                await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
 
                 await DisplayAlertAsync(
                     "Upload Complete",

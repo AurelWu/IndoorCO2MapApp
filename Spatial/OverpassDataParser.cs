@@ -54,7 +54,9 @@ internal static class OverpassDataParser
             if (keepResultsIfEmptyResults == true && locations.Count == 0) return locations;
             LocationStore.Instance.SetBuildingLocations(locations);
         }
+
         
+
         return locations;
     }
 

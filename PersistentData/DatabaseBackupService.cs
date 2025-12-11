@@ -21,7 +21,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             try
             {
                 // Copy live DB to temp
-                File.Copy(App.DBPath, tempPath, true);
+                File.Copy(App.historyDBPath, tempPath, true);
 
                 // Save file using FileSaver
                 FileStream stream = File.OpenRead(tempPath);
@@ -82,7 +82,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             string tempImportPath = Path.Combine(FileSystem.CacheDirectory, TempImportFileName);
             if (File.Exists(tempImportPath))
             {
-                File.Copy(tempImportPath, App.DBPath, true);
+                File.Copy(tempImportPath, App.historyDBPath, true);
                 File.Delete(tempImportPath);
             }
         }
