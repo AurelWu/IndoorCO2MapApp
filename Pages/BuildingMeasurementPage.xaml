@@ -39,6 +39,7 @@
 
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
+            x:Name="DoorsWindowsUnknownRb"
             Content="No data"
             IsChecked="True"
             GroupName="DoorsWindowsGroup"
@@ -46,12 +47,14 @@
             CheckedChanged="OnDoorsWindowsChanged" />
 
                     <RadioButton
+            x:Name="DoorsWindowsYesRb"
             Content="Yes"
             GroupName="DoorsWindowsGroup"
             Value="{x:Static enums:TriState.Yes}"
             CheckedChanged="OnDoorsWindowsChanged" />
 
                     <RadioButton
+            x:Name="DoorsWindowsNoRb"
             Content="No"
             GroupName="DoorsWindowsGroup"
             Value="{x:Static enums:TriState.No}"
@@ -64,6 +67,7 @@
 
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
+            x:Name="VentilationUnknownRb"
             Content="No data"
             GroupName="VentilationGroup"
             IsChecked="True"
@@ -71,12 +75,14 @@
             CheckedChanged="OnVentilationChanged" />
 
                     <RadioButton
+            x:Name="VentilationYesRb"
             Content="Yes"
             GroupName="VentilationGroup"
             Value="{x:Static enums:TriState.Yes}"
             CheckedChanged="OnVentilationChanged" />
 
                     <RadioButton
+            x:Name="VentilationNoRb"
             Content="No"
             GroupName="VentilationGroup"
             Value="{x:Static enums:TriState.No}"

@@ -119,6 +119,7 @@ namespace IndoorCO2MapAppV2.Pages
             if (answer)
             {
                 RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
+                ResetPageForNewMeasurement();
                 await NavigateAsync("///home");
             }
         }
@@ -181,6 +182,7 @@ namespace IndoorCO2MapAppV2.Pages
                     "OK"
                 );
 
+                ResetPageForNewMeasurement();
                 await NavigateAsync("///home");
             }
             catch (Exception ex)
@@ -268,5 +270,45 @@ namespace IndoorCO2MapAppV2.Pages
                 System.Diagnostics.Debug.WriteLine($"Ventilation: {_ventilationState}");
             }
         }
+
+        private void ResetPageForNewMeasurement()
+        {
+            // Reset TriStates
+            _doorsWindowsState = TriState.Unknown;
+            _ventilationState = TriState.Unknown;
+
+            // Reset RadioButtons
+            DoorsWindowsUnknownRb.IsChecked = true;
+            DoorsWindowsYesRb.IsChecked = false;
+            DoorsWindowsNoRb.IsChecked = false;
+
+            VentilationUnknownRb.IsChecked = true;
+            VentilationYesRb.IsChecked = false;
+            VentilationNoRb.IsChecked = false;
+
+
+            // Reset UI elements
+            TrimSlider.Minimum = 0;
+            TrimSlider.UpperValue = 0;
+            TrimSlider.LowerValue = 0;
+
+            TrimSlider.ForceLayout();
+
+            NoteEditor.Text = string.Empty;
+
+            ClearChart();
+
+
+            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay ?? string.Empty;
+
+
+            RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+            RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
+
+
+            SubmitButton.IsEnabled = false;            
+            SubmitButton.Text = Localisation.SubmitRecordingButton;
+        }
+
     }
 }
