@@ -138,6 +138,9 @@ namespace IndoorCO2MapAppV2.Pages
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
 
             string originalButtonText = SubmitButton.Text;
+
+            string customNote = NoteEditor.Text?.Trim() ?? "";
+
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting...");
 
             try
@@ -154,6 +157,7 @@ namespace IndoorCO2MapAppV2.Pages
                 var submission = builder
                     .WithOpenWindowsDoors(_doorsWindowsState)
                     .WithVentilationSystem(_ventilationState)
+                    .WithNotes(customNote)
                     .Build();
                 string json = submission.ToJson();
 

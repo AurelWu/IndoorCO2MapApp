@@ -85,6 +85,20 @@
 
             </VerticalStackLayout>
 
+            <!-- Custom Note -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Custom Note" FontAttributes="Bold" />
+
+                <Editor
+                x:Name="NoteEditor"
+                Placeholder="Add a note about this measurement..."
+                AutoSize="TextChanges"
+                HeightRequest="100"
+                BackgroundColor="White"
+                TextColor="Black"
+                />
+            </VerticalStackLayout>
+
 
             <Button x:Name="SubmitButton"
                     Text="{x:Static t:Localisation.SubmitRecordingButton}"
