@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
@@ -52,6 +53,15 @@ namespace IndoorCO2MapAppV2.Bluetooth
             if (_adapter.IsScanning)
                 await _adapter.StopScanningForDevicesAsync();
 
+            //check permissions            
+
+            var bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
+            var btOn = bluetoothHelper.CheckIfBTEnabled();
+            var btAllowed = bluetoothHelper.CheckPermissions();
+
+            if (!btOn) return;
+            if (!btAllowed) return;
+
             IsScanning = true;
 
             using var cts = new CancellationTokenSource(scanDurationMs);
@@ -71,11 +81,17 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     }
                 }
             }
-
+            
+            _adapter.DeviceDiscovered -= Handler; //safeguard probably not strictly needed
             _adapter.DeviceDiscovered += Handler;
-
+            await _adapter.StopScanningForDevicesAsync(); //might be needed if something still running (or might not be needed)
             try { await _adapter.StartScanningForDevicesAsync(cts.Token); }
-            catch (TaskCanceledException) { }
+            catch (Exception e)
+            {
+                Logger.WriteToLog("Error when calling _adapter.StartScanningForDevicesAsync:" + e.ToString());
+                _adapter.DeviceDiscovered -= Handler;
+                IsScanning = false;
+            }
 
             if (_adapter.IsScanning)
                 await _adapter.StopScanningForDevicesAsync();
