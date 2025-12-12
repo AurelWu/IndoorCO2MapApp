@@ -134,7 +134,7 @@ namespace IndoorCO2MapAppV2.Pages
             SubmitRecordingAsync().SafeFireAndForget();
         }
 
-        private async Task SubmitRecordingAsync()
+        private async Task SubmitRecordingAsync() //this maybe should be in the RecordingManager eventually...
         {
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
 
@@ -182,6 +182,7 @@ namespace IndoorCO2MapAppV2.Pages
                     "OK"
                 );
 
+                Preferences.Remove("RecordingState");
                 ResetPageForNewMeasurement();
                 await NavigateAsync("///home");
             }

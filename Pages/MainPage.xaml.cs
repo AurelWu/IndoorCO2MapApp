@@ -1,12 +1,15 @@
-﻿using IndoorCO2MapAppV2.ExtensionMethods;
+﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -39,19 +42,44 @@ namespace IndoorCO2MapAppV2.Pages
 
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            // Optional: prevent multiple auto-refreshes if navigating back & forth
-            if (!_initialRefreshDone)
+            bool recovered = await TryRecoverRecordingAsync();
+
+            //only do it at startup once
+            if (!_initialRefreshDone && !recovered)
             {
                 _initialRefreshDone = true;
 
-                // Call the same method the button uses
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
             }
         }
+
+        protected async Task<bool> TryRecoverRecordingAsync()
+        {
+            ManualResumeButton.IsVisible = false;
+            var recoveryService = RecoveryManager.Instance;
+            recoveryService.Initialize(BLEDeviceManager.Instance._adapter, RecordingManager.Instance);
+
+            var snapshot = recoveryService.LoadSnapshot();
+            if (snapshot == null) return false;
+            
+            bool recovered = await recoveryService.TryAutoRecoverAsync(_mainPageViewModel.Sensor); //this sets the activeRecording to the saved state //TODO: also seed active sensor to correct one
+            if (!recovered)
+            {
+                // Show Manual Resume button
+                ManualResumeButton.IsVisible = true;
+                return false;
+                // Show UI: automatic recovery failed.
+                // Show Manual Resume Button => will use active Recording but with current sensor... might need to write that to the active recording
+            }
+
+            await NavigateAsync("///building");
+            return true;
+        }
+
 
         private void OnSearchRangeChanged(object sender, CheckedChangedEventArgs e)
         {
@@ -126,9 +154,29 @@ namespace IndoorCO2MapAppV2.Pages
             LocationStore.Instance.SetBuildingLocations(cachedLocations);
 
             // Refresh UI list
-            _mainPageViewModel.BuildingSearch.RefreshBuildings();
+            _mainPageViewModel.BuildingSearch.RefreshBuildings();            
+        }
 
-            
+        private async void OnManualResumeClicked(object sender, EventArgs e)
+        {
+            var recoveryService = RecoveryManager.Instance;
+            var snapshot = recoveryService.LoadSnapshot();
+            if (snapshot == null) return;
+
+            // Use current selected sensor
+            var selectedDevice = _mainPageViewModel.Sensor.SelectedDevice;
+            if (selectedDevice == null)
+            {
+                await DisplayAlertAsync("No Sensor", "Please select a sensor first.", "OK");
+                return;
+            }
+
+            await _mainPageViewModel.Sensor.SelectDeviceAsync(selectedDevice);
+            await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, selectedDevice.Id.ToString());
+
+            ManualResumeButton.IsVisible = false;
+
+            await NavigateAsync("///building");
         }
     }
 }

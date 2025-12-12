@@ -168,6 +168,13 @@
             <Button Text="Start Building Recording"
                 Command="{Binding StartBuildingRecordingCommand}"
                 IsEnabled="{Binding CanStartBuildingRecording}" />
+
+            <Button
+                x:Name="ManualResumeButton"
+                Text="Resume Recording"
+                IsVisible="False"
+                Clicked="OnManualResumeClicked" />
+
             <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
             <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
             <!--

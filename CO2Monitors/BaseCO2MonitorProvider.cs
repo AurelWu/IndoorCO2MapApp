@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.DebugTools;
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using System;
@@ -64,8 +65,17 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
     {
         for (int i = 0; i < RetryCount; i++)
         {
-            var chr = await service.GetCharacteristicAsync(uuid);
-            if (chr != null) return chr;
+            ICharacteristic? chr;
+            try
+            {
+                chr = await service.GetCharacteristicAsync(uuid);
+                if (chr != null) return chr;
+            }
+            catch (Exception e)
+            {
+                Logger.WriteToLog("failed to get characteristic: " + e.ToString());
+            }
+            
             await Task.Delay(RetryDelayMs);
         }
         return null;

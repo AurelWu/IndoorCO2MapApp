@@ -28,7 +28,7 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         // START RECORDING
         // ----------------------------------------------------------------------
-        public async Task StartRecordingAsync(string nwrType, long nwrID, double latitude, double longitude, string locationName, string monitorType)
+        public async Task StartRecordingAsync(string nwrType, long nwrID, double latitude, double longitude, string locationName, string monitorType, string deviceID)
         {
             if (IsRecording)
 
@@ -50,7 +50,7 @@ namespace IndoorCO2MapAppV2.Recording
             };
 
             ActiveRecording = rec;
-
+            SaveRecoverySnapshot(rec, deviceID);
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30)); //updates every 30 seconds.
 
@@ -69,7 +69,7 @@ namespace IndoorCO2MapAppV2.Recording
             _cts = null;
 
             ActiveRecording = null;
-
+            Preferences.Remove("RecordingState");
         }
 
         // ----------------------------------------------------------------------
@@ -141,6 +141,64 @@ namespace IndoorCO2MapAppV2.Recording
                 // Otherwise fall back to OSM type + ID
                 return $"Location ID: {ActiveRecording.NwrType} {ActiveRecording.NwrId}";
             }
+        }
+
+        /// <summary>
+        /// Recovery Mechanism
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
+        /// <summary>
+        /// Restore an active recording once the given deviceId is known/ready.
+        /// This no longer reads Preferences; the caller supplies the snapshot.
+        /// </summary>
+        public async Task TryRecoverRecordingAfterDeviceReadyAsync(RecordingRecoverySnapshot snapshot, string deviceId)
+        {
+            if (snapshot == null || snapshot.MonitorDeviceId != deviceId)
+                return;
+
+            // Restore active recording
+            ActiveRecording = new BuildingRecording
+            {
+                NwrId = snapshot.NwrID,
+                NwrType = snapshot.NwrType,
+                LocationName = snapshot.LocationName,
+                Latitude = snapshot.Latitude,
+                Longitude = snapshot.Longitude,
+                RecordingStart = snapshot.RecordingStart,
+                MeasurementData = new(),
+                CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed
+                AdditionalDataByParameter = new()
+            };
+
+            Logger.WriteToLog("Recovered recording after sensor ready.");
+
+            // Start periodic loop (make sure you dispose previous _cts if any)
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+            _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            _ = RunLoopAsync(_cts.Token);
+
+            // Optionally: signal UI to navigate to recording page.
+        }
+
+        // Recovery Snapshot
+        private void SaveRecoverySnapshot(BuildingRecording recording, string deviceId)
+        {
+            var snapshot = new RecordingRecoverySnapshot
+            {
+                RecordingStart = recording.RecordingStart,
+                NwrID = recording.NwrId,
+                NwrType = recording.NwrType,
+                LocationName = recording.LocationName,
+                Latitude = recording.Latitude,
+                Longitude = recording.Longitude,
+                MonitorType = recording.CO2MonitorType,
+                MonitorDeviceId = deviceId
+            };
+
+            var json = JsonSerializer.Serialize(snapshot);
+            Preferences.Set("RecordingState", json);
         }
     }
 }

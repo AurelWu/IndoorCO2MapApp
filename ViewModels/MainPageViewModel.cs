@@ -57,7 +57,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 BuildingSearch.SelectedBuilding.Latitude,
                 BuildingSearch.SelectedBuilding.Longitude,
                 BuildingSearch.SelectedBuilding.Name,
-                Sensor.SelectedMonitorType.ToString()
+                Sensor.SelectedMonitorType.ToString(),
+                Sensor.SelectedDevice.Id
             );
             await AppPage.NavigateAsync("///building");
         }
