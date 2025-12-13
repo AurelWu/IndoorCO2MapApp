@@ -26,16 +26,19 @@
         ClearButtonVisibility="WhileEditing" />
         </VerticalStackLayout>
 
-        <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+            <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
         
-        <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
-        <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
-        <c:LabeledSegmentedControl Label="Default Sortmode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
+            <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
+            <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
+            <c:LabeledSegmentedControl Label="Default Sortmode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
 
-        <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
-        <c:LabeledSwitch Text="Enable local recording History" IsToggled="{Binding EnableHistory}" />
+            <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
+            <c:LabeledSwitch Text="Enable local recording History" IsToggled="{Binding EnableHistory}" />
 
-    </VerticalStackLayout>
+            <Button Text="Delete Location Cache" Clicked="OnDeleteLocationCacheClicked" HorizontalOptions="Fill"/>
+            <Button Text="Delete Local Recording History" Clicked="OnDeleteRecordingHistoryClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
+
+        </VerticalStackLayout>
     </ScrollView>
 
 </local:AppPage>

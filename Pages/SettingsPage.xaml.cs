@@ -18,6 +18,55 @@ namespace IndoorCO2MapAppV2.Pages
 
         }
 
+        private void OnDeleteRecordingHistoryClicked(object sender, EventArgs e)
+        {
+            DeleteRecordingHistory().SafeFireAndForget();
+        }
+
+        private async Task DeleteRecordingHistory()
+        {
+            bool answer = await DisplayAlertAsync(
+               "Delete History",
+               "Are you sure you want to delete your entire  local Recording History?",
+               "Yes",
+               "No"
+               );
+
+            if (!answer)
+            {
+                return;
+            }
+            else
+            {
+                await App.HistoryDatabase.ClearAllRecordingsAsync();
+            }
+        }
+
+
+        private void OnDeleteLocationCacheClicked(object sender, EventArgs e)
+        {
+            DeleteLocationCache().SafeFireAndForget();
+        }
+
+        private async Task DeleteLocationCache()
+        {
+            bool answer = await DisplayAlertAsync(
+               "Delete Location Cache",
+               "Are you sure you want to delete the location cache?",
+               "Yes",
+               "No"
+               );
+
+            if (!answer)
+            {
+                return;
+            }
+            else
+            {
+                await App.LocationCacheDb.ClearAsync();
+            }
+        }
+
         //Select Language Dropdown
         //Default Sorting Mode (Distance, Alphabetical - for Buildings, Transit Stops, Transit Lines separate)
         //Default Search Range

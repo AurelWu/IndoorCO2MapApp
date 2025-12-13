@@ -5,7 +5,7 @@ namespace IndoorCO2MapAppV2
 {
     public partial class App : Application
     {
-        public static LocalDatabase HistoryDatabase { get; private set; }
+        public static HistoryDatabase HistoryDatabase { get; private set; }
         public static LocationCacheDatabase LocationCacheDb { get; private set; }
         public static DatabaseBackupService BackupService { get; private set; }
 
@@ -21,7 +21,7 @@ namespace IndoorCO2MapAppV2
             BackupService = new DatabaseBackupService();
             DatabaseBackupService.ApplyStagedImport();
 
-            HistoryDatabase = new LocalDatabase(historyDBPath);
+            HistoryDatabase = new HistoryDatabase(historyDBPath);
 
             LocationCacheDb = new LocationCacheDatabase(locationCacheDbPath);
         }
@@ -31,7 +31,7 @@ namespace IndoorCO2MapAppV2
             return new Window(new AppShell());
         }
 
-        public static void ImportDB(LocalDatabase db)
+        public static void ImportDB(HistoryDatabase db)
         {
             HistoryDatabase = db;
         }

@@ -75,7 +75,7 @@ namespace IndoorCO2MapAppV2.PersistentData
         }
 
         /// <summary>
-        /// Check for staging DB and replace live DB. Call this in App constructor before creating LocalDatabase.
+        /// Check for staging DB and replace live DB. Call this in App constructor before creating HistoryDatabase.
         /// </summary>
         public static void ApplyStagedImport()
         {

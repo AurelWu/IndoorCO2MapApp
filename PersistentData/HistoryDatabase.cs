@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.PersistentData
 {
-    public class LocalDatabase
+    public class HistoryDatabase
     {
         private SQLiteAsyncConnection _database;
         private readonly string _dbPath;
 
         public string DatabasePath => _dbPath;
 
-        public LocalDatabase(string dbPath)
+        public HistoryDatabase(string dbPath)
         {
             _dbPath = dbPath;
             _database = new SQLiteAsyncConnection(_dbPath);
@@ -36,6 +36,11 @@ namespace IndoorCO2MapAppV2.PersistentData
             conn?.Close();
             conn?.Dispose();
             _database = null;
+        }
+
+        public async Task ClearAllRecordingsAsync()
+        {
+            await _database.DeleteAllAsync<PersistentRecording>();
         }
     }
 }
