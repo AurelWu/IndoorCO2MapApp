@@ -1,4 +1,6 @@
-﻿namespace IndoorCO2MapAppV2.Recording
+﻿using IndoorCO2MapAppV2.Enumerations;
+
+namespace IndoorCO2MapAppV2.Recording
 {
     /// <summary>
     /// a snapshot that allows restoring
@@ -17,12 +19,13 @@
         public double Longitude { get; set; }
         
         public string MonitorType { get; set; } = ""; //maybe not needed
-        public string? MonitorDeviceId { get; set; }  
+        public string MonitorDeviceId { get; set; } = ""; 
 
-        // public string? DoorState { get; set; }
-        // public string? WindowState { get; set; }
-        // public string? VentilationState { get; set; }
-        // public string? CustomNote { get; set; }
-        // public double? TrimSliderValue { get; set; }
+         public TriState DoorWindowState { get; set; }
+
+         public TriState VentilationState { get; set; }
+        public string CustomNote { get; set; } = "";
+        // public double? TrimSliderValueLow { get; set; }
+        // public double? TrimSliderValueHigh { get; set; }
     }
 }

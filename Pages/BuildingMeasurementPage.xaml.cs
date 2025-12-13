@@ -6,6 +6,7 @@ using IndoorCO2MapAppV2.DataUpload;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.PersistentData;
 
+
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class BuildingMeasurementPage : AppPage
@@ -36,6 +37,50 @@ namespace IndoorCO2MapAppV2.Pages
                 MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
                 await UpdateChartAsync();
             });
+
+            //TODO: check activeRecording for recoveryValues to set UI
+            var activeRec = RecordingManager.Instance.ActiveRecording!; //this should never be null, if it is then there is a bug somewhere needing fixing
+            TriState windowState = activeRec.DoorWindowState;
+            TriState ventilationState = activeRec.VentilationState;
+            string customNotes = activeRec.CustomNotes;
+            if (windowState == TriState.Unknown)
+            {
+                DoorsWindowsUnknownRb.IsChecked = true;
+                DoorsWindowsNoRb.IsChecked = false;
+                DoorsWindowsYesRb.IsChecked = false;
+            }
+            else if(windowState == TriState.No)
+            {
+                DoorsWindowsUnknownRb.IsChecked = false;
+                DoorsWindowsNoRb.IsChecked = true;
+                DoorsWindowsYesRb.IsChecked = false;
+            }
+            else if (windowState == TriState.Yes)
+            {
+                DoorsWindowsUnknownRb.IsChecked = false;
+                DoorsWindowsNoRb.IsChecked = false;
+                DoorsWindowsYesRb.IsChecked = true;
+            }
+
+            if (ventilationState == TriState.Unknown)
+            {
+                VentilationUnknownRb.IsChecked = true;
+                VentilationNoRb.IsChecked = false;
+                VentilationYesRb.IsChecked = false;
+            }
+            else if (ventilationState == TriState.No)
+            {
+                VentilationUnknownRb.IsChecked = false;
+                VentilationNoRb.IsChecked = true;
+                VentilationYesRb.IsChecked = false;
+            }
+            else if (ventilationState == TriState.Yes)
+            {
+                VentilationUnknownRb.IsChecked = false;
+                VentilationNoRb.IsChecked = false;
+                VentilationYesRb.IsChecked = true;
+            }
+            NoteEditor.Text = customNotes;
         }
 
         protected override void OnDisappearing()
@@ -258,6 +303,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 _doorsWindowsState = state;
                 System.Diagnostics.Debug.WriteLine($"Doors/Windows: {_doorsWindowsState}");
+                RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
             }
         }
 
@@ -269,6 +315,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 _ventilationState = state;
                 System.Diagnostics.Debug.WriteLine($"Ventilation: {_ventilationState}");
+                RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
             }
         }
 
@@ -311,5 +358,9 @@ namespace IndoorCO2MapAppV2.Pages
             SubmitButton.Text = Localisation.SubmitRecordingButton;
         }
 
+        private void OnCustomNotesChanged(object sender, TextChangedEventArgs e)
+        {
+            RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
+        }
     }
 }

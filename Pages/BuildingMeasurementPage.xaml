@@ -102,6 +102,7 @@
                 HeightRequest="100"
                 BackgroundColor="White"
                 TextColor="Black"
+                TextChanged="OnCustomNotesChanged"
                 />
             </VerticalStackLayout>
 

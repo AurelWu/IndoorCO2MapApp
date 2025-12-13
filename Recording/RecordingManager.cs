@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.Resources.Strings;
 using System.Text.Json;
 
@@ -23,6 +24,8 @@ namespace IndoorCO2MapAppV2.Recording
 
         public event Action? MeasurementDataUpdated;
 
+        public static RecordingRecoverySnapshot CurrentSnapShot { get; set; } = new RecordingRecoverySnapshot();
+
         private RecordingManager() { }
 
         // ----------------------------------------------------------------------
@@ -42,12 +45,16 @@ namespace IndoorCO2MapAppV2.Recording
                 NwrType = nwrType,
                 LocationName = locationName,
                 Latitude = latitude,
-                Longitude =longitude,
+                Longitude = longitude,
                 RecordingStart = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 MeasurementData = new(),
                 CO2MonitorType = monitorType,
+                DoorWindowState = TriState.Unknown,
+                VentilationState = TriState.Unknown,
+                CustomNotes = "",
                 AdditionalDataByParameter = new()
             };
+
 
             ActiveRecording = rec;
             SaveRecoverySnapshot(rec, deviceID);
@@ -167,9 +174,13 @@ namespace IndoorCO2MapAppV2.Recording
                 Longitude = snapshot.Longitude,
                 RecordingStart = snapshot.RecordingStart,
                 MeasurementData = new(),
-                CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed
-                AdditionalDataByParameter = new()
+                CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed                
+                DoorWindowState = snapshot.DoorWindowState,
+                VentilationState = snapshot.VentilationState,
+                CustomNotes = snapshot.CustomNote,
+                
             };
+            
 
             Logger.WriteToLog("Recovered recording after sensor ready.");
 
@@ -194,11 +205,24 @@ namespace IndoorCO2MapAppV2.Recording
                 Latitude = recording.Latitude,
                 Longitude = recording.Longitude,
                 MonitorType = recording.CO2MonitorType,
-                MonitorDeviceId = deviceId
+                MonitorDeviceId = deviceId,     
+                //DoorWindowState = 
             };
 
+            CurrentSnapShot = snapshot;
             var json = JsonSerializer.Serialize(snapshot);
             Preferences.Set("RecordingState", json);
+        }
+
+        public void UpdateRecoverySnapshot(TriState doorWindowstate, TriState ventilationState, string customNote)
+        {
+            CurrentSnapShot.DoorWindowState = doorWindowstate;
+            CurrentSnapShot.VentilationState = ventilationState;
+            CurrentSnapShot.CustomNote = customNote;
+            //TODO: this will set windowsDoorState / Ventilation / Custom Notes and TrimSlider Values ; should be called whenever any of these change
+            var json = JsonSerializer.Serialize(CurrentSnapShot);
+            Preferences.Set("RecordingState", json);
+            
         }
     }
 }

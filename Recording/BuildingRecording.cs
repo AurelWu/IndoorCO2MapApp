@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,6 +20,10 @@ namespace IndoorCO2MapAppV2.Recording
         public long RecordingStart { get; set; }
 
         public List<CO2Reading> MeasurementData { get; set; } = new();
+
+        public TriState DoorWindowState { get; set; }
+        public TriState VentilationState { get; set; }
+        public string CustomNotes { get; set; } = "";
         public Dictionary<string, string> AdditionalDataByParameter { get; set; } = new();
     }
 }
