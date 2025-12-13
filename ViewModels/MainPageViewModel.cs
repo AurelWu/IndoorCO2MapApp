@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Spatial;
@@ -51,13 +52,15 @@ namespace IndoorCO2MapAppV2.ViewModels
                 Sensor.CurrentCO2 <= 0)
                 return;
 
+            var monitorType = CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
+
             await RecordingManager.Instance.StartRecordingAsync(
                 BuildingSearch.SelectedBuilding.Type,
                 BuildingSearch.SelectedBuilding.ID,
                 BuildingSearch.SelectedBuilding.Latitude,
                 BuildingSearch.SelectedBuilding.Longitude,
                 BuildingSearch.SelectedBuilding.Name,
-                Sensor.SelectedMonitorType.ToString(),
+                monitorType.ToString() ?? "", //shouldnt ever be "" but just to be safe - if it happens we will notice in backend and can investigate
                 Sensor.SelectedDevice.Id
             );
             await AppPage.NavigateAsync("///building");

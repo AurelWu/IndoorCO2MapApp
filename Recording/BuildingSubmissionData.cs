@@ -59,7 +59,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             JObject json = new JObject
             {
-                ["d"] = "TestRunNewApp" + Random.Shared.Next(0, 100000),
+                ["d"] = "TestRunNewApp_" + SensorType + "_" + Random.Shared.Next(0, 100000),
                 ["p"] = NwrType,
                 ["i"] = NwrID,
                 ["n"] = NwrName,
