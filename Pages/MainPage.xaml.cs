@@ -20,7 +20,8 @@ namespace IndoorCO2MapAppV2.Pages
         private readonly MainPageViewModel _mainPageViewModel;
         private bool _initialRefreshDone = false;
 
-        private bool sortAlphabetical = false;                                                                                          
+        private bool sortAlphabetical = false;          
+                
 
         public MainPage()
         {
@@ -47,6 +48,7 @@ namespace IndoorCO2MapAppV2.Pages
             base.OnAppearing();
 
             bool recovered = await TryRecoverRecordingAsync();
+            _mainPageViewModel.Settings.EnablePreRecording = false;
 
             //only do it at startup once
             if (!_initialRefreshDone && !recovered)

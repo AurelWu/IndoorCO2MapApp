@@ -93,6 +93,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.EnableHistory = value; OnPropertyChanged();}
         }
 
+        public bool EnablePreRecording
+        {
+            get => UserSettings.Instance.EnablePrerecording;
+            set { UserSettings.Instance.EnablePrerecording = value; OnPropertyChanged(); }
+        }
+
         public string SensorFilter
         {
             get => UserSettings.Instance.SensorFilter ?? string.Empty;

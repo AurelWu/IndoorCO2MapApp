@@ -61,7 +61,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 BuildingSearch.SelectedBuilding.Longitude,
                 BuildingSearch.SelectedBuilding.Name,
                 monitorType.ToString() ?? "", //shouldnt ever be "" but just to be safe - if it happens we will notice in backend and can investigate
-                Sensor.SelectedDevice.Id
+                Sensor.SelectedDevice.Id,
+                Settings.EnablePreRecording
             );
             await AppPage.NavigateAsync("///building");
         }

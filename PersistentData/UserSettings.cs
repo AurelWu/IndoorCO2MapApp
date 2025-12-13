@@ -81,6 +81,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _notPickedToggleButtonColor, value);
         }
 
+        private bool _enablePrerecording;
+        public bool EnablePrerecording
+        {
+            get => _enablePrerecording;
+            set => SetProperty(ref _enablePrerecording, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

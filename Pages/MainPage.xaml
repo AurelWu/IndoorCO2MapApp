@@ -169,6 +169,8 @@
                 Command="{Binding StartBuildingRecordingCommand}"
                 IsEnabled="{Binding CanStartBuildingRecording}" />
 
+            <c:LabeledSwitch Text="Enable 15 minutes prerecording" IsToggled="{Binding Settings.EnablePreRecording}" />
+
             <Button
                 x:Name="ManualResumeButton"
                 Text="Resume Recording"

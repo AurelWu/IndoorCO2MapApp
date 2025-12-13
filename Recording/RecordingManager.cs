@@ -31,7 +31,7 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         // START RECORDING
         // ----------------------------------------------------------------------
-        public async Task StartRecordingAsync(string nwrType, long nwrID, double latitude, double longitude, string locationName, string monitorType, string deviceID)
+        public async Task StartRecordingAsync(string nwrType, long nwrID, double latitude, double longitude, string locationName, string monitorType, string deviceID, bool prerecording)
         {
             if (IsRecording)
 
@@ -39,21 +39,33 @@ namespace IndoorCO2MapAppV2.Recording
                 Logger.WriteToLog("Already recording, overwriting current one with fresh one.");
             }
 
-            var rec = new BuildingRecording
+            long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            
+
+            if(prerecording)
             {
-                NwrId = nwrID,
-                NwrType = nwrType,
-                LocationName = locationName,
-                Latitude = latitude,
-                Longitude = longitude,
-                RecordingStart = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                MeasurementData = new(),
-                CO2MonitorType = monitorType,
-                DoorWindowState = TriState.Unknown,
-                VentilationState = TriState.Unknown,
-                CustomNotes = "",
-                AdditionalDataByParameter = new()
-            };
+                startTime -= 15 * 60 * 1000; // 15 minutes hardcoded is okay here, we dont really want to change that
+            }
+            else
+            {
+                startTime -= 1 * 60 * 1000; //even without preRecording we start 1 minute early to grab currenty sensor reading. //maybe we even change that to 2
+            }
+
+                var rec = new BuildingRecording
+                {
+                    NwrId = nwrID,
+                    NwrType = nwrType,
+                    LocationName = locationName,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    RecordingStart = startTime,
+                    MeasurementData = new(),
+                    CO2MonitorType = monitorType,
+                    DoorWindowState = TriState.Unknown,
+                    VentilationState = TriState.Unknown,
+                    CustomNotes = "",
+                    AdditionalDataByParameter = new()
+                };
 
 
             ActiveRecording = rec;
