@@ -6,6 +6,7 @@
              x:Class="IndoorCO2MapAppV2.Pages.SettingsPage"
              Title="Settings">
 
+    <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
         <Label Text="Settings"
@@ -25,10 +26,16 @@
         ClearButtonVisibility="WhileEditing" />
         </VerticalStackLayout>
 
+        <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+        
         <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
         <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
         <c:LabeledSegmentedControl Label="Default Sortmode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
-        
+
+        <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
+        <c:LabeledSwitch Text="Enable local recording History" IsToggled="{Binding EnableHistory}" />
+
     </VerticalStackLayout>
+    </ScrollView>
 
 </local:AppPage>

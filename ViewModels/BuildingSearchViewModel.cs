@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.PersistentData;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
@@ -132,17 +133,21 @@ namespace IndoorCO2MapAppV2.ViewModels
                 Longitude.Value
             );
 
-            foreach (var location in result)
+            if(UserSettings.Instance.EnableLocationCaching)
             {
-                try
+                foreach (var location in result)
                 {
-                    await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
+                    try
+                    {
+                        await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
+                    }
                 }
             }
+            
 
             // Now refresh UI list using filter + sorting
             RefreshBuildings();

@@ -25,7 +25,26 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _sensorFilter, value);
         }
 
+        private bool _confirmUpload = false;
+        public bool ConfirmUpload
+        {
+            get => _confirmUpload;
+            set => SetProperty(ref _confirmUpload, value);
+        }
 
+        private bool _enableHistory = true;
+        public bool EnableHistory
+        {
+            get => _enableHistory;
+            set => SetProperty(ref _enableHistory, value);
+        }
+
+        private bool _enableLocationCaching = true;
+        public bool EnableLocationCaching
+        {
+            get => _enableLocationCaching;
+            set => SetProperty(ref _enableLocationCaching, value);
+        }
 
         private bool _sortBuildingsAlphabetical = true;
         public bool SortBuildingsAlphabetical

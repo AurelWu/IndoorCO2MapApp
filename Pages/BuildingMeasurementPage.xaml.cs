@@ -165,6 +165,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
                 ResetPageForNewMeasurement();
+                Preferences.Set("RecordingState", string.Empty);
                 await NavigateAsync("///home");
             }
         }
@@ -181,6 +182,22 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async Task SubmitRecordingAsync() //this maybe should be in the RecordingManager eventually...
         {
+            if(UserSettings.Instance.ConfirmUpload)
+            {
+                bool answer = await DisplayAlertAsync(
+                "Submit Measurement",
+                "Are you sure you want to submit the measurement",
+                "Yes",
+                "No"
+                );
+
+                if (!answer)
+                {
+                    return;
+                }
+            }
+            
+
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
 
             string originalButtonText = SubmitButton.Text;
@@ -209,17 +226,22 @@ namespace IndoorCO2MapAppV2.Pages
 
                 await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
 
-                var persistentRecording = new PersistentRecording
+                if(UserSettings.Instance.EnableHistory)
                 {
-                    DateTime = rec.RecordingStart,
-                    LocationName = rec.LocationName,
-                    NWRId = rec.NwrId,
-                    NWRType = rec.NwrType,
-                    AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
-                    Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm))
-                };
+                    var persistentRecording = new PersistentRecording
+                    {
+                        DateTime = rec.RecordingStart,
+                        LocationName = rec.LocationName,
+                        NWRId = rec.NwrId,
+                        NWRType = rec.NwrType,
+                        AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
+                        Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm))
+                    };
 
-                await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
+                    await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
+                }
+
+                
 
                 await DisplayAlertAsync(
                     "Upload Complete",
@@ -227,8 +249,8 @@ namespace IndoorCO2MapAppV2.Pages
                     "OK"
                 );
 
-                Preferences.Remove("RecordingState");
                 ResetPageForNewMeasurement();
+                Preferences.Set("RecordingState", string.Empty); //order is important, must be after ResetPageForNewMeasurement, resetting changes the UI elements which triggers snapshot update (which maybe should be done differently to avoid such issues)
                 await NavigateAsync("///home");
             }
             catch (Exception ex)

@@ -75,6 +75,24 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.DisplayBuildingFilterInputField = value; OnPropertyChanged(); }
         }
 
+        public bool ConfirmationBeforeRecordingUpload
+        {
+            get => UserSettings.Instance.ConfirmUpload;
+            set { UserSettings.Instance.ConfirmUpload = value; OnPropertyChanged(); }
+        }
+
+        public bool EnableLocationCaching
+        {
+            get => UserSettings.Instance.EnableLocationCaching;
+            set { UserSettings.Instance.EnableLocationCaching = value; OnPropertyChanged();}
+        }
+
+        public bool EnableHistory
+        {
+            get => UserSettings.Instance.EnableHistory;
+            set { UserSettings.Instance.EnableHistory = value; OnPropertyChanged();}
+        }
+
         public string SensorFilter
         {
             get => UserSettings.Instance.SensorFilter ?? string.Empty;
