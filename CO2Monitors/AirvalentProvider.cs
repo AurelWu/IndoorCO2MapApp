@@ -19,7 +19,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             throw new NotImplementedException();
         }
 
-        protected override Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
+        protected override Task<ushort[]?> DoReadHistoryAsync(ushort startIndex, int sensorUpdateInterval)
         {
             throw new NotImplementedException();
         }

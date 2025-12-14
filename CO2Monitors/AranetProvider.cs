@@ -2,6 +2,7 @@
 using Plugin.BLE.Abstractions.Contracts;
 using System;
 using System.IO;
+using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
@@ -164,7 +165,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// <summary>
         /// Read CO2 history block from sensor. Returns null if anything goes wrong, returns empty array if the sensor returned data but data length is less than 10
         /// </summary>
-        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes, int sensorUpdateInterval)
         {
             if (!await EnsureConnectionIsValidAsync())
                 return null;
@@ -184,8 +185,23 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (totalDataPoints == null || totalDataPoints == 0)
                     return [];
 
+                int elapsedIntervals = amountOfMinutes;
+                if ( sensorUpdateInterval== 120)
+                {
+                    elapsedIntervals = elapsedIntervals / 2;
+                }
+                else if (sensorUpdateInterval == 300)
+                {
+                    elapsedIntervals = elapsedIntervals / 5;
+                }
+                else if (sensorUpdateInterval == 600)
+                {
+                    elapsedIntervals = elapsedIntervals / 10;
+                }
+
+
                 // 2. Determine start index (last N points)
-                int pointsToRead = amountOfMinutes; // currently using amountOfMinutes as "last N"
+                int pointsToRead = elapsedIntervals; // currently using amountOfMinutes as "last N"
                 int startIndex = totalDataPoints.Value - pointsToRead;
                 if (startIndex < 0)
                     startIndex = 0;

@@ -20,7 +20,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         }
 
 
-        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort startIndex, int sensorUpdateInterval)
         {
             return new ushort[0];
         }

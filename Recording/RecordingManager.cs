@@ -136,9 +136,29 @@ namespace IndoorCO2MapAppV2.Recording
                 ActiveRecording.MeasurementData.Clear();
             }
             if (ActiveRecording == null) return;
+
+            int interval = 1;            
+            if(CO2MonitorManager.Instance.UpdateInterval == 120)
+            {
+                interval = 2;
+            }
+            else if(CO2MonitorManager.Instance.UpdateInterval == 180)
+            {
+                interval = 3;
+            }
+            else if(CO2MonitorManager.Instance.UpdateInterval == 300)
+            {
+                interval = 5;
+            }
+            else if(CO2MonitorManager.Instance.UpdateInterval == 600)
+            {
+                interval = 10;
+            }
+            int offset = 0;
             foreach (var v in hist)
             {
-                ActiveRecording.MeasurementData.Add(new CO2Reading(v, 0, DateTime.Now));
+                ActiveRecording.MeasurementData.Add(new CO2Reading(v, offset, DateTime.Now));
+                offset += interval;
             }
             MeasurementDataUpdated?.Invoke();
         }

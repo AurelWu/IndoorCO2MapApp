@@ -202,7 +202,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             return 60;
         }
 
-        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes, int sensorUpdateInterval)
         {
             //TODO: convert from minutes to amount of datapoints based on interval between timestamps
             if (_writerCharacteristic == null) return null;

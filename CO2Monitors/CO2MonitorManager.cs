@@ -99,7 +99,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
             await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
-            var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(minutes);
+            var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(minutes, CO2MonitorManager.Instance.UpdateInterval);
             if (hist != null) Co2History = [.. hist];
         }
 
