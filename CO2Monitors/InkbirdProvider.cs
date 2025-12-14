@@ -14,24 +14,25 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             throw new NotImplementedException();
         }
 
-        protected override Task<int> DoReadCurrentCO2Async()
+        protected override async Task<int> DoReadCurrentCO2Async()
         {
-            throw new NotImplementedException();
+            return -1;            
         }
 
-        protected override Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
+
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort startIndex)
         {
-            throw new NotImplementedException();
+            return new ushort[0];
         }
 
-        protected override Task<int> DoReadUpdateIntervalAsync()
+        protected override async Task<int> DoReadUpdateIntervalAsync()
         {
-            throw new NotImplementedException();
+            return -1;
         }
 
         protected override bool IsGattValid()
         {
-            throw new NotImplementedException();
+            return false;
         }
     }
 }

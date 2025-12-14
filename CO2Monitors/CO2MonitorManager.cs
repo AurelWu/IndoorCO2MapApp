@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.PersistentData;
 using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         [ObservableProperty] private CO2MonitorType selectedMonitorType;
         [ObservableProperty] private bool isScanning;
         [ObservableProperty] private int currentCO2;
-        [ObservableProperty] private int updateInterval;
+        [ObservableProperty] private int updateInterval = -1;
         [ObservableProperty] private List<ushort> co2History = [];
 
 #pragma warning restore MVVMTK0045
@@ -51,7 +52,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task StartScanAsync(CO2MonitorType filter)
         {
-            await _ble.StartScanningAsync(filter: filter);
+            await _ble.StartScanningAsync(filter: filter, deviceNameFilter: UserSettings.Instance.SensorFilter);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)

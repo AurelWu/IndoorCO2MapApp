@@ -73,7 +73,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                     return Localisation.ScanningStatusLabel;
 
                 if (SelectedDevice != null)
-                    return Localisation.CO2LevelsLabel + CurrentCO2;
+                    return Localisation.CO2LevelsLabel + CurrentCO2 + " | " + Localisation.UpdateInterval + MeasurementInterval + "s";
 
                 return Localisation.NoSensorFoundStatusLabel;
             }
@@ -91,6 +91,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             if (device == null) return;
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();
+            await RefreshUpdateIntervalAsync();
             RefreshHistoryAsync(10).SafeFireAndForget(); // used to check if we can successfully get the history (but actual check still TODO), should trigger bonding request on mobiles.
         }
 
@@ -125,6 +126,11 @@ namespace IndoorCO2MapAppV2.ViewModels
         }
 
         partial void OnCurrentCO2Changed(int value)
+        {
+            OnPropertyChanged(nameof(SelectedDeviceStatusText));
+        }
+
+        partial void OnMeasurementIntervalChanged(int value)
         {
             OnPropertyChanged(nameof(SelectedDeviceStatusText));
         }

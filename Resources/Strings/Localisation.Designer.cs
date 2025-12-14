@@ -185,5 +185,14 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
                 return ResourceManager.GetString("SubmitRecordingButtonNeedData", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Update Interval:  ähnelt.
+        /// </summary>
+        internal static string UpdateInterval {
+            get {
+                return ResourceManager.GetString("UpdateInterval", resourceCulture);
+            }
+        }
     }
 }

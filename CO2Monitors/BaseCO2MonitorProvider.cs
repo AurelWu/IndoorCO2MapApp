@@ -15,6 +15,8 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
 
     public int CurrentCO2Value { get; protected set; }
 
+    public int MeasurementIntervalInSeconds { get; protected set; } = 60;
+
     public bool IsInitialized =>
         ActiveDevice != null &&
         ActiveDevice.State == DeviceState.Connected &&
@@ -95,12 +97,13 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
     public async Task<int> ReadUpdateIntervalSafeAsync()
     {
         if (!await EnsureConnectionIsValidAsync())
-            return 0;
+            return -1;
 
         return await DoReadUpdateIntervalAsync();
     }
 
     protected abstract Task<int> DoReadUpdateIntervalAsync();
+
 
     public async Task<ushort[]?> ReadHistorySafeAsync(ushort amountOfMinutes)
     {

@@ -91,6 +91,7 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
             _viewModel.RefreshLiveCO2Async().SafeFireAndForget();
+            _viewModel.RefreshUpdateIntervalAsync().SafeFireAndForget();
             _viewModel.RefreshHistoryAsync(20).SafeFireAndForget();         
         }
 

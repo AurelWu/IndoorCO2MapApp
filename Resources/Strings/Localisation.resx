@@ -159,4 +159,7 @@
   <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
     <value>{0}/5 data points needed to submit</value>
   </data>
+  <data name="UpdateInterval" xml:space="preserve">
+    <value>Update Interval: </value>
+  </data>
 </root>

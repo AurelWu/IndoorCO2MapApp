@@ -198,7 +198,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             //TODO: check if airspot directly exposes that info, if not we can still infer from the history
             //return await DoReadCurrentCO2Async();
-            return 0;
+            //for now just returns 1 Minute (in seconds)
+            return 60;
         }
 
         protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes)
