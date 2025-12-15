@@ -57,6 +57,12 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
+            if (ActiveCO2MonitorProvider != null)
+            {
+                await ActiveCO2MonitorProvider.DisposeAsync();
+                ActiveCO2MonitorProvider = null;
+            }
+
             if (device?.Device == null)
                 return;
 
@@ -71,7 +77,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             if (ActiveCO2MonitorProvider == null)
                 return;
 
-            await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+            bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+            if (!ok)
+            {
+                await ActiveCO2MonitorProvider.DisposeAsync();
+                ActiveCO2MonitorProvider= null;
+                return;
+            }
             CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
         }
 

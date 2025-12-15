@@ -26,6 +26,7 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
 
     public async Task<bool> EnsureConnectionIsValidAsync()
     {
+        bool debugGattCheck = IsGattValid();
         // 1. If valid, nothing to do
         if (IsInitialized)
             return true;
@@ -47,7 +48,7 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
             }
         }
 
-        // 3. Run initialization again
+        // 3. Run initialization again || right now for airspot this will early exit if its still the same Provider once its been initialized once
         return await InitializeAsync(ActiveDevice);
     }
 
