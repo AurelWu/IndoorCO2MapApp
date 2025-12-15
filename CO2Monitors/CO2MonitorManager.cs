@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.PersistentData;
 using Microsoft.VisualBasic;
@@ -80,11 +81,24 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
             if (!ok)
             {
-                await ActiveCO2MonitorProvider.DisposeAsync();
-                ActiveCO2MonitorProvider= null;
+                //Initialisation is called from RefreshLiveCO2Async, RefreshUpdateIntervalAsync(), and RefreshHistoryAsync
+                if (ActiveCO2MonitorProvider!= null)
+                {
+                    await ActiveCO2MonitorProvider.DisposeAsync();
+                    ActiveCO2MonitorProvider = null;
+                    return;
+                }
                 return;
             }
-            CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
+            if(ActiveCO2MonitorProvider!=null)
+            {
+                CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
+            }
+            if(ActiveCO2MonitorProvider==null)
+            {
+                Logger.WriteToLog("ActiveCO2MonitorProvider currently Null after Initialisation");
+            }
+            
         }
 
         public void ZeroOutCO2Values()

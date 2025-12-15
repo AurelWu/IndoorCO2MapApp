@@ -26,26 +26,30 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             for (int i = 0; i < 16; i++)
             {
-                uint timestamp = (uint)((data[offset] << 24) |
-                                        (data[offset + 1] << 16) |
-                                        (data[offset + 2] << 8) |
-                                         data[offset + 3]);
-                Timestamps.Add(timestamp);
-
-                if (timestamp == 0xFFFFFFFF)
-                    FinishedPage = false;
+                uint timestamp =
+                    (uint)((data[offset] << 24) |
+                           (data[offset + 1] << 16) |
+                           (data[offset + 2] << 8) |
+                            data[offset + 3]);
 
                 offset += 4;
 
                 int co2 = (data[offset] << 8) | data[offset + 1];
-                CO2Values.Add(co2);
                 offset += 2;
 
-                offset += 2; // skip unused ushort
+                byte msgType = data[offset];      // 00 = CO2 ; 02 = TimeSync
+                byte padding = data[offset + 1]; // unused
+                offset += 2;
 
-                // Optional debug:
-                // DateTime time = new DateTime(2000, 1, 1).AddSeconds(timestamp);
-                // Console.WriteLine($"Entry {i}: Time={time}, CO2={co2} ppm");
+                if (timestamp == 0xFFFFFFFF)
+                    FinishedPage = false;
+
+                // Only store entries with status 0x00
+                if (msgType == 0x00)
+                {
+                    Timestamps.Add(timestamp);
+                    CO2Values.Add(co2);
+                }
             }
 
             PageID = (data[offset] << 8) | data[offset + 1];

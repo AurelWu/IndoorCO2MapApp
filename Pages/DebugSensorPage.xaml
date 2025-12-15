@@ -38,6 +38,14 @@
                 Text="Retrieve Data from Sensor"
                 Clicked="OnRetrieveDataFromMonitorClicked"
                 HorizontalOptions="Fill"/>
+        <Button x:Name="GetDataRepeatedlyButton"
+        Text="Retrieve Data from Sensor repeatedly"
+        Clicked="OnRetrieveDataFromMonitorContinouslyClicked"
+        HorizontalOptions="Fill"/>
+        <Button x:Name="SaveLogToFileButton"
+Text="Safe Log to File"
+Clicked="SaveLogToFile"
+HorizontalOptions="Fill"/>
 
         <!-- List with all discovered BLE Devices 
         <CollectionView x:Name="BluetoothDevicesList"

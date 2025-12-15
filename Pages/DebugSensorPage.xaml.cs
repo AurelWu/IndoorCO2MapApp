@@ -1,5 +1,6 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.ViewModels;
@@ -90,9 +91,21 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnRetrieveDataFromMonitorClicked(object sender, EventArgs e)
         {
-            _viewModel.RefreshLiveCO2Async().SafeFireAndForget();
-            _viewModel.RefreshUpdateIntervalAsync().SafeFireAndForget();
+            //_viewModel.RefreshLiveCO2Async().SafeFireAndForget();
+            //_viewModel.RefreshUpdateIntervalAsync().SafeFireAndForget();
             _viewModel.RefreshHistoryAsync(20).SafeFireAndForget();         
+        }
+
+        private void OnRetrieveDataFromMonitorContinouslyClicked(object sender, EventArgs e)
+        {
+            Logger.WriteLogToFile("started logging Data from continuously");
+            CancellationTokenSource ct = new CancellationTokenSource();
+            _ = RunContinuousRetrievalAsync(ct.Token);
+        }
+
+        private void SaveLogToFile(object sender, EventArgs e)
+        {
+            Logger.WriteLogToFile("DebugLog.txt");
         }
 
         // Sync picker selection with viewmodel
@@ -102,6 +115,31 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 var device = _viewModel.Devices[DevicePicker.SelectedIndex];
                 _viewModel.SelectDeviceAsync(device).SafeFireAndForget();
+            }
+        }
+
+        private async Task RunContinuousRetrievalAsync(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    int amount = System.Random.Shared.Next(10, 61); // 10–60 inclusive
+
+                    //Logger.WriteLogToFile($"Retrieving last {amount} history entries");
+
+                    await _viewModel.RefreshHistoryAsync((ushort)amount);
+
+                    await Task.Delay(TimeSpan.FromSeconds(20), token);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                
+            }
+            catch (Exception ex)
+            {
+                //Logger.WriteLogToFile($"Continuous logging error: {ex}");
             }
         }
     }

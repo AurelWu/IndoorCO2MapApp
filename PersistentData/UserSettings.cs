@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using Microsoft.Maui.Storage;
 using System;
 using System.Collections.Generic;
@@ -108,7 +109,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             }
             catch
             {
-                Logger.WriteToLog("Error saving user settings");
+                Logger.WriteToLog("Error saving user settings",minimumLogMode: LogMode.Default);
             }
         }
         public static void Load()

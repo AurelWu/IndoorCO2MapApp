@@ -92,7 +92,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();
             await RefreshUpdateIntervalAsync();
-            RefreshHistoryAsync(10).SafeFireAndForget(); // used to check if we can successfully get the history (but actual check still TODO), should trigger bonding request on mobiles.
+            //RefreshHistoryAsync(10).SafeFireAndForget(); // used to check if we can successfully get the history (but actual check still TODO), should trigger bonding request on mobiles.
         }
 
         public async Task RefreshLiveCO2Async()

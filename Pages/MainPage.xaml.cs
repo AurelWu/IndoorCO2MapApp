@@ -51,13 +51,16 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel.Settings.EnablePreRecording = false;
 
             //only do it at startup once
+#if !WINDOWS //disabled for now on windows to debug airspot without auto connecting to random sensor
             if (!_initialRefreshDone && !recovered)
             {
                 _initialRefreshDone = true;
 
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
             }
+#endif
         }
+
 
         protected async Task<bool> TryRecoverRecordingAsync()
         {

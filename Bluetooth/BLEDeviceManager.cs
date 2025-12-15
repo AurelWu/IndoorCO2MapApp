@@ -47,6 +47,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
         internal async Task StartScanningAsync(int scanDurationMs = 15000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None, string deviceNameFilter ="")
         {
+            //TODO: if we have a deviceNameFilter set we can probably cancel once we find it
             if (clearBeforeScan)
                 Devices.Clear();
 
