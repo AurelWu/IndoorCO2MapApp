@@ -39,7 +39,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     public override async Task<bool> InitializeAsync(IDevice device)
     {
         //return true; //for debugging: return true so connection stays active but dont do anything (no notification etc) for testing purposes
-        if (_notificationSetupDone) return true;
+        if (_notificationSetupDone && IsGattValid()) return true; //already initialized so can skip
         ActiveDevice = device;
         CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
 
@@ -273,8 +273,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         _service = null;
         _writer = null;
         _notify = null;
-        ActiveDevice = null;
-
+        ActiveDevice = null;        
         Logger.WriteToLog("Airspot disposed", minimumLogMode: LogMode.Verbose);
     }
 }

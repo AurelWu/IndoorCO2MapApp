@@ -10,6 +10,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 {
     public partial class MainPageViewModel : ObservableObject
     {
+
+
         public IRelayCommand StartBuildingRecordingCommand { get; }
 
         public SensorViewModel Sensor { get; }
@@ -66,6 +68,9 @@ namespace IndoorCO2MapAppV2.ViewModels
             );
             await AppPage.NavigateAsync("///building");
         }
+
+
+        
 
         public bool CanStartBuildingRecording =>
             BuildingSearch.SelectedBuilding != null &&

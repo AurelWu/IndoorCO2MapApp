@@ -16,6 +16,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             new(() => new UserSettings());
 
         public static UserSettings Instance => _instance.Value;
+        private static bool currentlyLoading = false;
 
         public UserSettings() { }
 
@@ -96,6 +97,7 @@ namespace IndoorCO2MapAppV2.PersistentData
 
         public static async Task SaveAsync()
         {
+            if (currentlyLoading) return; //dont write to the file while we are still loading from it
             try
             {
                 string path = Path.Combine(FileSystem.AppDataDirectory, FileName);
@@ -114,12 +116,17 @@ namespace IndoorCO2MapAppV2.PersistentData
         }
         public static void Load()
         {
+            currentlyLoading = true;
             try
             {
                 string path = Path.Combine(FileSystem.AppDataDirectory, FileName);
 
                 if (!File.Exists(path))
+                {
+                    currentlyLoading = false;
                     return;
+                }
+                    
 
                 using var stream = File.OpenRead(path);
                 using var reader = new StreamReader(stream);
@@ -136,8 +143,10 @@ namespace IndoorCO2MapAppV2.PersistentData
             }
             catch (Exception ex)
             {
+                currentlyLoading = false;
                 Logger.WriteToLog("Error loading user settings: " + ex.Message);
             }
+            currentlyLoading = false;
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.PersistentData;
@@ -20,8 +21,10 @@ namespace IndoorCO2MapAppV2.Pages
         private readonly MainPageViewModel _mainPageViewModel;
         private bool _initialRefreshDone = false;
 
-        private bool sortAlphabetical = false;          
-                
+        private bool sortAlphabetical = false;
+
+        private IDispatcherTimer? _co2liveValueUpdateTimer;
+
 
         public MainPage()
         {
@@ -49,6 +52,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             bool recovered = await TryRecoverRecordingAsync();
             _mainPageViewModel.Settings.EnablePreRecording = false;
+            StartCo2TimerOnce();
 
             //only do it at startup once
 #if !WINDOWS //disabled for now on windows to debug airspot without auto connecting to random sensor
@@ -60,7 +64,6 @@ namespace IndoorCO2MapAppV2.Pages
             }
 #endif
         }
-
 
         protected async Task<bool> TryRecoverRecordingAsync()
         {
@@ -183,5 +186,35 @@ namespace IndoorCO2MapAppV2.Pages
 
             await NavigateAsync("///building");
         }
+
+        private void StartCo2TimerOnce()
+        {
+            if (_co2liveValueUpdateTimer != null)
+                return;
+
+            _co2liveValueUpdateTimer = Dispatcher.CreateTimer();
+            _co2liveValueUpdateTimer.Interval = TimeSpan.FromSeconds(15);
+            _co2liveValueUpdateTimer.Tick += OnCo2TimerTick;
+            _co2liveValueUpdateTimer.Start();
+        }
+
+        private async void OnCo2TimerTick(object? sender, EventArgs e)
+        {
+            var sensorVm = _mainPageViewModel.Sensor;
+
+            if (sensorVm.SelectedDevice == null)
+                return;
+            
+            try
+            {
+                await sensorVm.RefreshLiveCO2Async();
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog($"CO₂ Live update failed: {ex}", minimumLogMode: Enumerations.LogMode.Default);
+            }
+        }
+
+
     }
 }

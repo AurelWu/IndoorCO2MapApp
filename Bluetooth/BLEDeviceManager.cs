@@ -110,7 +110,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     await _adapter.ConnectToDeviceAsync(device);
                 return true;
             }
-            catch { return false; }
+            catch 
+            { 
+                return false; 
+            }
         }
     }
 }

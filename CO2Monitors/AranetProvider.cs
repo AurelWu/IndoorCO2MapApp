@@ -1,4 +1,5 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
+using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using System;
 using System.IO;
@@ -26,6 +27,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         private ICharacteristic? _historyV2Characteristic;
 
         private static bool IsOldVersion { get; set; }
+
         //private static string SensorVersion { get; set; } = ""; //we might not need this at all the way we do it now
                 
         /// <summary>
@@ -37,6 +39,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             ActiveDevice = device;
             CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
+            //if (IsGattValid() == true && errorReadingHappened == false) for Aranet we always just reinitialize as connections get closed aggressively
             // Find new-version service, fall back to old
             _service =
                 await TryGetServiceAsync(device, SERVICE_UUID) ??
@@ -93,7 +96,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         /// Read current CO2 from live characteristic.
         /// </summary>
         protected override async Task<int> DoReadCurrentCO2Async()
-        {
+        {                            
 
             if (_liveCharacteristic == null || !_liveCharacteristic.CanRead)
                 return 0;
@@ -109,7 +112,6 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
             catch
             {
-                // If reading fails after reconnection, return 0
                 return 0;
             }
         }
@@ -131,6 +133,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
             catch
             {
+
                 return 0; // return 0 if reading fails
             }
         }

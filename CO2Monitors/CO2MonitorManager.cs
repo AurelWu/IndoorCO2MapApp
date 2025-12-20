@@ -52,12 +52,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
 
         public async Task StartScanAsync(CO2MonitorType filter)
-        {
+        {           
             await _ble.StartScanningAsync(filter: filter, deviceNameFilter: UserSettings.Instance.SensorFilter);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
+            if (selectedDevice == device) return; //same as current device selected again, no need to do anything
             if (ActiveCO2MonitorProvider != null)
             {
                 await ActiveCO2MonitorProvider.DisposeAsync();
