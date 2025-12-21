@@ -20,7 +20,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnDeleteRecordingHistoryClicked(object sender, EventArgs e)
         {
-            DeleteRecordingHistory().SafeFireAndForget();
+            DeleteRecordingHistory().SafeFireAndForget("OnDeleteRecordingHistoryClicked|DeleteRecordingHistory");
         }
 
         private async Task DeleteRecordingHistory()
@@ -45,7 +45,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnDeleteLocationCacheClicked(object sender, EventArgs e)
         {
-            DeleteLocationCache().SafeFireAndForget();
+            DeleteLocationCache().SafeFireAndForget("OnDeleteLocationCacheClicked|DeleteLocationCache");
         }
 
         private async Task DeleteLocationCache()

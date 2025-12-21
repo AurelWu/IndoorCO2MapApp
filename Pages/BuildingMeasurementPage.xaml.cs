@@ -1,17 +1,18 @@
 ﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DataUpload;
+using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
-using IndoorCO2MapAppV2.DataUpload;
-using IndoorCO2MapAppV2.Enumerations;
-using IndoorCO2MapAppV2.PersistentData;
-
+using System.Diagnostics;
 
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class BuildingMeasurementPage : AppPage
     {
-        private CancellationTokenSource _trimCts;
+        private IDispatcherTimer? _trimDebounceTimer;
 
         private TriState _doorsWindowsState = TriState.Unknown;
         private TriState _ventilationState = TriState.Unknown;
@@ -24,6 +25,8 @@ namespace IndoorCO2MapAppV2.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            InitializeTrimDebounce();
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
@@ -38,18 +41,19 @@ namespace IndoorCO2MapAppV2.Pages
                 await UpdateChartAsync();
             });
 
-            //TODO: check activeRecording for recoveryValues to set UI
-            var activeRec = RecordingManager.Instance.ActiveRecording!; //this should never be null, if it is then there is a bug somewhere needing fixing
+            // TODO: check activeRecording for recoveryValues to set UI
+            var activeRec = RecordingManager.Instance.ActiveRecording!;
             TriState windowState = activeRec.DoorWindowState;
             TriState ventilationState = activeRec.VentilationState;
             string customNotes = activeRec.CustomNotes;
+
             if (windowState == TriState.Unknown)
             {
                 DoorsWindowsUnknownRb.IsChecked = true;
                 DoorsWindowsNoRb.IsChecked = false;
                 DoorsWindowsYesRb.IsChecked = false;
             }
-            else if(windowState == TriState.No)
+            else if (windowState == TriState.No)
             {
                 DoorsWindowsUnknownRb.IsChecked = false;
                 DoorsWindowsNoRb.IsChecked = true;
@@ -80,13 +84,21 @@ namespace IndoorCO2MapAppV2.Pages
                 VentilationNoRb.IsChecked = false;
                 VentilationYesRb.IsChecked = true;
             }
+
             NoteEditor.Text = customNotes;
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
+
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+
+            if (_trimDebounceTimer != null)
+            {
+                _trimDebounceTimer.Stop();
+                _trimDebounceTimer = null;
+            }
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -99,6 +111,22 @@ namespace IndoorCO2MapAppV2.Pages
             lineChartView.WidthRequest = targetWidth;
             TrimSlider.WidthRequest = sliderWidth;
             TrimSlider.ForceLayout();
+        }
+
+        private void InitializeTrimDebounce()
+        {
+            if (_trimDebounceTimer != null)
+                return;
+
+            _trimDebounceTimer = Dispatcher.CreateTimer();
+            _trimDebounceTimer.Interval = TimeSpan.FromMilliseconds(150);
+            _trimDebounceTimer.IsRepeating = false;
+
+            _trimDebounceTimer.Tick += (_, __) =>
+            {
+                _trimDebounceTimer.Stop();
+                _ = UpdateChartAsync();
+            };
         }
 
         private void OnMeasurementUpdated()
@@ -135,21 +163,11 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
-            // debounce rapid slider changes
-            _trimCts?.Cancel();
-            _trimCts = new CancellationTokenSource();
-            var token = _trimCts.Token;
+            if (_trimDebounceTimer == null)
+                return;
 
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                try
-                {
-                    await Task.Delay(150, token);
-                    if (!token.IsCancellationRequested)
-                        await UpdateChartAsync();
-                }
-                catch (TaskCanceledException) { }
-            });
+            _trimDebounceTimer.Stop();
+            _trimDebounceTimer.Start();
         }
 
         private async Task CancelMeasurementAsync()
@@ -163,7 +181,9 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (answer)
             {
-                RecordingManager.Instance.StopRecordingAsync().SafeFireAndForget();
+                RecordingManager.Instance.StopRecordingAsync()
+                    .SafeFireAndForget("CancelMeasurementAsync|StopRecordingAsync");
+
                 ResetPageForNewMeasurement();
                 Preferences.Set("RecordingState", string.Empty);
                 await NavigateAsync("///home");
@@ -172,36 +192,32 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnCancelClicked(object sender, EventArgs e)
         {
-            CancelMeasurementAsync().SafeFireAndForget();
+            CancelMeasurementAsync().SafeFireAndForget("OnCancelClicked|CancelMeasurementAsync");
         }
 
         private void OnSubmitRecordingClicked(object sender, EventArgs e)
         {
-            SubmitRecordingAsync().SafeFireAndForget();
+            SubmitRecordingAsync().SafeFireAndForget("OnSubmitRecordingClicked|SubmitRecordingAsync");
         }
 
-        private async Task SubmitRecordingAsync() //this maybe should be in the RecordingManager eventually...
+        private async Task SubmitRecordingAsync()
         {
-            if(UserSettings.Instance.ConfirmUpload)
+            if (UserSettings.Instance.ConfirmUpload)
             {
                 bool answer = await DisplayAlertAsync(
-                "Submit Measurement",
-                "Are you sure you want to submit the measurement",
-                "Yes",
-                "No"
+                    "Submit Measurement",
+                    "Are you sure you want to submit the measurement",
+                    "Yes",
+                    "No"
                 );
 
                 if (!answer)
-                {
                     return;
-                }
             }
-            
 
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
 
             string originalButtonText = SubmitButton.Text;
-
             string customNote = NoteEditor.Text?.Trim() ?? "";
 
             await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting...");
@@ -222,11 +238,13 @@ namespace IndoorCO2MapAppV2.Pages
                     .WithVentilationSystem(_ventilationState)
                     .WithNotes(customNote)
                     .Build();
-                string json = submission.ToJson();
 
-                await Co2ApiGatewayClient.SubmitAsync(json, SubmissionMode.Building);
+                await Co2ApiGatewayClient.SubmitAsync(
+                    submission.ToJson(),
+                    SubmissionMode.Building
+                );
 
-                if(UserSettings.Instance.EnableHistory)
+                if (UserSettings.Instance.EnableHistory)
                 {
                     var persistentRecording = new PersistentRecording
                     {
@@ -241,8 +259,6 @@ namespace IndoorCO2MapAppV2.Pages
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
                 }
 
-                
-
                 await DisplayAlertAsync(
                     "Upload Complete",
                     "Your measurement was successfully submitted.",
@@ -250,7 +266,7 @@ namespace IndoorCO2MapAppV2.Pages
                 );
 
                 ResetPageForNewMeasurement();
-                Preferences.Set("RecordingState", string.Empty); //order is important, must be after ResetPageForNewMeasurement, resetting changes the UI elements which triggers snapshot update (which maybe should be done differently to avoid such issues)
+                Preferences.Set("RecordingState", string.Empty);
                 await NavigateAsync("///home");
             }
             catch (Exception ex)
@@ -308,24 +324,27 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void ClearChart()
         {
-            // Make sure this runs on the main thread
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                lineChartView.Clear(); // <-- your chart control should have a Clear() or similar method
+                lineChartView.Clear();
                 SubmitButton.IsEnabled = false;
-                SubmitButton.Text = Localisation.SubmitRecordingButtonNeedData.Replace("{0}", "0");
+                SubmitButton.Text =
+                    Localisation.SubmitRecordingButtonNeedData.Replace("{0}", "0");
             });
         }
 
         private void OnDoorsWindowsChanged(object sender, CheckedChangedEventArgs e)
         {
-            if (!e.Value) return; // Only handle when a RadioButton becomes checked
+            if (!e.Value) return;
 
             if (sender is RadioButton rb && rb.Value is TriState state)
             {
                 _doorsWindowsState = state;
-                System.Diagnostics.Debug.WriteLine($"Doors/Windows: {_doorsWindowsState}");
-                RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
+                RecordingManager.Instance.UpdateRecoverySnapshot(
+                    _doorsWindowsState,
+                    _ventilationState,
+                    NoteEditor.Text
+                );
             }
         }
 
@@ -336,18 +355,19 @@ namespace IndoorCO2MapAppV2.Pages
             if (sender is RadioButton rb && rb.Value is TriState state)
             {
                 _ventilationState = state;
-                System.Diagnostics.Debug.WriteLine($"Ventilation: {_ventilationState}");
-                RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
+                RecordingManager.Instance.UpdateRecoverySnapshot(
+                    _doorsWindowsState,
+                    _ventilationState,
+                    NoteEditor.Text
+                );
             }
         }
 
         private void ResetPageForNewMeasurement()
         {
-            // Reset TriStates
             _doorsWindowsState = TriState.Unknown;
             _ventilationState = TriState.Unknown;
 
-            // Reset RadioButtons
             DoorsWindowsUnknownRb.IsChecked = true;
             DoorsWindowsYesRb.IsChecked = false;
             DoorsWindowsNoRb.IsChecked = false;
@@ -356,33 +376,32 @@ namespace IndoorCO2MapAppV2.Pages
             VentilationYesRb.IsChecked = false;
             VentilationNoRb.IsChecked = false;
 
-
-            // Reset UI elements
             TrimSlider.Minimum = 0;
             TrimSlider.UpperValue = 0;
             TrimSlider.LowerValue = 0;
-
             TrimSlider.ForceLayout();
 
             NoteEditor.Text = string.Empty;
 
             ClearChart();
 
-
-            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay ?? string.Empty;
-
+            MeasuredLocationLabel.Text =
+                RecordingManager.Instance.CurrentLocationDisplay ?? string.Empty;
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
 
-
-            SubmitButton.IsEnabled = false;            
+            SubmitButton.IsEnabled = false;
             SubmitButton.Text = Localisation.SubmitRecordingButton;
         }
 
         private void OnCustomNotesChanged(object sender, TextChangedEventArgs e)
         {
-            RecordingManager.Instance.UpdateRecoverySnapshot(_doorsWindowsState, _ventilationState, NoteEditor.Text);
+            RecordingManager.Instance.UpdateRecoverySnapshot(
+                _doorsWindowsState,
+                _ventilationState,
+                NoteEditor.Text
+            );
         }
     }
 }

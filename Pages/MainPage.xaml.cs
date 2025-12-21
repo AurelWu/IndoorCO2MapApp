@@ -25,6 +25,8 @@ namespace IndoorCO2MapAppV2.Pages
 
         private IDispatcherTimer? _co2liveValueUpdateTimer;
 
+        private bool pageActive = true;
+
 
         public MainPage()
         {
@@ -49,20 +51,26 @@ namespace IndoorCO2MapAppV2.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
+            pageActive = true;
             bool recovered = await TryRecoverRecordingAsync();
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();
 
             //only do it at startup once
-#if !WINDOWS //disabled for now on windows to debug airspot without auto connecting to random sensor
+
             if (!_initialRefreshDone && !recovered)
             {
                 _initialRefreshDone = true;
 
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
             }
-#endif
+
+        }
+
+        protected override async void OnDisappearing()
+        {
+            base.OnDisappearing();
+            pageActive = false;
         }
 
         protected async Task<bool> TryRecoverRecordingAsync()
@@ -107,13 +115,13 @@ namespace IndoorCO2MapAppV2.Pages
             if (index >= 0 && index < _mainPageViewModel.Sensor.Devices.Count)
             {
                 var device = _mainPageViewModel.Sensor.Devices[index];
-                _mainPageViewModel.Sensor.SelectDeviceAsync(device).SafeFireAndForget();
+                _mainPageViewModel.Sensor.SelectDeviceAsync(device).SafeFireAndForget("DevicePicker_SelectedIndexChanged|_mainPageViewModel.Sensor.SelectDeviceAsync");
             }
         }
 
         private void OnRefreshSensorListClicked(object sender, EventArgs e)
         {
-            RefreshSensorListAsync().SafeFireAndForget();
+            RefreshSensorListAsync().SafeFireAndForget("OnRefreshSensorListClicked|RefreshSensorListAsync");
         }
 
         //TODO: add filter from settings (not just type but also explicit string)
@@ -128,18 +136,18 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 CO2MonitorPicker.SelectedIndex = 0;
                 var firstDevice = _mainPageViewModel.Sensor.Devices[0];
-                _mainPageViewModel.Sensor.SelectDeviceAsync(firstDevice).SafeFireAndForget();
+                _mainPageViewModel.Sensor.SelectDeviceAsync(firstDevice).SafeFireAndForget("RefreshSensorListAsync|_mainPageViewModel.Sensor.SelectDeviceAsync");
             }
         }
 
         private void OnSearchBuildingsClicked(object sender, EventArgs e)
         {
-            SearchBuildingsAsync().SafeFireAndForget();
+            SearchBuildingsAsync().SafeFireAndForget("OnSearchBuildingsClicked|SearchBuildingsAsync");
         }
 
         private void OnGetCachedLocationsClicked(object sender, EventArgs e)
         {
-            LoadCachedLocationsAsync().SafeFireAndForget();
+            LoadCachedLocationsAsync().SafeFireAndForget("OnGetCachedLocationsClicked|LoadCachedLocationsAsync");
         }
 
         private async Task LoadCachedLocationsAsync()
@@ -200,11 +208,13 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async void OnCo2TimerTick(object? sender, EventArgs e)
         {
+            
+            if (!pageActive) return;
+            Logger.WriteToLog("OnCo2TimerTick Called && is after active page check return");
             var sensorVm = _mainPageViewModel.Sensor;
-
             if (sensorVm.SelectedDevice == null)
                 return;
-            
+
             try
             {
                 await sensorVm.RefreshLiveCO2Async();

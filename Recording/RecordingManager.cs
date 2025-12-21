@@ -3,6 +3,7 @@ using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.Resources.Strings;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace IndoorCO2MapAppV2.Recording
@@ -81,6 +82,7 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         public async Task StopRecordingAsync()
         {
+            Logger.WriteToLog("StopRecordingAsync called", LogMode.Verbose);
             if (!IsRecording)
                 return;
 
@@ -96,16 +98,23 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         private async Task RunLoopAsync(CancellationToken token)
         {
+            Logger.WriteToLog("RunLoopAsync called", LogMode.Verbose);
+            if (token.IsCancellationRequested)
+            {
+                Logger.WriteToLog("Recording Manager RunLoop CancellationToken IsCancellationRequested set to true");
+            }
             try
             {
                 while (await _timer!.WaitForNextTickAsync(token))
                 {
+                    Logger.WriteToLog("RunLoopAsync|in while loop before ReadAndStoreLatestAsync", LogMode.Verbose);
                     await ReadAndStoreLatestAsync();
+                    Logger.WriteToLog("RunLoopAsync|in while loop after ReadAndStoreLatestAsync", LogMode.Verbose);
                 }
             }
             catch (OperationCanceledException)
             {
-                // normal exit
+                Logger.WriteToLog("OperationCanceledException caught in RunLoopAsync", LogMode.Verbose);
             }
         }
 
@@ -114,6 +123,7 @@ namespace IndoorCO2MapAppV2.Recording
         // ----------------------------------------------------------------------
         private async Task ReadAndStoreLatestAsync()
         {
+            Logger.WriteToLog("ReadAndStoreLatestAsync() called", LogMode.Verbose);
             if (ActiveRecording == null)
                 return;
 
@@ -134,8 +144,13 @@ namespace IndoorCO2MapAppV2.Recording
             if(ActiveRecording!= null && ActiveRecording.MeasurementData!= null)
             {
                 ActiveRecording.MeasurementData.Clear();
+                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording!= null && ActiveRecording.MeasurementData!= null - clearing MeasurementData",LogMode.Verbose);
             }
-            if (ActiveRecording == null) return;
+            if (ActiveRecording == null)
+            {
+                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording is null - returning",LogMode.Verbose);
+                return;
+            }
 
             int interval = 1;            
             if(CO2MonitorManager.Instance.UpdateInterval == 120)
@@ -160,6 +175,7 @@ namespace IndoorCO2MapAppV2.Recording
                 ActiveRecording.MeasurementData.Add(new CO2Reading(v, offset, DateTime.Now));
                 offset += interval;
             }
+            Logger.WriteToLog("ReadAndStoreLatestAsync |Before MeasurementDataUpdated?.Invoke()", LogMode.Verbose);
             MeasurementDataUpdated?.Invoke();
         }
 

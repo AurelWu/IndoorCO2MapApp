@@ -48,7 +48,7 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
             }
         }
 
-        // 3. Run initialization again || right now for airspot this will early exit if its still the same Provider once its been initialized once
+        
         return await InitializeAsync(ActiveDevice);
     }
 

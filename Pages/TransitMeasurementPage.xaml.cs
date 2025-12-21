@@ -12,7 +12,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnCancelClicked(object sender, EventArgs e)
         {
-            CancelMeasurementAsync().SafeFireAndForget();
+            CancelMeasurementAsync().SafeFireAndForget("TransitMeasurementPage|OnCancelClicked|CancelMeasurementAsync");
         }
 
         private async Task CancelMeasurementAsync()

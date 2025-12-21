@@ -18,7 +18,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (BindingContext is HistoryViewModel vm)
             {
-                vm.ReloadRecordingsAsync().SafeFireAndForget();
+                vm.ReloadRecordingsAsync().SafeFireAndForget("HistoryPage|OnAppearing|vm.ReloadRecordingsAsync");
             }
         }
     }

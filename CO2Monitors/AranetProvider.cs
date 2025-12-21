@@ -2,6 +2,7 @@
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
@@ -38,7 +39,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-            CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
+
+            //this can apparently survive sensor change currently (was still called while airspot selected) => CO2MonitorManager.Instance.ActiceCO2MonitorProvider = this should not be set here
+
+            //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
             //if (IsGattValid() == true && errorReadingHappened == false) for Aranet we always just reinitialize as connections get closed aggressively
             // Find new-version service, fall back to old
             _service =
@@ -47,7 +51,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             if (_service == null)
             {
-                Console.WriteLine("Aranet service not found.");
+                Debug.WriteLine("Aranet service not found.");
                 return false;
             }
 
@@ -87,8 +91,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 _historyV2Characteristic != null;
 
             if (!ok)
-                Console.WriteLine("Initialization incomplete: missing one or more characteristics.");
-            Console.WriteLine("Initialization complete: all characteristics found");
+                Debug.WriteLine("Initialization incomplete: missing one or more characteristics.");
+            Debug.WriteLine("Initialization complete: all characteristics found");
             return ok;
         }
 
@@ -209,7 +213,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (startIndex < 0)
                     startIndex = 0;
 
-                Console.WriteLine($"TotalDataPoints: {totalDataPoints}, StartIndex: {startIndex}, PointsToRead: {pointsToRead}");
+                Debug.WriteLine($"TotalDataPoints: {totalDataPoints}, StartIndex: {startIndex}, PointsToRead: {pointsToRead}");
 
                 // 3. Build request packet with startIndex (adjust CreateCO2HistoryRequestPacket to take start index)
                 byte[] packet = CreateCO2HistoryRequestPacket((ushort)startIndex);
@@ -225,7 +229,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"WriteAsync failed: {ex.Message}");
+                    Debug.WriteLine($"WriteAsync failed: {ex.Message}");
                     return null;
                 }
 

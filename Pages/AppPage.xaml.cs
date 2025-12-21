@@ -57,7 +57,7 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnNavigateClicked(object sender, EventArgs e)
         {
             if (sender is Button button && button.CommandParameter is string route)
-                NavigateAsync(route).SafeFireAndForget();
+                NavigateAsync(route).SafeFireAndForget("OnNavigateClicked|NavigateAsync");
         }
 
         public static async Task NavigateAsync(string route)
@@ -70,28 +70,28 @@ namespace IndoorCO2MapAppV2.Pages
         {
             LocationServicePlatformProvider.CreateOrUse()
                 .ShowEnableGpsDialogAsync()
-                .SafeFireAndForget();
+                .SafeFireAndForget("OnRequestGPSEnableDialog|ShowEnableGpsDialogAsync");
         }
 
         private void OnRequestGPSPermissionDialog(object sender, EventArgs e)
         {
             LocationServicePlatformProvider.CreateOrUse()
                 .RequestLocationPermissionAsync()
-                .SafeFireAndForget();
+                .SafeFireAndForget("OnRequestGPSPermissionDialog|RequestLocationPermissionAsync");
         }
 
         private void OnRequestBluetoothEnableDialog(object sender, EventArgs e)
         {
             BluetoothPlatformProvider.CreateOrUse()
                 .RequestBluetoothEnableAsync()
-                .SafeFireAndForget();
+                .SafeFireAndForget("OnRequestBluetoothEnableDialog");
         }
 
         private void OnRequestBluetoothPermissionsDialog(object sender, EventArgs e)
         {
             BluetoothPlatformProvider.CreateOrUse()
                 .RequestPermissionsAsync()
-                .SafeFireAndForget();
+                .SafeFireAndForget("OnRequestBluetoothPermissionsDialog");
         }
     }
 }

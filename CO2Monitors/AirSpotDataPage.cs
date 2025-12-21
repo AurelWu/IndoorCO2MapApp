@@ -1,6 +1,8 @@
 ﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DebugTools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +23,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         private void ParseData(byte[] data)
         {
+            if(data.Length!= 135)
+            {
+                Logger.WriteToLog("Airspot History Data package with length deviating from normal 135 byte");
+            }
             FinishedPage = true;
             int offset = 4;
 
@@ -45,14 +51,14 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     FinishedPage = false;
 
                 // Only store entries with status 0x00
-                if (msgType == 0x00)
+                if (msgType == 0x00 && co2 > 200)
                 {
                     Timestamps.Add(timestamp);
                     CO2Values.Add(co2);
                 }
             }
-
-            PageID = (data[offset] << 8) | data[offset + 1];
+            int id = (data[offset] << 8) | data[offset + 1];
+            PageID = id;
         }
     }
 

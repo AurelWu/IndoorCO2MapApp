@@ -132,7 +132,7 @@ namespace IndoorCO2MapAppV2.PersistentData
                 using var reader = new StreamReader(stream);
 
                 string json = reader.ReadToEnd();
-                Console.WriteLine(json);
+                //Console.WriteLine(json);
 
                 var loaded = JsonSerializer.Deserialize<UserSettings>(json);
 

@@ -1,7 +1,9 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace IndoorCO2MapAppV2.ExtensionMethods
@@ -11,7 +13,7 @@ namespace IndoorCO2MapAppV2.ExtensionMethods
         /// <summary>
         /// Safely fire-and-forget a Task, writing errors to console and log.
         /// </summary>
-        public static void SafeFireAndForget(this Task task)
+        public static void SafeFireAndForget(this Task task, string sender ="")
         {
             _ = task.ContinueWith(async t =>
             {
@@ -20,8 +22,8 @@ namespace IndoorCO2MapAppV2.ExtensionMethods
                     // Log all inner exceptions
                     foreach (var ex in t.Exception!.InnerExceptions)
                     {
-                        Console.WriteLine($"Task failed: {ex.Message}");
-                        Logger.WriteToLog(ex.Message);
+                        //Debug.WriteLine($"Task from {sender} failed: {ex.Message}");
+                        Logger.WriteToLog($"Task from {sender} failed: {ex.Message}",LogMode.Verbose);
                     }
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());

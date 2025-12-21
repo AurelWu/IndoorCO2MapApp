@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,13 +37,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-            CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
+            //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
 
             _service = await TryGetServiceAsync(device, AirvalentServiceUUID); 
 
             if (_service == null)
             {
-                Console.WriteLine("Airvalent service not found.");
+                Debug.WriteLine("Airvalent service not found.");
                 return false;
             }
 
@@ -94,8 +95,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 _airValentChunkCounter != null;
 
             if (!ok)
-                Console.WriteLine("Initialization incomplete: missing one or more characteristics.");
-            Console.WriteLine("Initialization complete: all characteristics found");
+                Debug.WriteLine("Initialization incomplete: missing one or more characteristics.");
+            Debug.WriteLine("Initialization complete: all characteristics found");
             return ok;
         }
 

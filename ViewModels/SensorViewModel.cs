@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Resources.Strings;
@@ -97,6 +98,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task RefreshLiveCO2Async()
         {
+            Logger.WriteToLog("SensorViewModel |RefreshLiveCO2Async called", LogMode.Verbose);
             await _monitorManager.RefreshLiveCO2Async();
         }
 

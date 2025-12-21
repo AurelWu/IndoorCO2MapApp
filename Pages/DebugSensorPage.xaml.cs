@@ -43,7 +43,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void BluetoothDevicesList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            HandleSelectionChangedAsync(e).SafeFireAndForget();
+            HandleSelectionChangedAsync(e).SafeFireAndForget("BluetoothDevicesList_SelectionChanged|HandleSelectionChangedAsync");
         }
 
         private async Task HandleSelectionChangedAsync(SelectionChangedEventArgs e)
@@ -70,7 +70,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnSearchBluetoothDevicesClicked(object sender, EventArgs e)
         {
-            SearchBluetoothDevicesAsync().SafeFireAndForget();
+            SearchBluetoothDevicesAsync().SafeFireAndForget("OnSearchBluetoothDevicesClicked|SearchBluetoothDevicesAsync");
         }
 
         private async Task SearchBluetoothDevicesAsync()
@@ -93,7 +93,7 @@ namespace IndoorCO2MapAppV2.Pages
         {
             //_viewModel.RefreshLiveCO2Async().SafeFireAndForget();
             //_viewModel.RefreshUpdateIntervalAsync().SafeFireAndForget();
-            _viewModel.RefreshHistoryAsync(20).SafeFireAndForget();         
+            _viewModel.RefreshHistoryAsync(20).SafeFireAndForget("OnRetrieveDataFromMonitorClicked|_viewModel.RefreshHistoryAsync");         
         }
 
         private void OnRetrieveDataFromMonitorContinouslyClicked(object sender, EventArgs e)
@@ -114,7 +114,7 @@ namespace IndoorCO2MapAppV2.Pages
             if (DevicePicker.SelectedIndex >= 0)
             {
                 var device = _viewModel.Devices[DevicePicker.SelectedIndex];
-                _viewModel.SelectDeviceAsync(device).SafeFireAndForget();
+                _viewModel.SelectDeviceAsync(device).SafeFireAndForget("DevicePicker_SelectedIndexChanged|_viewModel.SelectDeviceAsync");
             }
         }
 

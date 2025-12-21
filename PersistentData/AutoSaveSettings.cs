@@ -12,7 +12,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             if (!EqualityComparer<T>.Default.Equals(field, value))
             {
                 field = value;
-                UserSettings.SaveAsync().SafeFireAndForget();
+                UserSettings.SaveAsync().SafeFireAndForget("AutoSaveSettings|SetProperty|UserSettings.SaveAsync");
             }
         }
     }

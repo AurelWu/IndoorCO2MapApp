@@ -1,8 +1,11 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Spatial;
+using IndoorCO2MapAppV2.Enumerations;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Timers;
 
@@ -92,7 +95,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             // --- GPS status ---
             var locationHelper = LocationServicePlatformProvider.CreateOrUse();
-            UpdateGpsStatusAsync(locationHelper).SafeFireAndForget();
+            UpdateGpsStatusAsync(locationHelper).SafeFireAndForget("StatusViewModel|UpdateStatus");
         }
 
         private async Task UpdateGpsStatusAsync(ILocationService locationHelper)
@@ -115,7 +118,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                     IsGpsOn = false;
                     GpsPermissionGranted = false;
                 });
-                Console.WriteLine($"UpdateGpsStatusAsync failed: {ex.Message}");
+                Logger.WriteToLog($"UpdateGpsStatusAsync failed: {ex.Message}", minimumLogMode: LogMode.Verbose);
             }
         }
     }

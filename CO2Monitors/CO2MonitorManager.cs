@@ -58,7 +58,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
-            if (selectedDevice == device) return; //same as current device selected again, no need to do anything
+            if (SelectedDevice == device) return; //same as current device selected again, no need to do anything
             if (ActiveCO2MonitorProvider != null)
             {
                 await ActiveCO2MonitorProvider.DisposeAsync();
@@ -110,6 +110,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task RefreshLiveCO2Async()
         {
+            Logger.WriteToLog("CO2MonitorManager |RefreshLiveCO2Async called", LogMode.Verbose);
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
             await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
             CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
@@ -127,7 +128,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
             await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
             var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(minutes, CO2MonitorManager.Instance.UpdateInterval);
-            if (hist != null) Co2History = [.. hist];
+            if (hist != null) Co2History = [.. hist];            
         }
 
         public async Task DisconnectAsync()

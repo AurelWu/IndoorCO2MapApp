@@ -34,7 +34,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnGetGPSPositionClicked(object sender, EventArgs e)
         {
-            GetGPSPositionAsync().SafeFireAndForget();
+            GetGPSPositionAsync().SafeFireAndForget("OnGetGPSPositionClicked|GetGPSPositionAsync");
         }
 
         private async Task GetGPSPositionAsync()
@@ -49,7 +49,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnSearchBuildingsClicked(object sender, EventArgs e)
         {
-            GetBuildingLocationsAsync().SafeFireAndForget();
+            GetBuildingLocationsAsync().SafeFireAndForget("OnSearchBuildingsClicked|GetBuildingLocationsAsync");
         }
 
         private async Task<bool> GetBuildingLocationsAsync()

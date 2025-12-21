@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,7 +19,7 @@ namespace IndoorCO2MapAppV2.DebugTools
         public static bool includeSender = true;
         //maybe add Enum for different Logging Levels
 
-        public static void WriteToLog(string text, string sender="", LogMode minimumLogMode=LogMode.Default)
+        public static void WriteToLog(string text, LogMode minimumLogMode=LogMode.Default, string sender = "")
         {
             DateTime dateTime = DateTime.Now;
             string textWithTimeStamp = text + " | " + dateTime.ToString();
@@ -26,7 +27,7 @@ namespace IndoorCO2MapAppV2.DebugTools
             circularBuffer.Add(textWithTimeStamp);           
             if (writeAlsoToConsole)
             {
-                Console.WriteLine(textWithTimeStamp);
+                Debug.WriteLine(textWithTimeStamp);
             }
         }
 

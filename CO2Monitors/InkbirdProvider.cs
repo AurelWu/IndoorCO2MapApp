@@ -6,6 +6,7 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,13 +29,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-            CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
+            //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
             if (_setupDone == IsGattValid()) return true;
             _service = await TryGetServiceAsync(device, InkbirdServiceUUID);
 
             if (_service == null)
             {
-                Console.WriteLine("Inkbird service not found.");
+                Logger.WriteToLog("Inkbird service not found.",LogMode.Default);
                 return false;
             }
             if (assembledCO2History == null)

@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Maui.Storage;
+using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using Microsoft.Maui.Storage;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,7 +45,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Export failed: {ex}");
+                Logger.WriteToLog($"Recovery Backup Export failed: {ex}",LogMode.Default);
                 return false;
             }
         }
@@ -69,7 +72,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Import failed: {ex}");
+                Logger.WriteToLog($"Recovery Database Import failed: {ex}",LogMode.Default);
                 return false;
             }
         }
