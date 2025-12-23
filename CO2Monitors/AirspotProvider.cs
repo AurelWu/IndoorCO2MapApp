@@ -21,33 +21,24 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     private ICharacteristic? _writer;
     private ICharacteristic? _notify;
 
-    private CancellationTokenSource? _cts;
     private volatile bool _isActive;
 
     private readonly SemaphoreSlim _writeLock = new(1, 1);
 
-    private CancellationToken Token => _cts?.Token ?? CancellationToken.None;
-
     // ================= PACKET PIPELINE =================
 
-    private readonly Channel<byte[]> _packetChannel =
-        Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            SingleWriter = false
-        });
-
+    private Channel<byte[]>? _packetChannel;
     private readonly SortedDictionary<int, AirspotDataPage> _pages = new();
 
     // ================= INITIALIZATION =================
 
     public override async Task<bool> InitializeAsync(IDevice device)
     {
-        Logger.WriteToLog("AirspotProvider|InitializeAsync called before DisposeAsync", LogMode.Verbose);
+        Logger.WriteToLog("AirspotProvider|InitializeAsync - start", LogMode.Verbose);
+
         await DisposeAsync(); // ensure clean state
-        Logger.WriteToLog("AirspotProvider|InitializeAsync called, after DisposeAsync", LogMode.Verbose);
+
         ActiveDevice = device;
-        //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
 
         _service = await TryGetServiceAsync(device, SERVICE_UUID);
         if (_service == null) return false;
@@ -58,15 +49,28 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         if (_writer == null || _notify == null || !_writer.CanWrite)
             return false;
 
-        _cts = new CancellationTokenSource();
+        _packetChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = false
+        });
+
         _isActive = true;
 
         _notify.ValueUpdated += OnNotify;
-        await _notify.StartUpdatesAsync();
+        try
+        {
+            await _notify.StartUpdatesAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.WriteToLog("Exception during await _notify.StartUpdatesAsync: " + e.Message);
+        }
+        
 
-        _ = Task.Run(() => PacketRouterLoop(_cts.Token));
+        _ = Task.Run(PacketRouterLoop);
 
-        Logger.WriteToLog("Airspot initialized",minimumLogMode: LogMode.Verbose);
+        Logger.WriteToLog("AirspotProvider|InitializeAsync - completed", LogMode.Verbose);
         return true;
     }
 
@@ -77,29 +81,33 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
     private void OnNotify(object? sender, CharacteristicUpdatedEventArgs e)
     {
-        if (!_isActive) return;
+        if (!_isActive || _packetChannel == null)
+            return;
 
         var data = e.Characteristic.Value;
-        if (data == null || data.Length < 4) return;
+        if (data == null || data.Length < 4)
+            return;
 
         _packetChannel.Writer.TryWrite(data);
     }
 
-    // ================= PROTOCOL LOOP =================
+    // ================= PACKET LOOP =================
 
-    private async Task PacketRouterLoop(CancellationToken token)
+    private async Task PacketRouterLoop()
     {
-        if (token.IsCancellationRequested)
-            return; // if cancellation is already requested before this is called and not during reading the data then we can instantly return
-
         try
         {
-            await foreach (var data in _packetChannel.Reader.ReadAllAsync(token))
+            if (_packetChannel == null)
+                return;
+
+            await foreach (var data in _packetChannel.Reader.ReadAllAsync())
             {
-                if (!_isActive || token.IsCancellationRequested) break;
+                if (!_isActive)
+                    break;
 
                 // History page
-                if (data[0] == 0xFF && data[1] == 0xAA && data[2] == 0x0C && data[3] == 0x80)
+                if (data[0] == 0xFF && data[1] == 0xAA &&
+                    data[2] == 0x0C && data[3] == 0x80)
                 {
                     var page = new AirspotDataPage(data);
                     _pages[page.PageID] = page;
@@ -108,6 +116,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
                 else if (data.Length >= 10 && data[2] == 0x01 && data[3] == 0x02)
                 {
                     CurrentCO2Value = (data[8] << 8) | data[9];
+                    Logger.WriteToLog("PacketRouterLoop|new CO2Value: " + CurrentCO2Value);
                 }
                 // Current page response
                 else if (data.Length >= 7 &&
@@ -119,9 +128,13 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
                 }
             }
         }
-        catch (OperationCanceledException)
+        catch (ChannelClosedException)
         {
-            Logger.WriteToLog("PacketRouterLoop|OperationCanceledException - [expected Behaviour]", LogMode.Verbose);
+            Logger.WriteToLog("PacketRouterLoop|Channel closed - expected", LogMode.Verbose);
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteToLog($"PacketRouterLoop|Unhandled exception: {ex}", LogMode.Verbose);
         }
     }
 
@@ -139,19 +152,20 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     private static byte Checksum(byte[] cmd)
         => (byte)(cmd.Sum(b => b) & 0xFF);
 
-    private async Task SendAsync(byte[] cmd, CancellationToken token)
+    private async Task SendAsync(byte[] cmd)
     {
-        if (!_isActive || _writer == null) return;
+        if (!_isActive || _writer == null)
+            return;
 
-        await _writeLock.WaitAsync(token);
+        await _writeLock.WaitAsync();
         try
         {
             var packet = cmd.Concat(new[] { Checksum(cmd) }).ToArray();
-            await _writer.WriteAsync(packet, token);
+            await _writer.WriteAsync(packet);
         }
         catch
         {
-            // BLE failures are expected — swallow
+            // BLE failures are expected
         }
         finally
         {
@@ -163,22 +177,24 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
     private TaskCompletionSource<ushort>? _currentPageTcs;
 
-    private async Task<ushort?> RequestCurrentPageAsync(CancellationToken token)
+    private async Task<ushort?> RequestCurrentPageAsync()
     {
-        if (!IsGattValid()) return null;
+        if (!IsGattValid())
+            return null;
 
         _currentPageTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         try
         {
-            await SendAsync(CMD_CURRENT_PAGE, token);
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
-            return await _currentPageTcs.Task.WaitAsync(linked.Token);
-        }
-        catch
-        {
-            return null;
+            await SendAsync(CMD_CURRENT_PAGE);
+
+            var completed = await Task.WhenAny(
+                _currentPageTcs.Task,
+                Task.Delay(TimeSpan.FromSeconds(5)));
+
+            return completed == _currentPageTcs.Task
+                ? _currentPageTcs.Task.Result
+                : null;
         }
         finally
         {
@@ -190,10 +206,12 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
     protected override async Task<int> DoReadCurrentCO2Async()
     {
-        if (!IsGattValid()) return CurrentCO2Value;
+        if (!IsGattValid())
+            return CurrentCO2Value;
 
-        await SendAsync(CMD_LIVE, Token);
-        await Task.Delay(150, Token);
+        await SendAsync(CMD_LIVE);
+        await Task.Delay(150);
+
         return CurrentCO2Value;
     }
 
@@ -205,10 +223,9 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         if (!IsGattValid())
             return null;
 
-        // Collect enough pages to cover requested minutes
         await CollectPagesAsync((minutes / 16) + 2);
 
-        ushort? current = await RequestCurrentPageAsync(Token);
+        ushort? current = await RequestCurrentPageAsync();
         if (current == null)
             return null;
 
@@ -217,24 +234,17 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
         var newestFirst = new List<ushort>();
 
-        // Iterate pages: newest => oldest
         for (int i = 0; i < _pages.Count; i++)
         {
             if (_pages.TryGetValue(page, out var p))
             {
-                // Within page: newest => oldest
-                foreach (var v in p.CO2Values
-                                    .Where(v => v != 0xFFFF)
-                                    .Reverse())
-                {
+                foreach (var v in p.CO2Values.Where(v => v != 0xFFFF).Reverse())
                     newestFirst.Add((ushort)v);
-                }
             }
 
             page = (page - 1 + maxPages) % maxPages;
         }
 
-        // Convert to chronological order: oldest => newest
         newestFirst.Reverse();
 
         return newestFirst
@@ -242,23 +252,26 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
             .ToArray();
     }
 
-
     public async Task CollectPagesAsync(int count)
     {
-        if (!IsGattValid()) return;
+        if (!IsGattValid())
+            return;
 
-        ushort? current = await RequestCurrentPageAsync(Token);
-        if (current == null) return;
+        ushort? current = await RequestCurrentPageAsync();
+        if (current == null)
+            return;
 
         const int maxPages = 16384;
 
         for (int i = 0; i < count; i++)
         {
             int page = ((int)current - i + maxPages) % maxPages;
-            if (_pages.TryGetValue(page, out var p) && p.FinishedPage) continue;
 
-            await SendAsync(CMD_READ_PAGE((ushort)page), Token);
-            await Task.Delay(50, Token);
+            if (_pages.TryGetValue(page, out var p) && p.FinishedPage)
+                continue;
+
+            await SendAsync(CMD_READ_PAGE((ushort)page));
+            await Task.Delay(50);
         }
     }
 
@@ -266,46 +279,24 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
     public override async ValueTask DisposeAsync()
     {
-        Logger.WriteToLog($"AirspotProvider|DisposeAsync called and before initial sanity check: isactive: {_isActive} | cts: {_cts}", LogMode.Verbose);
-        if (!_isActive && _cts == null) return;
-        Logger.WriteToLog("AirspotProvider|DisposeAsync called and past initial sanity check", LogMode.Verbose);
+        if (!_isActive)
+            return;
 
         _isActive = false;
 
-        await _cts?.CancelAsync();
+        _packetChannel?.Writer.TryComplete();
 
         if (_notify != null)
         {
-            Logger.WriteToLog("AirspotProvider|DisposeAsync called | before unsubscribing from OnNotify", LogMode.Verbose);
             _notify.ValueUpdated -= OnNotify;
 
-            try 
-            {
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | before await _notify.StopUpdatesAsync()", LogMode.Verbose);
-                await _notify.StopUpdatesAsync();
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | after await _notify.StopUpdatesAsync()", LogMode.Verbose);
-            } 
-            catch 
-            {
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | exception caught during await _notify.StopUpdatesAsync()", LogMode.Verbose);
-            }
-        }
-
-        _cts?.Dispose();
-        _cts = null;
-
-        if (ActiveDevice != null)
-        {
             try
             {
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | before await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); ", LogMode.Verbose);
-                await BLEDeviceManager.Instance._adapter
-                    .DisconnectDeviceAsync(ActiveDevice);
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | after await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); ", LogMode.Verbose);
+                await _notify.StopUpdatesAsync();
             }
-            catch 
+            catch
             {
-                Logger.WriteToLog("AirspotProvider|DisposeAsync called | exception during await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); ", LogMode.Verbose);
+                // Windows BLE may throw or hang internally
             }
         }
 
@@ -314,6 +305,6 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         _notify = null;
         ActiveDevice = null;
 
-        Logger.WriteToLog("Airspot disposed", minimumLogMode: LogMode.Verbose);
+        Logger.WriteToLog("AirspotProvider disposed", LogMode.Verbose);
     }
 }

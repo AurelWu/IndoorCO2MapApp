@@ -39,8 +39,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public override async Task<bool> InitializeAsync(IDevice device)
         {
             ActiveDevice = device;
-
-            //this can apparently survive sensor change currently (was still called while airspot selected) => CO2MonitorManager.Instance.ActiceCO2MonitorProvider = this should not be set here
+            
 
             //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
             //if (IsGattValid() == true && errorReadingHappened == false) for Aranet we always just reinitialize as connections get closed aggressively
