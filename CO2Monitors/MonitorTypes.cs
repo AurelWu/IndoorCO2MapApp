@@ -35,5 +35,16 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             { "IAM-T1", CO2MonitorType.InkbirdIAMT1 },
             { "Airspot", CO2MonitorType.AirSpotHealth }
         };
+
+        internal static readonly Dictionary<Guid, CO2MonitorType> MonitorTypeByAdvertisementServiceUuid = new()
+        {
+
+            { Guid.Parse("29EA02DF-0C82-9357-414D-2B6BA4941CB8"), CO2MonitorType.Airvalent }
+        };
+
+        internal static readonly Dictionary<Guid, CO2MonitorType> MonitorTypeByServiceUuid = new()
+        {
+            { Guid.Parse("B81C94A4-6B2B-4D41-9357-0C8229EA02DF"), CO2MonitorType.Airvalent }
+        };
     }
 }

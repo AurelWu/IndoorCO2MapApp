@@ -50,14 +50,121 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             return await DiscoverCharacteristicsAsync(_service);
         }
 
-        protected override Task<int> DoReadCurrentCO2Async()
+        protected override async Task<int> DoReadCurrentCO2Async()
         {
-            throw new NotImplementedException();
+            if (!IsGattValid()) return -1;
+
+            try
+            {
+                // Read the latest history chunk
+                var reply = await _airValentHistory.ReadAsync();
+                var bytes = reply.data.ToList();
+
+                if (bytes.Count <= 8) return -1; // no valid data
+
+                bytes.RemoveRange(0, 8); // remove header/meta data
+
+                // The newest entry is the last 8 bytes
+                int lastIndex = bytes.Count - 8;
+                byte co2byte2shift = (byte)(bytes[lastIndex + 1] << 2);
+                co2byte2shift = (byte)(co2byte2shift >> 2);
+                byte[] co2bytes = new byte[2] { bytes[lastIndex + 0], co2byte2shift };
+                ushort co2Value = BitConverter.ToUInt16(co2bytes, 0);
+
+                return co2Value;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
-        protected override Task<ushort[]?> DoReadHistoryAsync(ushort startIndex, int sensorUpdateInterval)
+        protected override async Task<ushort[]?> DoReadHistoryAsync(ushort amountOfMinutes, int sensorUpdateInterval)
         {
-            throw new NotImplementedException();
+            if (!IsGattValid()) return null;
+
+            try
+            {
+                // 1️ Read chunk count
+                var chunkReply = await _airValentChunkCounter.ReadAsync();
+                byte[] chunkBytes = chunkReply.data;
+                ushort chunkCount = BitConverter.ToUInt16(chunkBytes, 0);
+
+                // 2️ Set history pointer if chunks exist
+                if (chunkCount > 0 && _airValentHistoryPointer != null)
+                {
+                    var msg = AirvalentSetHistoryPointerMsgData();
+                    await _airValentHistoryPointer.WriteAsync(msg);
+                }
+
+                // 3️ Read history chunks
+                var historyBytesList = new List<byte>();
+                for (int i = 0; i < (chunkCount > 0 ? 2 : 1); i++)
+                {
+                    var reply = await _airValentHistory.ReadAsync();
+                    var bytes = reply.data.ToList();
+                    if (bytes.Count > 8) bytes.RemoveRange(0, 8); // skip header
+                    historyBytesList.AddRange(bytes);
+                }
+
+                // 4️ Convert to CO2 values
+                var co2Values = new List<ushort>();
+                for (int i = 0; i < historyBytesList.Count; i += 8)
+                {
+                    byte co2byte2shift = (byte)(historyBytesList[i + 1] << 2);
+                    co2byte2shift = (byte)(co2byte2shift >> 2);
+                    byte[] co2bytes = new byte[2] { historyBytesList[i + 0], co2byte2shift };
+                    co2Values.Add(BitConverter.ToUInt16(co2bytes, 0));
+                }
+
+                // 5️ Calculate elapsed intervals based on sensorUpdateInterval
+                int elapsedIntervals = amountOfMinutes;
+                switch (sensorUpdateInterval)
+                {
+                    case 120:
+                        elapsedIntervals /= 2;
+                        break;
+                    case 300:
+                        elapsedIntervals /= 5;
+                        break;
+                    case 600:
+                        elapsedIntervals /= 10;
+                        break;
+                    case 900:
+                        elapsedIntervals /= 15;
+                        break;
+                }
+
+                if (elapsedIntervals <= 0) elapsedIntervals = 1;
+
+                // 6️ Take the last N values
+                if (elapsedIntervals > co2Values.Count)
+                    elapsedIntervals = co2Values.Count;
+
+                var result = co2Values.Skip(co2Values.Count - elapsedIntervals).Take(elapsedIntervals).ToArray();
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+        public static byte[] AirvalentSetHistoryPointerMsgData() //sets it to the last but one data array (the newest already completely filled one)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                byte b1 = 0xbf;
+                byte b2 = 0x04;
+                using (var binaryWriter = new BinaryWriter(memoryStream))
+                {
+                    binaryWriter.Write(b1);
+                    binaryWriter.Write(b2);
+                }
+                byte[] data = memoryStream.ToArray();
+                return memoryStream.ToArray();
+            }
         }
 
         protected override async Task<int> DoReadUpdateIntervalAsync()
@@ -71,7 +178,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         protected override bool IsGattValid()
         {
-            throw new NotImplementedException();
+            return
+                _airValentUpdateInterval != null &&
+                _airValentHistory != null &&
+                _airValentHistoryPointer != null &&
+                _airValentChunkCounter != null;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.PersistentData;
 using Microsoft.VisualBasic;
+using Plugin.BLE.Abstractions;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -70,11 +71,20 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             SelectedDevice = device;
 
+            var advertisedServices = device.Device.AdvertisementRecords?
+                   .Where(r =>
+                       r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
+                       r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
+                   .SelectMany(r => r.Data.To128BitGuids())
+                   .ToList();
+
             var connected = await _ble.ConnectDeviceAsync(device.Device);
             if (!connected)
                 return;
+            
+           
 
-            var type = CO2MonitorProviderFactory.DetectFromName(device.Device.Name) ?? SelectedMonitorType;
+            var type = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(device.Device,BLEDeviceManager.Instance._adapter) ?? SelectedMonitorType;
             ActiveCO2MonitorProvider = CO2MonitorProviderFactory.CreateProvider(type);
             if (ActiveCO2MonitorProvider == null)
                 return;

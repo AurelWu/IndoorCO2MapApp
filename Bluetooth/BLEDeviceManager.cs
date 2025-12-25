@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using Plugin.BLE;
+using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Extensions;
@@ -67,23 +68,36 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             using var cts = new CancellationTokenSource(scanDurationMs);
 
-            void Handler(object? sender, DeviceEventArgs e)
+            async void Handler(object? sender, DeviceEventArgs e)
             {
                 if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
-                if(!e.Device.Name.Contains(deviceNameFilter)) return;
+                if (!e.Device.Name.Contains(deviceNameFilter)) return;
 
-                var detectedType = CO2MonitorProviderFactory.DetectFromName(e.Device.Name);
-                if (detectedType.HasValue && (filter & detectedType.Value) != 0)
+                var advertisedServices = e.Device.AdvertisementRecords?
+                    .Where(r =>
+                        r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
+                        r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
+                    .SelectMany(r => r.Data.To128BitGuids())
+                    .ToList();
+
+                var detectedType = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(
+                    e.Device,
+                    _adapter
+                );
+
+                if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
+                    return;
+
+                var deviceModel = new BluetoothDeviceModel(e.Device);
+
+                if (!Devices.Contains(deviceModel))
                 {
-                    var deviceModel = new BluetoothDeviceModel(e.Device);
-                    if (!Devices.Contains(deviceModel))
-                    {
-                        Devices.Add(deviceModel);
-                        DeviceDiscovered?.Invoke(this, deviceModel);
-                    }
+                    Devices.Add(deviceModel);
+                    DeviceDiscovered?.Invoke(this, deviceModel);
                 }
             }
-            
+
+
             _adapter.DeviceDiscovered -= Handler; //safeguard probably not strictly needed
             _adapter.DeviceDiscovered += Handler;
             await _adapter.StopScanningForDevicesAsync(); //might be needed if something still running (or might not be needed)
