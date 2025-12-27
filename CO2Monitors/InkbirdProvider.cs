@@ -30,7 +30,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             ActiveDevice = device;
             //CO2MonitorManager.Instance.ActiveCO2MonitorProvider = this;
-            if (_setupDone == IsGattValid()) return true;
+            if (_setupDone && IsGattValid()) return true;
             _service = await TryGetServiceAsync(device, InkbirdServiceUUID);
 
             if (_service == null)
