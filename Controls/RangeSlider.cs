@@ -139,11 +139,20 @@ public partial class RangeSlider : ContentView
     private static void OnMaximumChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var slider = (RangeSlider)bindable;
-        int max = (int)newValue;
+
+        int oldMax = (int)oldValue;
+        int newMax = (int)newValue;
+
+        // Was the upper handle fully open before?
+        bool upperWasAtMax = slider.UpperValue == oldMax;
+
+        // If so, keep it fully open
+        if (upperWasAtMax)
+            slider.UpperValue = newMax;
 
         // Clamp upper
-        if (slider.UpperValue > max)
-            slider.UpperValue = max;
+        if (slider.UpperValue > newMax)
+            slider.UpperValue = newMax;
 
         // Clamp lower (and ensure lower < upper)
         if (slider.LowerValue > slider.UpperValue - 1)
