@@ -76,15 +76,16 @@ namespace IndoorCO2MapAppV2.Pages
         protected async Task<bool> TryRecoverRecordingAsync()
         {
             ManualResumeButton.IsVisible = false;
-            var recoveryService = RecoveryManager.Instance;
-            recoveryService.Initialize(BLEDeviceManager.Instance._adapter, RecordingManager.Instance);
+            var recoveryManager = RecoveryManager.Instance;
+            recoveryManager.Initialize(BLEDeviceManager.Instance._adapter, RecordingManager.Instance);
 
-            var snapshot = recoveryService.LoadSnapshot();
+            var snapshot = recoveryManager.LoadSnapshot();
             if (snapshot == null ) return false;
             
-            bool recovered = await recoveryService.TryAutoRecoverAsync(_mainPageViewModel.Sensor); //this sets the activeRecording to the saved state //TODO: also seed active sensor to correct one
+            bool recovered = await recoveryManager.TryAutoRecoverAsync(_mainPageViewModel.Sensor); //this sets the activeRecording to the saved state //TODO: also seed active sensor to correct one
             if (!recovered)
             {
+                Logger.WriteToLog("Automatic Recovery failed, showing manual resume button");
                 // Show Manual Resume button
                 ManualResumeButton.IsVisible = true;
                 return false;

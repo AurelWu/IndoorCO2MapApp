@@ -1,4 +1,5 @@
-﻿using IndoorCO2MapAppV2.Enumerations;
+﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Enumerations;
 
 namespace IndoorCO2MapAppV2.Recording
 {
@@ -25,6 +26,8 @@ namespace IndoorCO2MapAppV2.Recording
 
          public TriState VentilationState { get; set; }
         public string CustomNote { get; set; } = "";
+
+        public List<CO2Reading> CO2Values { get; set; } = [];
         // public double? TrimSliderValueLow { get; set; }
         // public double? TrimSliderValueHigh { get; set; }
     }

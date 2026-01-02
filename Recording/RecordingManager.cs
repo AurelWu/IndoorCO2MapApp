@@ -27,6 +27,8 @@ namespace IndoorCO2MapAppV2.Recording
 
         public static RecordingRecoverySnapshot CurrentSnapShot { get; set; } = new RecordingRecoverySnapshot();
 
+        bool inkBirdRecoveryDone = false;
+
         private RecordingManager() { }
 
         // ----------------------------------------------------------------------
@@ -52,21 +54,22 @@ namespace IndoorCO2MapAppV2.Recording
                 startTime -= 1 * 60 * 1000; //even without preRecording we start 1 minute early to grab currenty sensor reading. //maybe we even change that to 2
             }
 
-                var rec = new BuildingRecording
-                {
-                    NwrId = nwrID,
-                    NwrType = nwrType,
-                    LocationName = locationName,
-                    Latitude = latitude,
-                    Longitude = longitude,
-                    RecordingStart = startTime,
-                    MeasurementData = new(),
-                    CO2MonitorType = monitorType,
-                    DoorWindowState = TriState.Unknown,
-                    VentilationState = TriState.Unknown,
-                    CustomNotes = "",
-                    AdditionalDataByParameter = new()
-                };
+            var rec = new BuildingRecording
+            {
+                NwrId = nwrID,
+                NwrType = nwrType,
+                LocationName = locationName,
+                Latitude = latitude,
+                Longitude = longitude,
+                RecordingStart = startTime,
+                MeasurementData = new(),
+                CO2MonitorType = monitorType,
+                DoorWindowState = TriState.Unknown,
+                VentilationState = TriState.Unknown,
+                CustomNotes = "",
+                AdditionalDataByParameter = new(),
+                MonitorID = deviceID,
+            };
 
 
             ActiveRecording = rec;
@@ -143,8 +146,22 @@ namespace IndoorCO2MapAppV2.Recording
             var dateTime = DateTimeOffset.UtcNow.DateTime;
             if(ActiveRecording!= null && ActiveRecording.MeasurementData!= null)
             {
+                //=> needs to handle Inkbird Recovery setup
+                if(activeRecording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString() && !inkBirdRecoveryDone)
+                {
+                    var m = _monitor.ActiveCO2MonitorProvider as InkbirdProvider;
+                    var recData = ActiveRecording.MeasurementData;
+                    m.assembledCO2History = new List<ushort>();
+                    foreach(var r in recData)
+                    {
+                        m.assembledCO2History.Add(r.Ppm);
+                    }
+                    inkBirdRecoveryDone = true;
+                    hist = m.assembledCO2History;
+                }
                 ActiveRecording.MeasurementData.Clear();
-                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording!= null && ActiveRecording.MeasurementData!= null - clearing MeasurementData",LogMode.Verbose);
+                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording!= null && ActiveRecording.MeasurementData!= null - clearing MeasurementData", LogMode.Verbose);
+             
             }
             if (ActiveRecording == null)
             {
@@ -170,12 +187,14 @@ namespace IndoorCO2MapAppV2.Recording
                 interval = 10;
             }
             int offset = 0;
+            
             foreach (var v in hist)
             {
                 ActiveRecording.MeasurementData.Add(new CO2Reading(v, offset, DateTime.Now));
                 offset += interval;
             }
             Logger.WriteToLog("ReadAndStoreLatestAsync |Before MeasurementDataUpdated?.Invoke()", LogMode.Verbose);
+            SaveRecoverySnapshot(ActiveRecording!, ActiveRecording!.MonitorID);
             MeasurementDataUpdated?.Invoke();
         }
 
@@ -223,11 +242,19 @@ namespace IndoorCO2MapAppV2.Recording
                 RecordingStart = snapshot.RecordingStart,
                 MeasurementData = new(),
                 CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed                
+                MonitorID = snapshot.MonitorDeviceId,
                 DoorWindowState = snapshot.DoorWindowState,
                 VentilationState = snapshot.VentilationState,
-                CustomNotes = snapshot.CustomNote,
+                CustomNotes = snapshot.CustomNote,                
                 
             };
+
+            if(ActiveRecording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString())
+            {
+                ActiveRecording.MeasurementData = snapshot.CO2Values;                
+            }
+
+            //TODO: if Inkbird then we also set the Measurementdata to what we had.
             
 
             Logger.WriteToLog("Recovered recording after sensor ready.");
@@ -253,7 +280,8 @@ namespace IndoorCO2MapAppV2.Recording
                 Latitude = recording.Latitude,
                 Longitude = recording.Longitude,
                 MonitorType = recording.CO2MonitorType,
-                MonitorDeviceId = deviceId,     
+                MonitorDeviceId = deviceId,    
+                CO2Values = recording.MeasurementData
                 //DoorWindowState = 
             };
 

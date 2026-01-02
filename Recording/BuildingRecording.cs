@@ -9,6 +9,7 @@ namespace IndoorCO2MapAppV2.Recording
     public class BuildingRecording
     {
         public string CO2MonitorType { get; set; } = "";
+        public string MonitorID { get; set; } = "";
         public long NwrId { get; set; }
         public string NwrType { get; set; } = "";
 

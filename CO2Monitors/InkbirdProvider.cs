@@ -2,6 +2,7 @@
 using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.Recording;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using System;
@@ -23,7 +24,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         private IService? _service;
         ICharacteristic? _notifyCharacteristic;
         bool _setupDone = false;
-        private List<ushort> assembledCO2History = []; // as we dont directly get the history from the sensor (for now at least) we need to build it using the notifications.
+        public List<ushort> assembledCO2History = []; // as we dont directly get the history from the sensor (for now at least) we need to build it using the notifications.
 
 
         public override async Task<bool> InitializeAsync(IDevice device)
@@ -38,9 +39,22 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 Logger.WriteToLog("Inkbird service not found.",LogMode.Default);
                 return false;
             }
-            if (assembledCO2History == null)
+            if (assembledCO2History == null) //TODO: this here needs to get the recovered Values if it is a recovery
             {
-                assembledCO2History = new List<ushort>();
+                if(RecordingManager.Instance.ActiveRecording?.MeasurementData.Count > 0)
+                {
+                    var recoveryData = RecordingManager.Instance.ActiveRecording.MeasurementData;
+                    assembledCO2History = new List<ushort>();
+                    for(int i = 0; i < recoveryData.Count;i++)
+                    {
+                        assembledCO2History.Add(recoveryData[i].Ppm);
+                    }
+                }
+                else
+                {
+                    assembledCO2History = new List<ushort>();
+                }
+                
             }
             
             _notifyCharacteristic = await TryGetCharacteristicAsync(_service, InkbirdCO2NotifyCharacteristic);
