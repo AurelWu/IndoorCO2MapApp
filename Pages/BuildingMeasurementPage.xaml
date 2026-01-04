@@ -35,7 +35,7 @@
             <VerticalStackLayout Padding="30" Spacing="20">
 
                 <!-- Doors/Windows -->
-                <Label Text="Open Doors / Windows" FontAttributes="Bold" />
+                <Label Text="{x:Static t:Localisation.RadioButtonLabelOpenDoorsWindows}" FontAttributes="Bold" />
 
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
@@ -63,7 +63,7 @@
 
 
                 <!-- Ventilation System -->
-                <Label Text="Ventilation System" FontAttributes="Bold" />
+                <Label Text="{x:Static t:Localisation.RadioButtonLabelVentilationSystem}" FontAttributes="Bold" />
 
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
@@ -93,11 +93,11 @@
 
             <!-- Custom Note -->
             <VerticalStackLayout Spacing="10">
-                <Label Text="Custom Note" FontAttributes="Bold" />
+                <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}" FontAttributes="Bold" />
 
                 <Editor
                 x:Name="NoteEditor"
-                Placeholder="Add a note about this measurement..."
+                Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
                 AutoSize="TextChanges"
                 HeightRequest="100"
                 BackgroundColor="White"

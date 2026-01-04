@@ -165,11 +165,11 @@
                 Text="{Binding FilterText}"
                 IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
 
-            <Button Text="Start Building Recording"
+            <Button Text="{x:Static t:Localisation.MainMenuButtonStartBuildingRecording}"
                 Command="{Binding StartBuildingRecordingCommand}"
                 IsEnabled="{Binding CanStartBuildingRecording}" />
 
-            <c:LabeledSwitch Text="Enable 15 minutes prerecording" IsToggled="{Binding Settings.EnablePreRecording}" />
+            <c:LabeledSwitch Text="{x:Static t:Localisation.MainMenuPrerecordingSwitchText}" IsToggled="{Binding Settings.EnablePreRecording}" />
 
             <Button
                 x:Name="ManualResumeButton"
@@ -177,8 +177,8 @@
                 IsVisible="False"
                 Clicked="OnManualResumeClicked" />
 
-            <Button Text="Settings" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
-            <Button Text="History" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
+            <Button Text="{x:Static t:Localisation.MainMenuSettingsButtonText}" Clicked="OnNavigateClicked" CommandParameter="///settings" HorizontalOptions="Fill"/>
+            <Button Text="{x:Static t:Localisation.MainMenuHistoryButtonText}" Clicked="OnNavigateClicked" CommandParameter="///history" HorizontalOptions="Fill"/>
             <!--
             <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
             <Button Text="Map" Clicked="OnNavigateClicked" CommandParameter="///map" HorizontalOptions="Fill"/>            

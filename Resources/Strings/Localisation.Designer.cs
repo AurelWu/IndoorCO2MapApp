@@ -151,6 +151,42 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Start Building Recording ähnelt.
+        /// </summary>
+        internal static string MainMenuButtonStartBuildingRecording {
+            get {
+                return ResourceManager.GetString("MainMenuButtonStartBuildingRecording", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die History ähnelt.
+        /// </summary>
+        internal static string MainMenuHistoryButtonText {
+            get {
+                return ResourceManager.GetString("MainMenuHistoryButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Enable 15 minutes prerecording ähnelt.
+        /// </summary>
+        internal static string MainMenuPrerecordingSwitchText {
+            get {
+                return ResourceManager.GetString("MainMenuPrerecordingSwitchText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Settings ähnelt.
+        /// </summary>
+        internal static string MainMenuSettingsButtonText {
+            get {
+                return ResourceManager.GetString("MainMenuSettingsButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Select your CO2-Monitor ähnelt.
         /// </summary>
         internal static string MonitorSelectionLabel {
@@ -165,6 +201,42 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string NoSensorFoundStatusLabel {
             get {
                 return ResourceManager.GetString("NoSensorFoundStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Open Doors / Windows ähnelt.
+        /// </summary>
+        internal static string RadioButtonLabelOpenDoorsWindows {
+            get {
+                return ResourceManager.GetString("RadioButtonLabelOpenDoorsWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ventilation System ähnelt.
+        /// </summary>
+        internal static string RadioButtonLabelVentilationSystem {
+            get {
+                return ResourceManager.GetString("RadioButtonLabelVentilationSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Custom Note ähnelt.
+        /// </summary>
+        internal static string RecordingCustomNoteLabelText {
+            get {
+                return ResourceManager.GetString("RecordingCustomNoteLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Add a note about this measurement... ähnelt.
+        /// </summary>
+        internal static string RecordingCustomNotPlaceholderText {
+            get {
+                return ResourceManager.GetString("RecordingCustomNotPlaceholderText", resourceCulture);
             }
         }
         
