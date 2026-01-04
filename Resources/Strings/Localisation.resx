@@ -162,4 +162,25 @@
   <data name="UpdateInterval" xml:space="preserve">
     <value>Update Interval: </value>
   </data>
+  <data name="HistoryExportDatabaseTitle" xml:space="preserve">
+    <value>Export to File</value>
+  </data>
+  <data name="HistoryExportDatabaseSuccess" xml:space="preserve">
+    <value>Export completed</value>
+  </data>
+  <data name="HistoryExportDatabaseFailure" xml:space="preserve">
+    <value>Export failed</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulTitle" xml:space="preserve">
+    <value>Import Successful</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulDescription" xml:space="preserve">
+    <value>Database imported successfully. Please restart the app to load the new database.</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureTitle" xml:space="preserve">
+    <value>Import Failed</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureDescription" xml:space="preserve">
+    <value>Could not import the database. Please try again.</value>
+  </data>
 </root>

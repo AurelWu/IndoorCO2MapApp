@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Resources.Strings;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
@@ -25,8 +26,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 bool result = await App.BackupService.ExportDatabaseAsync();
                 await App.Current.MainPage.DisplayAlertAsync(
-                    "Export",
-                    result ? "Export completed!" : "Export failed.",
+                    Localisation.HistoryExportDatabaseTitle,
+                    result ? Localisation.HistoryExportDatabaseSuccess : Localisation.HistoryExportDatabaseFailure,
                     "OK"
                 );
             });
@@ -39,8 +40,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 {
                     // Import succeeded → tell user to restart app
                     await App.Current.MainPage.DisplayAlertAsync(
-                        "Import Successful",
-                        "Database imported successfully. Please restart the app to load the new database.",
+                        Localisation.HistoryImportDatabaseSuccessfulTitle,
+                        Localisation.HistoryImportDatabaseSuccessfulDescription,
                         "OK"
                     );
                 }
@@ -48,8 +49,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 {
                     // Import failed → notify user
                     await App.Current.MainPage.DisplayAlertAsync(
-                        "Import Failed",
-                        "Could not import the database. Please try again.",
+                        Localisation.HistoryImportDatabaseFailureTitle,
+                        Localisation.HistoryImportDatabaseFailureDescription,
                         "OK"
                     );
                 }

@@ -88,6 +88,69 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Export failed ähnelt.
+        /// </summary>
+        internal static string HistoryExportDatabaseFailure {
+            get {
+                return ResourceManager.GetString("HistoryExportDatabaseFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Export completed ähnelt.
+        /// </summary>
+        internal static string HistoryExportDatabaseSuccess {
+            get {
+                return ResourceManager.GetString("HistoryExportDatabaseSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Export to File ähnelt.
+        /// </summary>
+        internal static string HistoryExportDatabaseTitle {
+            get {
+                return ResourceManager.GetString("HistoryExportDatabaseTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not import the database. Please try again. ähnelt.
+        /// </summary>
+        internal static string HistoryImportDatabaseFailureDescription {
+            get {
+                return ResourceManager.GetString("HistoryImportDatabaseFailureDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Import Failed ähnelt.
+        /// </summary>
+        internal static string HistoryImportDatabaseFailureTitle {
+            get {
+                return ResourceManager.GetString("HistoryImportDatabaseFailureTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Database imported successfully. Please restart the app to load the new database. ähnelt.
+        /// </summary>
+        internal static string HistoryImportDatabaseSuccessfulDescription {
+            get {
+                return ResourceManager.GetString("HistoryImportDatabaseSuccessfulDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Import Successful ähnelt.
+        /// </summary>
+        internal static string HistoryImportDatabaseSuccessfulTitle {
+            get {
+                return ResourceManager.GetString("HistoryImportDatabaseSuccessfulTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Select your CO2-Monitor ähnelt.
         /// </summary>
         internal static string MonitorSelectionLabel {
