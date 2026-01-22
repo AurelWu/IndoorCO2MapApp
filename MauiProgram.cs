@@ -1,9 +1,13 @@
 ﻿using CommunityToolkit.Maui;
-using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Bluetooth;
-using Microsoft.Extensions.Logging;
-using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Controls;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Spatial;
+using Microsoft.Extensions.Logging;
+#if ANDROID
+using IndoorCO2MapAppV2.Platforms.Android.Handlers;
+#endif
 
 
 namespace IndoorCO2MapAppV2
@@ -17,6 +21,12 @@ namespace IndoorCO2MapAppV2
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+#if ANDROID
+                .ConfigureMauiHandlers(handlers =>
+                 {
+                     handlers.AddHandler(typeof(RangeSlider), typeof(RangeSliderHandler));
+                 })
+#endif
                 .UseMauiCommunityToolkit()                
             // After initializing the .NET MAUI Community Toolkit, optionally add additional fonts
 

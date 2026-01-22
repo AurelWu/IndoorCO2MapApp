@@ -207,4 +207,7 @@
   <data name="MainMenuHistoryButtonText" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="MainMenuResultFilterPlaceholderText" xml:space="preserve">
+    <value>Search by name...</value>
+  </data>
 </root>

@@ -161,7 +161,7 @@
 
 
             <Entry x:Name="FilterEntry"
-                Placeholder="Search by name..."
+                Placeholder="{x:Static t:Localisation.MainMenuResultFilterPlaceholderText}"
                 Text="{Binding FilterText}"
                 IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
 

@@ -178,6 +178,15 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search by name... ähnelt.
+        /// </summary>
+        internal static string MainMenuResultFilterPlaceholderText {
+            get {
+                return ResourceManager.GetString("MainMenuResultFilterPlaceholderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Settings ähnelt.
         /// </summary>
         internal static string MainMenuSettingsButtonText {
