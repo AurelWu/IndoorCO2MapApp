@@ -85,6 +85,8 @@ namespace IndoorCO2MapAppV2.Spatial
                 $"nwr(around:{rString},{latString},{lonString})[leisure=sauna];" +
                 $"nwr(around:{rString},{latString},{lonString})[leisure=hackerspace];" +
                 $"nwr(around:{rString},{latString},{lonString})[leisure=escape_game];" +
+                $"nwr(around:{rString},{latString},{lonString})[leisure=dance];" +
+                $"nwr(around:{rString},{latString},{lonString})[amenity=studio];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=townhall];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=car_rental];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=convention_centre];" +
@@ -126,6 +128,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 $"nwr(around:{rString},{latString},{lonString})[amenity=post_office];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=university];" +
                 $"nwr(around:{rString},{latString},{lonString})[building=university];" +
+                $"nwr(around:{rString},{latString},{lonString})[building=college];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=hospital];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=clinic];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=dentist];" +
