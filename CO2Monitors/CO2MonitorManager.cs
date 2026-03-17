@@ -4,10 +4,8 @@ using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.PersistentData;
-using Microsoft.VisualBasic;
 using Plugin.BLE.Abstractions;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
 {
@@ -19,6 +17,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         private readonly BLEDeviceManager _ble;
 
         public List<CO2MonitorType> _monitorTypes;
+
+        // Single lock that serializes ALL sensor operations so concurrent
+        // UI triggers (RefreshLiveCO2Async called 4-5x at startup etc.)
+        // never overlap and hammer the sensor simultaneously.
+        private readonly SemaphoreSlim _opLock = new(1, 1);
 
         private CO2MonitorManager()
         {
@@ -51,65 +54,62 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public ObservableCollection<BluetoothDeviceModel> Devices { get; }
 
-
         public async Task StartScanAsync(CO2MonitorType filter)
-        {           
-            await _ble.StartScanningAsync(filter: filter, deviceNameFilter: UserSettings.Instance.SensorFilter);
+        {
+            await _ble.StartScanningAsync(
+                filter: filter,
+                deviceNameFilter: UserSettings.Instance.SensorFilter);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
-            if (SelectedDevice == device) return; //same as current device selected again, no need to do anything
-            if (ActiveCO2MonitorProvider != null)
+            if (SelectedDevice == device) return;
+
+            await _opLock.WaitAsync();
+            try
             {
-                await ActiveCO2MonitorProvider.DisposeAsync();
-                ActiveCO2MonitorProvider = null;
-            }
+                if (ActiveCO2MonitorProvider != null)
+                {
+                    await ActiveCO2MonitorProvider.DisposeAsync();
+                    ActiveCO2MonitorProvider = null;
+                }
 
-            if (device?.Device == null)
-                return;
+                if (device?.Device == null)
+                    return;
 
-            SelectedDevice = device;
+                SelectedDevice = device;
 
-            var advertisedServices = device.Device.AdvertisementRecords?
-                   .Where(r =>
-                       r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
-                       r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
-                   .SelectMany(r => r.Data.To128BitGuids())
-                   .ToList();
+                var connected = await _ble.ConnectDeviceAsync(device.Device);
+                if (!connected)
+                    return;
 
-            var connected = await _ble.ConnectDeviceAsync(device.Device);
-            if (!connected)
-                return;
-            
-           
+                var type = await CO2MonitorProviderFactory
+                    .DetectFromNameOrAdvertisementAsync(
+                        device.Device,
+                        BLEDeviceManager.Instance._adapter)
+                    ?? SelectedMonitorType;
 
-            var type = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(device.Device,BLEDeviceManager.Instance._adapter) ?? SelectedMonitorType;
-            ActiveCO2MonitorProvider = CO2MonitorProviderFactory.CreateProvider(type);
-            if (ActiveCO2MonitorProvider == null)
-                return;
+                ActiveCO2MonitorProvider = CO2MonitorProviderFactory.CreateProvider(type);
+                if (ActiveCO2MonitorProvider == null)
+                    return;
 
-            bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
-            if (!ok)
-            {
-                //Initialisation is called from RefreshLiveCO2Async, RefreshUpdateIntervalAsync(), and RefreshHistoryAsync
-                if (ActiveCO2MonitorProvider!= null)
+                // InitializeAsync is called ONCE here when connecting.
+                // Refresh methods below must NOT call it again.
+                bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+                if (!ok)
                 {
                     await ActiveCO2MonitorProvider.DisposeAsync();
                     ActiveCO2MonitorProvider = null;
                     return;
                 }
-                return;
-            }
-            if(ActiveCO2MonitorProvider!=null)
-            {
+
                 CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
+                Logger.WriteToLog("CO2MonitorManager|SelectDeviceAsync completed", LogMode.Verbose);
             }
-            if(ActiveCO2MonitorProvider==null)
+            finally
             {
-                Logger.WriteToLog("ActiveCO2MonitorProvider currently Null after Initialisation");
+                _opLock.Release();
             }
-            
         }
 
         public void ZeroOutCO2Values()
@@ -120,34 +120,79 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task RefreshLiveCO2Async()
         {
-            Logger.WriteToLog("CO2MonitorManager |RefreshLiveCO2Async called", LogMode.Verbose);
-            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
-            await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
-            CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
+            Logger.WriteToLog("CO2MonitorManager|RefreshLiveCO2Async called", LogMode.Verbose);
+
+            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null)
+                return;
+
+            // FIX: no InitializeAsync here — session is already established by
+            // SelectDeviceAsync. Calling it on every refresh was the source of
+            // repeated BLE subscription attempts that confused the sensor.
+            await _opLock.WaitAsync();
+            try
+            {
+                if (ActiveCO2MonitorProvider == null) return;
+                CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
+            }
+            finally
+            {
+                _opLock.Release();
+            }
         }
 
         public async Task RefreshUpdateIntervalAsync()
         {
-            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
-            await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
-            UpdateInterval = await ActiveCO2MonitorProvider.ReadUpdateIntervalSafeAsync();
+            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null)
+                return;
+
+            await _opLock.WaitAsync();
+            try
+            {
+                if (ActiveCO2MonitorProvider == null) return;
+                UpdateInterval = await ActiveCO2MonitorProvider.ReadUpdateIntervalSafeAsync();
+            }
+            finally
+            {
+                _opLock.Release();
+            }
         }
 
         public async Task RefreshHistoryAsync(ushort minutes)
         {
-            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null) return;
-            await ActiveCO2MonitorProvider.InitializeAsync(SelectedDevice.Device);
-            var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(minutes, CO2MonitorManager.Instance.UpdateInterval);
-            if (hist != null) Co2History = [.. hist];            
+            if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null)
+                return;
+
+            await _opLock.WaitAsync();
+            try
+            {
+                if (ActiveCO2MonitorProvider == null) return;
+                var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(
+                    minutes,
+                    CO2MonitorManager.Instance.UpdateInterval);
+                if (hist != null)
+                    Co2History = [.. hist];
+            }
+            finally
+            {
+                _opLock.Release();
+            }
         }
 
         public async Task DisconnectAsync()
         {
-            if (ActiveCO2MonitorProvider is IAsyncDisposable asyncDisposable)
-                await asyncDisposable.DisposeAsync();
+            await _opLock.WaitAsync();
+            try
+            {
+                if (ActiveCO2MonitorProvider is IAsyncDisposable asyncDisposable)
+                    await asyncDisposable.DisposeAsync();
 
-            ActiveCO2MonitorProvider = null;
-            SelectedDevice = null;
+                ActiveCO2MonitorProvider = null;
+                SelectedDevice = null;
+            }
+            finally
+            {
+                _opLock.Release();
+            }
         }
     }
 }

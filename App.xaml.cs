@@ -1,5 +1,6 @@
 ﻿using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Spatial;
+using IndoorCO2MapAppV2.CO2Monitors;
 
 namespace IndoorCO2MapAppV2
 {
@@ -28,7 +29,14 @@ namespace IndoorCO2MapAppV2
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            var window = new Window(new AppShell());
+
+            window.Destroying += async (s, e) =>
+            {
+                await CO2MonitorManager.Instance.DisconnectAsync();
+            };
+
+            return window;
         }
 
         public static void ImportDB(HistoryDatabase db)
