@@ -124,7 +124,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         // Private constructor for singleton
         private StatusViewModel()
         {
-            _statusTimer = new System.Timers.Timer(1000); 
+            _statusTimer = new System.Timers.Timer(5000);
             _statusTimer.Elapsed += StatusTimer_Elapsed;
             _statusTimer.AutoReset = true;
             _statusTimer.Start();
@@ -132,44 +132,36 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private void StatusTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            // continuous updates on main thread
-            MainThread.BeginInvokeOnMainThread(UpdateStatus);
+            // Run all platform checks on the ThreadPool thread (timer callback),
+            // only dispatch results to the main thread for property assignment.
+            _ = UpdateStatusAsync();
         }
 
-        private void UpdateStatus()
+        private async Task UpdateStatusAsync()
         {
-            // --- Bluetooth status ---
             var bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
-            IsBluetoothOn = bluetoothHelper.CheckIfBTEnabled();
-            BluetoothPermissionGranted = bluetoothHelper.CheckPermissions();
+            bool btOn   = bluetoothHelper.CheckIfBTEnabled();
+            bool btPerm = bluetoothHelper.CheckPermissions();
 
-            // --- GPS status ---
             var locationHelper = LocationServicePlatformProvider.CreateOrUse();
-            UpdateGpsStatusAsync(locationHelper).SafeFireAndForget("StatusViewModel|UpdateStatus");
-        }
-
-        private async Task UpdateGpsStatusAsync(ILocationService locationHelper)
-        {
+            bool gpsOn = false, gpsPerm = false;
             try
             {
-                bool gpsOn = await locationHelper.IsGpsEnabledAsync();
-                bool permGranted = await locationHelper.HasLocationPermissionAsync();
-
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    IsGpsOn = gpsOn;
-                    GpsPermissionGranted = permGranted;
-                });
+                gpsOn   = await locationHelper.IsGpsEnabledAsync().ConfigureAwait(false);
+                gpsPerm = await locationHelper.HasLocationPermissionAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    IsGpsOn = false;
-                    GpsPermissionGranted = false;
-                });
-                Logger.WriteToLog($"UpdateGpsStatusAsync failed: {ex.Message}", minimumLogMode: LogMode.Verbose);
+                Logger.WriteToLog($"UpdateStatusAsync GPS failed: {ex.Message}", minimumLogMode: LogMode.Verbose);
             }
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                IsBluetoothOn              = btOn;
+                BluetoothPermissionGranted = btPerm;
+                IsGpsOn                    = gpsOn;
+                GpsPermissionGranted       = gpsPerm;
+            });
         }
     }
 }
