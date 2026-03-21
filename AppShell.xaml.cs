@@ -28,11 +28,15 @@ namespace IndoorCO2MapAppV2
         protected override void OnNavigated(ShellNavigatedEventArgs args)
         {
             base.OnNavigated(args);
+#if DEBUG
+            // In Release AOT, JIT compilation is eliminated and page inflation drops to
+            // ~100–400 ms — imperceptible, so warmup is unnecessary and just wastes time.
             if (!_prewarmed)
             {
                 _prewarmed = true;
                 _ = PrewarmPagesAsync();
             }
+#endif
         }
 
         private async Task PrewarmPagesAsync()

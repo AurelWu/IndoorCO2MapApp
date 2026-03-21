@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using IndoorCO2MapAppV2.Enumerations;
-using Microsoft.VisualStudio.Utilities;
 
 namespace IndoorCO2MapAppV2.DebugTools
 {
