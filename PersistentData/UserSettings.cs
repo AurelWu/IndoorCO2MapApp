@@ -90,6 +90,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _enablePrerecording, value);
         }
 
+        private List<string> _favouriteLocationKeys = new();
+        public List<string> FavouriteLocationKeys
+        {
+            get => _favouriteLocationKeys;
+            set => SetProperty(ref _favouriteLocationKeys, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

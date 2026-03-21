@@ -1,4 +1,5 @@
-﻿using IndoorCO2MapAppV2.Utility;
+﻿using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace IndoorCO2MapAppV2.Spatial
         public double Longitude { get; }
 
         public double Distance { get; private set; }
+
+        public string FavouriteKey => $"{Type}_{ID}";
 
         public LocationData(string type, long id, string name, double latitude, double longitude, double userLatitude, double userLongitude)
         {
@@ -52,10 +55,10 @@ namespace IndoorCO2MapAppV2.Spatial
                     return "nameless entry " + ID;
                 }
             }
-            //else if (MainPage.MainPageSingleton.favouredLocations.Contains(Type + "_" + ID.ToString()))
-            //{
-            //    return $"★ {Name} | {(int)DistanceToGivenLocation}m";
-            //}
+            else if (UserSettings.Instance.FavouriteLocationKeys.Contains(FavouriteKey))
+            {
+                return $"★ {Name} | {(int)Distance}m";
+            }
             else
             {
                 return $"{Name} | {(int)Distance}m";

@@ -42,8 +42,8 @@ namespace IndoorCO2MapAppV2.Recording
 
             submission.OccupancyLevel = _occupancy;
             submission.AdditionalNotes = _notes;
-            submission.OpenWindowsDoors = _openWindowsDoors == TriState.Yes; //TODO: currently backend expects bools, so we can't submit "unknown" yet so for now we do this, but at some point we should change that!
-            submission.VentilationSystem = _ventilationSystem == TriState.Yes; //TODO: currently backend expects bools, so we can't submit "unknown" yet so for now we do this, but at some point we should change that!
+            submission.OpenWindowsDoors = TriStateToString(_openWindowsDoors);
+            submission.VentilationSystem = TriStateToString(_ventilationSystem);
             submission.AdditionalNotes = _notes;
             ApplyTrimmedMeasurements(submission);
 
@@ -86,5 +86,12 @@ namespace IndoorCO2MapAppV2.Recording
             _notes = notes;
             return this;
         }
+
+        private static string TriStateToString(TriState value) => value switch
+        {
+            TriState.Yes => "true",
+            TriState.No  => "false",
+            _            => "noData"
+        };
     }
 }

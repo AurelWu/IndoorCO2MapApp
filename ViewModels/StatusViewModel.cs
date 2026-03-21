@@ -50,6 +50,56 @@ namespace IndoorCO2MapAppV2.ViewModels
         // --- is GPS and BT Ready ---
         public bool AllReady => IsGpsOn && GpsPermissionGranted && IsBluetoothOn && BluetoothPermissionGranted;
 
+        // --- App status ticker ---
+        private static readonly HttpClient _statusHttpClient = new();
+        private string? _statusMessage;
+        public string? StatusMessage
+        {
+            get => _statusMessage;
+            private set
+            {
+                if (_statusMessage == value) return;
+                _statusMessage = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusMessage)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasStatusMessage)));
+            }
+        }
+        public bool HasStatusMessage => !string.IsNullOrEmpty(_statusMessage);
+
+        public static async Task FetchAppStatusAsync()
+        {
+            await FetchInternalAsync(clearOnFailure: true);
+        }
+
+        public static void StartPeriodicRefresh()
+        {
+            _ = PeriodicRefreshLoopAsync();
+        }
+
+        private static async Task FetchInternalAsync(bool clearOnFailure)
+        {
+            try
+            {
+                var text = (await _statusHttpClient.GetStringAsync("https://indoorco2map.com/appstatus.txt")).Trim();
+                Instance.StatusMessage = text.Equals("ok", StringComparison.OrdinalIgnoreCase) ? null : text;
+            }
+            catch
+            {
+                if (clearOnFailure)
+                    Instance.StatusMessage = null;
+                // else: keep previous state
+            }
+        }
+
+        private static async Task PeriodicRefreshLoopAsync()
+        {
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromMinutes(15));
+                await FetchInternalAsync(clearOnFailure: false);
+            }
+        }
+
         // --- PropertyChanged implementation ---
         public event PropertyChangedEventHandler? PropertyChanged;
 

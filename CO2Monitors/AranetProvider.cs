@@ -1,10 +1,13 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
+using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.CO2Monitors
@@ -106,15 +109,17 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             try
             {
-                var result = await _liveCharacteristic.ReadAsync();
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var result = await _liveCharacteristic.ReadAsync(cts.Token);
                 var data = result.data;
 
                 return data.Length >= 2
                     ? (data[1] << 8) | data[0]
                     : 0;
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.WriteToLog("DoReadCurrentCO2Async failed: " + ex.Message, LogMode.Verbose);
                 return 0;
             }
         }
@@ -126,7 +131,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             try
             {
-                var result = await _liveCharacteristic.ReadAsync();
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var result = await _liveCharacteristic.ReadAsync(cts.Token);
                 var data = result.data;
 
                 // Only read if data has enough bytes
@@ -134,10 +140,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     ? (data[10] << 8) | data[9]
                     : 0;
             }
-            catch
+            catch (Exception ex)
             {
-
-                return 0; // return 0 if reading fails
+                Logger.WriteToLog("DoReadUpdateIntervalAsync failed: " + ex.Message, LogMode.Verbose);
+                return 0;
             }
         }
 
@@ -155,15 +161,17 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             try
             {
-                var result = await _totalDataPointsCharacteristic.ReadAsync();
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var result = await _totalDataPointsCharacteristic.ReadAsync(cts.Token);
                 var data = result.data;
 
                 return data.Length >= 2
                     ? (data[1] << 8) | data[0]
                     : null;
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.WriteToLog("ReadTotalDataPointsAsync failed: " + ex.Message, LogMode.Verbose);
                 return null;
             }
         }
@@ -236,7 +244,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 await Task.Delay(35);
 
                 // 6. Read the response
-                var result = await _historyV2Characteristic.ReadAsync();
+                using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var result = await _historyV2Characteristic.ReadAsync(readCts.Token);
                 var data = result.data;
 
                 if (data.Length < 10)
@@ -251,8 +260,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 return values;
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.WriteToLog("DoReadHistoryAsync failed: " + ex.Message, LogMode.Verbose);
                 return null;
             }
         }

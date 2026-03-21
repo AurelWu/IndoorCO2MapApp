@@ -51,7 +51,7 @@ namespace IndoorCO2MapAppV2.Recording
             }
             else
             {
-                startTime -= 1 * 60 * 1000; //even without preRecording we start 1 minute early to grab currenty sensor reading. //maybe we even change that to 2
+                startTime -= 2 * 60 * 1000; // grab last 2 sensor readings immediately
             }
 
             var rec = new BuildingRecording
@@ -74,6 +74,9 @@ namespace IndoorCO2MapAppV2.Recording
 
             ActiveRecording = rec;
             SaveRecoverySnapshot(rec, deviceID);
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _timer?.Dispose();
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30)); //updates every 30 seconds.
 
@@ -90,10 +93,14 @@ namespace IndoorCO2MapAppV2.Recording
                 return;
 
             _cts?.Cancel();
+            _cts?.Dispose();
             _cts = null;
+            _timer?.Dispose();
+            _timer = null;
 
             ActiveRecording = null;
             Preferences.Remove("RecordingState");
+            CurrentSnapShot = new RecordingRecoverySnapshot();
         }
 
         // ----------------------------------------------------------------------
@@ -102,12 +109,11 @@ namespace IndoorCO2MapAppV2.Recording
         private async Task RunLoopAsync(CancellationToken token)
         {
             Logger.WriteToLog("RunLoopAsync called", LogMode.Verbose);
-            if (token.IsCancellationRequested)
-            {
-                Logger.WriteToLog("Recording Manager RunLoop CancellationToken IsCancellationRequested set to true");
-            }
             try
             {
+                // Immediate first read — don't wait for the first 30-second tick
+                await ReadAndStoreLatestAsync();
+
                 while (await _timer!.WaitForNextTickAsync(token))
                 {
                     Logger.WriteToLog("RunLoopAsync|in while loop before ReadAndStoreLatestAsync", LogMode.Verbose);
@@ -127,11 +133,12 @@ namespace IndoorCO2MapAppV2.Recording
         private async Task ReadAndStoreLatestAsync()
         {
             Logger.WriteToLog("ReadAndStoreLatestAsync() called", LogMode.Verbose);
-            if (ActiveRecording == null)
+            var recording = ActiveRecording;
+            if (recording == null)
                 return;
 
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            long minutes = (now - ActiveRecording.RecordingStart) / 60000;
+            long minutes = (now - recording.RecordingStart) / 60000;
 
             if (minutes < 1)
                 return;
@@ -139,18 +146,24 @@ namespace IndoorCO2MapAppV2.Recording
             //we read max 120 minutes for now
             await _monitor.RefreshHistoryAsync((ushort)Math.Min(minutes, 120));
 
+            // Re-check after the await — recording could have been stopped
+            if (ActiveRecording == null)
+            {
+                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording is null after RefreshHistory - returning", LogMode.Verbose);
+                return;
+            }
+
             var hist = _monitor.Co2History;
             if (hist == null || hist.Count == 0)
                 return;
 
-            var dateTime = DateTimeOffset.UtcNow.DateTime;
-            if(ActiveRecording!= null && ActiveRecording.MeasurementData!= null)
+            if (recording.MeasurementData != null)
             {
                 //=> needs to handle Inkbird Recovery setup
-                if(activeRecording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString() && !inkBirdRecoveryDone)
+                if(recording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString() && !inkBirdRecoveryDone)
                 {
                     var m = _monitor.ActiveCO2MonitorProvider as InkbirdProvider;
-                    var recData = ActiveRecording.MeasurementData;
+                    var recData = recording.MeasurementData;
                     m.assembledCO2History = new List<ushort>();
                     foreach(var r in recData)
                     {
@@ -159,17 +172,11 @@ namespace IndoorCO2MapAppV2.Recording
                     inkBirdRecoveryDone = true;
                     hist = m.assembledCO2History;
                 }
-                ActiveRecording.MeasurementData.Clear();
-                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording!= null && ActiveRecording.MeasurementData!= null - clearing MeasurementData", LogMode.Verbose);
-             
-            }
-            if (ActiveRecording == null)
-            {
-                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording is null - returning",LogMode.Verbose);
-                return;
+                recording.MeasurementData.Clear();
+                Logger.WriteToLog("ReadAndStoreLatestAsync| clearing MeasurementData", LogMode.Verbose);
             }
 
-            int interval = 1;            
+            int interval = 1;
             if(CO2MonitorManager.Instance.UpdateInterval == 120)
             {
                 interval = 2;
@@ -187,14 +194,14 @@ namespace IndoorCO2MapAppV2.Recording
                 interval = 10;
             }
             int offset = 0;
-            
+
             foreach (var v in hist)
             {
-                ActiveRecording.MeasurementData.Add(new CO2Reading(v, offset, DateTime.Now));
+                recording.MeasurementData.Add(new CO2Reading(v, offset, DateTime.Now));
                 offset += interval;
             }
             Logger.WriteToLog("ReadAndStoreLatestAsync |Before MeasurementDataUpdated?.Invoke()", LogMode.Verbose);
-            SaveRecoverySnapshot(ActiveRecording!, ActiveRecording!.MonitorID);
+            SaveRecoverySnapshot(recording, recording.MonitorID);
             MeasurementDataUpdated?.Invoke();
         }
 
@@ -261,6 +268,8 @@ namespace IndoorCO2MapAppV2.Recording
 
             // Start periodic loop (make sure you dispose previous _cts if any)
             _cts?.Cancel();
+            _cts?.Dispose();
+            _timer?.Dispose();
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
             _ = RunLoopAsync(_cts.Token);
@@ -292,6 +301,7 @@ namespace IndoorCO2MapAppV2.Recording
 
         public void UpdateRecoverySnapshot(TriState doorWindowstate, TriState ventilationState, string customNote)
         {
+            if (!IsRecording) return;
             CurrentSnapShot.DoorWindowState = doorWindowstate;
             CurrentSnapShot.VentilationState = ventilationState;
             CurrentSnapShot.CustomNote = customNote;

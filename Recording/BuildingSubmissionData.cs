@@ -20,8 +20,8 @@ namespace IndoorCO2MapAppV2.Recording
         internal double NwrLongitude { get; set; }
         internal long StartTime { get; set; }
         internal List<CO2Reading> MeasurementData { get; set; }
-        internal bool OpenWindowsDoors { get; set; }
-        internal bool VentilationSystem { get; set; }
+        internal string OpenWindowsDoors { get; set; } = "noData";
+        internal string VentilationSystem { get; set; } = "noData";
         internal string OccupancyLevel { get; set; }
         internal string AdditionalNotes { get; set; }
 

@@ -42,4 +42,16 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+
+    <!-- Semantic tokens (light + dark pairs) -->
+    <Color x:Key="ErrorColor">#C62828</Color>
+    <Color x:Key="ErrorColorDark">#EF9A9A</Color>
+    <Color x:Key="SurfaceColor">#F5F5F5</Color>
+    <Color x:Key="SurfaceColorDark">#2A2A2A</Color>
+    <Color x:Key="OnSurfaceSubtle">#616161</Color>
+    <Color x:Key="OnSurfaceSubtleDark">#BDBDBD</Color>
+    <Color x:Key="DividerColor">#E0E0E0</Color>
+    <Color x:Key="DividerColorDark">#424242</Color>
+    <Color x:Key="InputBackground">White</Color>
+    <Color x:Key="InputBackgroundDark">#1E1E1E</Color>
 </ResourceDictionary>

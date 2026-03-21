@@ -10,7 +10,8 @@
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
-    <Label x:Name="MeasuredLocationLabel" Text="[ReplacedByLocationName]"/>
+    <Label x:Name="MeasuredLocationLabel" Text="[ReplacedByLocationName]"
+           Style="{StaticResource PageTitleStyle}"/>
 
             <StackLayout>
         <controls:LineChartView x:Name="lineChartView"
@@ -27,84 +28,89 @@
      UpperValue="20"
      ThumbSize="30"
      TrackHeight="15"
-     TrackColor="LightGray"
-     HighlightColor="DodgerBlue"
+     TrackColor="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+     HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
      WidthRequest="375"
      HeightRequest="60"/>
 
-            <VerticalStackLayout Padding="30" Spacing="20">
+            <Border Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="12">
 
-                <!-- Doors/Windows -->
-                <Label Text="{x:Static t:Localisation.RadioButtonLabelOpenDoorsWindows}" FontAttributes="Bold" />
+                    <!-- Doors/Windows -->
+                    <Label Text="{x:Static t:Localisation.RadioButtonLabelOpenDoorsWindows}"
+                           Style="{StaticResource SectionLabelStyle}" />
 
-                <HorizontalStackLayout Spacing="5">
-                    <RadioButton
-            x:Name="DoorsWindowsUnknownRb"
-            Content="No data"
-            IsChecked="True"
-            GroupName="DoorsWindowsGroup"
-            Value="{x:Static enums:TriState.Unknown}"
-            CheckedChanged="OnDoorsWindowsChanged" />
+                    <HorizontalStackLayout Spacing="5">
+                        <RadioButton
+                x:Name="DoorsWindowsUnknownRb"
+                Content="No data"
+                IsChecked="True"
+                GroupName="DoorsWindowsGroup"
+                Value="{x:Static enums:TriState.Unknown}"
+                CheckedChanged="OnDoorsWindowsChanged" />
 
-                    <RadioButton
-            x:Name="DoorsWindowsYesRb"
-            Content="Yes"
-            GroupName="DoorsWindowsGroup"
-            Value="{x:Static enums:TriState.Yes}"
-            CheckedChanged="OnDoorsWindowsChanged" />
+                        <RadioButton
+                x:Name="DoorsWindowsYesRb"
+                Content="Yes"
+                GroupName="DoorsWindowsGroup"
+                Value="{x:Static enums:TriState.Yes}"
+                CheckedChanged="OnDoorsWindowsChanged" />
 
-                    <RadioButton
-            x:Name="DoorsWindowsNoRb"
-            Content="No"
-            GroupName="DoorsWindowsGroup"
-            Value="{x:Static enums:TriState.No}"
-            CheckedChanged="OnDoorsWindowsChanged" />
-                </HorizontalStackLayout>
+                        <RadioButton
+                x:Name="DoorsWindowsNoRb"
+                Content="No"
+                GroupName="DoorsWindowsGroup"
+                Value="{x:Static enums:TriState.No}"
+                CheckedChanged="OnDoorsWindowsChanged" />
+                    </HorizontalStackLayout>
 
+                    <!-- Ventilation System -->
+                    <Label Text="{x:Static t:Localisation.RadioButtonLabelVentilationSystem}"
+                           Style="{StaticResource SectionLabelStyle}" />
 
-                <!-- Ventilation System -->
-                <Label Text="{x:Static t:Localisation.RadioButtonLabelVentilationSystem}" FontAttributes="Bold" />
+                    <HorizontalStackLayout Spacing="5">
+                        <RadioButton
+                x:Name="VentilationUnknownRb"
+                Content="No data"
+                GroupName="VentilationGroup"
+                IsChecked="True"
+                Value="{x:Static enums:TriState.Unknown}"
+                CheckedChanged="OnVentilationChanged" />
 
-                <HorizontalStackLayout Spacing="5">
-                    <RadioButton
-            x:Name="VentilationUnknownRb"
-            Content="No data"
-            GroupName="VentilationGroup"
-            IsChecked="True"
-            Value="{x:Static enums:TriState.Unknown}"
-            CheckedChanged="OnVentilationChanged" />
+                        <RadioButton
+                x:Name="VentilationYesRb"
+                Content="Yes"
+                GroupName="VentilationGroup"
+                Value="{x:Static enums:TriState.Yes}"
+                CheckedChanged="OnVentilationChanged" />
 
-                    <RadioButton
-            x:Name="VentilationYesRb"
-            Content="Yes"
-            GroupName="VentilationGroup"
-            Value="{x:Static enums:TriState.Yes}"
-            CheckedChanged="OnVentilationChanged" />
+                        <RadioButton
+                x:Name="VentilationNoRb"
+                Content="No"
+                GroupName="VentilationGroup"
+                Value="{x:Static enums:TriState.No}"
+                CheckedChanged="OnVentilationChanged" />
+                    </HorizontalStackLayout>
 
-                    <RadioButton
-            x:Name="VentilationNoRb"
-            Content="No"
-            GroupName="VentilationGroup"
-            Value="{x:Static enums:TriState.No}"
-            CheckedChanged="OnVentilationChanged" />
-                </HorizontalStackLayout>
-
-            </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
 
             <!-- Custom Note -->
-            <VerticalStackLayout Spacing="10">
-                <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}" FontAttributes="Bold" />
+            <Border Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
+                           Style="{StaticResource SectionLabelStyle}" />
 
-                <Editor
-                x:Name="NoteEditor"
-                Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
-                AutoSize="TextChanges"
-                HeightRequest="100"
-                BackgroundColor="White"
-                TextColor="Black"
-                TextChanged="OnCustomNotesChanged"
-                />
-            </VerticalStackLayout>
+                    <Editor
+                    x:Name="NoteEditor"
+                    Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
+                    AutoSize="TextChanges"
+                    MinimumHeightRequest="80"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource InputBackground}, Dark={StaticResource InputBackgroundDark}}"
+                    TextChanged="OnCustomNotesChanged"
+                    />
+                </VerticalStackLayout>
+            </Border>
 
 
             <Button x:Name="SubmitButton"
@@ -113,6 +119,7 @@
                     HorizontalOptions="Fill" />
 
             <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
+            Style="{StaticResource SecondaryButtonStyle}"
             Clicked="OnCancelClicked"
             HorizontalOptions="Fill" />
 

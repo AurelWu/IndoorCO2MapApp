@@ -15,7 +15,7 @@ namespace IndoorCO2MapAppV2.PersistentData
         {
             _dbPath = dbPath;
             _database = new SQLiteAsyncConnection(_dbPath);
-            _database.CreateTableAsync<PersistentRecording>().Wait();
+            _database.CreateTableAsync<PersistentRecording>().ConfigureAwait(false).GetAwaiter().GetResult();
             _database.GetConnection().Close();
             _database.CloseAsync();
             SQLiteAsyncConnection.ResetPool();

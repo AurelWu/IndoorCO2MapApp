@@ -12,6 +12,7 @@
             <ui:BooleanToTextConverter x:Key="ScanTextConverter"
                                        TrueText="Stop Scan"
                                        FalseText="Search for Bluetooth Devices"/>
+            <ui:NullToBoolConverter x:Key="NullToBoolConverter"/>
         </ResourceDictionary>
     </local:AppPage.Resources>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using IndoorCO2MapAppV2.Enumerations;
 using SQLite;
 
 namespace IndoorCO2MapAppV2.PersistentData
@@ -21,6 +22,12 @@ namespace IndoorCO2MapAppV2.PersistentData
         public string NWRType { get; set; } = "";
 
         public double AvgCO2 { get; set; }
-        public string Values { get; set; } = ""; 
+        public string Values { get; set; } = "";
+
+        // Context metadata — SQLite-net adds these columns automatically on first run
+        public TriState DoorWindowState { get; set; }
+        public TriState VentilationState { get; set; }
+        public string CustomNotes { get; set; } = "";
+        public string SensorType { get; set; } = "";
     }
 }

@@ -7,38 +7,67 @@
              Title="Settings">
 
     <ScrollView>
-    <VerticalStackLayout Padding="30" Spacing="25">
+    <VerticalStackLayout Padding="30" Spacing="14">
 
-        <Label Text="Settings"
-               FontSize="24"
-               HorizontalOptions="Center" />    
-        
         <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+
+        <!--
         <Button Text="Sensor Debug" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
         <Button Text="Overpass Debug" Clicked="OnNavigateClicked" CommandParameter="///overpassDebug" HorizontalOptions="Fill"/>
         <Button Text="Building Recording Debug" Clicked="OnNavigateClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
+        -->
 
-        <VerticalStackLayout Padding="10" Spacing="10">
-            <Label Text="Sensor Filter:" />
-            <Entry
-        Text="{Binding SensorFilter}"
-        Placeholder="Only show Sensors containing this string."
-        ClearButtonVisibility="WhileEditing" />
-        </VerticalStackLayout>
+        <!-- ===== Sensor ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Sensor Filter" Style="{StaticResource SectionLabelStyle}" />
+                <Entry
+                    Text="{Binding SensorFilter}"
+                    Placeholder="Only show sensors containing this string."
+                    ClearButtonVisibility="WhileEditing" />
+            </VerticalStackLayout>
+        </Border>
 
-            <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
-        
-            <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
-            <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
-            <c:LabeledSegmentedControl Label="Default Sortmode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
+        <!-- ===== Display ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Display" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
+                <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
+                <c:LabeledSegmentedControl Label="Default Sort Mode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
+            </VerticalStackLayout>
+        </Border>
 
-            <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
-            <c:LabeledSwitch Text="Enable local recording History" IsToggled="{Binding EnableHistory}" />
+        <!-- ===== Recording ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Recording" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+            </VerticalStackLayout>
+        </Border>
 
-            <Button Text="Delete Location Cache" Clicked="OnDeleteLocationCacheClicked" HorizontalOptions="Fill"/>
-            <Button Text="Delete Local Recording History" Clicked="OnDeleteRecordingHistoryClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
+        <!-- ===== Data ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Data" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
+                <c:LabeledSwitch Text="Enable Local Recording History" IsToggled="{Binding EnableHistory}" />
+                <Button Text="Delete Location Cache"
+                        Clicked="OnDeleteLocationCacheClicked"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                        BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                        HorizontalOptions="Fill"/>
+                <Button Text="Delete Local Recording History"
+                        Clicked="OnDeleteRecordingHistoryClicked"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                        BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                        HorizontalOptions="Fill"/>
+            </VerticalStackLayout>
+        </Border>
 
-        </VerticalStackLayout>
+    </VerticalStackLayout>
     </ScrollView>
 
 </local:AppPage>

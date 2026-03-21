@@ -47,6 +47,18 @@
         Shell.TabBarIsVisible="False"/>
 
     <ShellContent
+        Route="news"
+        ContentTemplate="{DataTemplate pages:NewsPage}"
+        Shell.NavBarIsVisible="False"
+        Shell.TabBarIsVisible="False"/>
+
+    <ShellContent
+        Route="statistics"
+        ContentTemplate="{DataTemplate pages:StatisticsPage}"
+        Shell.NavBarIsVisible="False"
+        Shell.TabBarIsVisible="False"/>
+
+    <ShellContent
         Route="sensorDebug"
         ContentTemplate="{DataTemplate pages:DebugSensorPage}" 
         Shell.NavBarIsVisible="False"

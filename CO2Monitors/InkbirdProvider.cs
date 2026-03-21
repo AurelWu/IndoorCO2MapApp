@@ -125,12 +125,12 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             if (_notifyCharacteristic != null)
             {
                 _notifyCharacteristic.ValueUpdated -= OnInkbirdCO2haracteristicValueChanged;
-                try { await _notifyCharacteristic.StopUpdatesAsync(); } catch { }
+                try { await _notifyCharacteristic.StopUpdatesAsync(); } catch (Exception ex) { Logger.WriteToLog("Inkbird StopUpdatesAsync failed: " + ex.Message, LogMode.Verbose); }
             }
 
             if (ActiveDevice != null)
             {
-                try { await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); } catch { }
+                try { await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); } catch (Exception ex) { Logger.WriteToLog("Inkbird DisconnectDeviceAsync failed: " + ex.Message, LogMode.Verbose); }
             }
 
             _service = null;

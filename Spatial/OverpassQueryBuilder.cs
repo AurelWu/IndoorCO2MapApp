@@ -1,14 +1,45 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Spatial
 {
     internal static class OverpassQueryBuilder
     {
+        // --- Remote whitelist ---
+
+        private record WhitelistEntry(
+            [property: JsonPropertyName("conditions")] List<string> Conditions);
+
+        private record BuildingWhitelist(
+            [property: JsonPropertyName("version")] int Version,
+            [property: JsonPropertyName("entries")] List<WhitelistEntry> Entries);
+
+        private static readonly HttpClient _whitelistHttpClient = new();
+        private static List<WhitelistEntry>? _cachedEntries;
+
+        internal static async Task FetchWhitelistAsync()
+        {
+            try
+            {
+                var json = await _whitelistHttpClient
+                    .GetStringAsync("https://indoorco2map.com/buildingWhitelist.json")
+                    .ConfigureAwait(false);
+                var whitelist = JsonSerializer.Deserialize<BuildingWhitelist>(json);
+                if (whitelist?.Entries is { Count: > 0 } entries)
+                    _cachedEntries = entries;
+            }
+            catch
+            {
+                // Leave _cachedEntries null → fallback to hardcoded query
+            }
+        }
+
+        // --- Query builders ---
 
         internal static string CreateTransportOverpassQuery(double latitude, double longitude, double radius, bool startLocation)
         {
@@ -16,8 +47,6 @@ namespace IndoorCO2MapAppV2.Spatial
             string latString = latitude.ToString(CultureInfo.InvariantCulture);
             string lonString = longitude.ToString(CultureInfo.InvariantCulture);
 
-            //TODO: don't query lines if it isnt start but destination request
-            // Construct the Overpass query with the specified radius and location, only for tram stops
             if (startLocation)
             {
                 return "[out:json];" +
@@ -34,23 +63,21 @@ namespace IndoorCO2MapAppV2.Spatial
                     $"relation(around:{rString},{latString},{lonString})[route=train];" +
                     $"relation(around:{rString},{latString},{lonString})[route=light_rail];" +
                     $"relation(around:{rString},{latString},{lonString})[route=monorail];" +
-
                     ");" +
                     "out center tags qt;";
             }
-            else //doesnt include transit lines as we just need target location
+            else
             {
                 return "[out:json];" +
-                  "(" +
-                  $"nwr(around:{rString},{latString},{lonString})[railway=tram_stop];" +
-                  $"nwr(around:{rString},{latString},{lonString})[highway=bus_stop];" +
-                  $"nwr(around:{rString},{latString},{lonString})[railway=subway_station];" +
-                  $"nwr(around:{rString},{latString},{lonString})[railway=station];" +
-                  $"nwr(around:{rString},{latString},{lonString})[railway=stop];" +
-                  $"nwr(around:{rString},{latString},{lonString})[railway=halt];" +
-
-                  ");" +
-                  "out center tags qt;";
+                    "(" +
+                    $"nwr(around:{rString},{latString},{lonString})[railway=tram_stop];" +
+                    $"nwr(around:{rString},{latString},{lonString})[highway=bus_stop];" +
+                    $"nwr(around:{rString},{latString},{lonString})[railway=subway_station];" +
+                    $"nwr(around:{rString},{latString},{lonString})[railway=station];" +
+                    $"nwr(around:{rString},{latString},{lonString})[railway=stop];" +
+                    $"nwr(around:{rString},{latString},{lonString})[railway=halt];" +
+                    ");" +
+                    "out center tags qt;";
             }
         }
 
@@ -59,8 +86,28 @@ namespace IndoorCO2MapAppV2.Spatial
             string rString = radius.ToString(CultureInfo.InvariantCulture);
             string latString = latitude.ToString(CultureInfo.InvariantCulture);
             string lonString = longitude.ToString(CultureInfo.InvariantCulture);
-            // Construct the Overpass query with the specified radius and location
-            //TODO: add remaining categories of amenities and maybe other
+
+            if (_cachedEntries is { Count: > 0 } entries)
+                return BuildQueryFromEntries(entries, rString, latString, lonString);
+
+            return BuildHardcodedQuery(rString, latString, lonString);
+        }
+
+        private static string BuildQueryFromEntries(
+            List<WhitelistEntry> entries, string rString, string latString, string lonString)
+        {
+            var sb = new StringBuilder("[out:json];(");
+            foreach (var entry in entries)
+            {
+                var filter = string.Join("][", entry.Conditions);
+                sb.Append($"nwr(around:{rString},{latString},{lonString})[{filter}];");
+            }
+            sb.Append(");out center qt;");
+            return sb.ToString();
+        }
+
+        private static string BuildHardcodedQuery(string rString, string latString, string lonString)
+        {
             return "[out:json];" +
                 "(" +
                 $"nwr(around:{rString},{latString},{lonString})[office=employment_agency];" +
@@ -123,7 +170,6 @@ namespace IndoorCO2MapAppV2.Spatial
                 $"nwr(around:{rString},{latString},{lonString})[amenity=research_institute];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=music_school];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=townhall];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=courthouse];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=post_office];" +
                 $"nwr(around:{rString},{latString},{lonString})[amenity=university];" +
@@ -147,7 +193,5 @@ namespace IndoorCO2MapAppV2.Spatial
                 ");" +
                 "out center qt;";
         }
-
-
     }
 }

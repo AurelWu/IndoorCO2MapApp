@@ -6,53 +6,140 @@
     xmlns:util="clr-namespace:IndoorCO2MapAppV2.UIUtility"
     xmlns:vm="clr-namespace:IndoorCO2MapAppV2.ViewModels">
 
-
     <ContentPage.Resources>
         <ResourceDictionary>
             <util:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
+            <util:BooleanToTextConverter x:Key="BoolToSymbolConverter" TrueText="✓" FalseText="✗"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.ControlTemplate>
         <ControlTemplate>
-            <Grid x:Name="RootGrid" RowDefinitions="Auto,*"
+            <Grid x:Name="RootGrid" RowDefinitions="Auto,Auto,*"
                 BindingContext="{x:Static vm:StatusViewModel.Instance}">
-                <!-- LARGE BAR -->
-                <HorizontalStackLayout x:Name="LargeBar"
-                                       Spacing="10"
-                                       HorizontalOptions="Center"
-                                       Padding="10">
-                    <ImageButton Source="gps_icon_v2.png"
-                                 BackgroundColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
-                                 Clicked="OnRequestGPSEnableDialog"
-                                 WidthRequest="75" HeightRequest="75"/>
-                    <ImageButton Source="gps_icon_permission.png"
-                                 BackgroundColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
-                                 Clicked="OnRequestGPSPermissionDialog"
-                                 WidthRequest="75" HeightRequest="75"/>
-                    <ImageButton Source="bluetoothstatus.png"
-                                 BackgroundColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
-                                 Clicked="OnRequestBluetoothEnableDialog"
-                                 WidthRequest="75" HeightRequest="75"/>
-                    <ImageButton Source="bluetoothscan.png"
-                                 BackgroundColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
-                                 Clicked="OnRequestBluetoothPermissionsDialog"
-                                 WidthRequest="75" HeightRequest="75"/>
-                </HorizontalStackLayout>
 
-                <!-- SMALL BAR -->
-                <Grid x:Name="SmallBar"
-                      BackgroundColor="Green"
-                      Padding="8"
-                      IsVisible="False">
-                    <Label Text="Bluetooth and GPS ready"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                <!-- LARGE BAR — compact chip row -->
+                <Grid x:Name="LargeBar"
+                      ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto"
+                      Padding="8,6"
+                      ColumnSpacing="6"
+                      RowSpacing="6">
+
+                    <!-- GPS enabled -->
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="1"
+                            BackgroundColor="Transparent"
+                            Padding="6,5">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRequestGPSEnableDialog"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Image Source="gps_icon_v2.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Text="GPS Status" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{Binding IsGpsOn, Converter={StaticResource BoolToSymbolConverter}}"
+                                   TextColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                                   FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Location permission -->
+                    <Border Grid.Row="0" Grid.Column="1"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="1"
+                            BackgroundColor="Transparent"
+                            Padding="6,5">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRequestGPSPermissionDialog"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Image Source="gps_icon_permission.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Text="GPS Permissions" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{Binding GpsPermissionGranted, Converter={StaticResource BoolToSymbolConverter}}"
+                                   TextColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                                   FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Bluetooth enabled -->
+                    <Border Grid.Row="1" Grid.Column="0"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="1"
+                            BackgroundColor="Transparent"
+                            Padding="6,5">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRequestBluetoothEnableDialog"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Image Source="bluetoothstatus.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Text="BT Status" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{Binding IsBluetoothOn, Converter={StaticResource BoolToSymbolConverter}}"
+                                   TextColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                                   FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Bluetooth permissions -->
+                    <Border Grid.Row="1" Grid.Column="1"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="1"
+                            BackgroundColor="Transparent"
+                            Padding="6,5">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRequestBluetoothPermissionsDialog"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Image Source="bluetoothscan.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                            <Label Text="BT Permissions" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{Binding BluetoothPermissionGranted, Converter={StaticResource BoolToSymbolConverter}}"
+                                   TextColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                                   FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- SMALL BAR — compact ready pill -->
+                <Grid x:Name="SmallBar" IsVisible="False" Padding="0,5">
+                    <Border BackgroundColor="#4CAF50"
+                            StrokeThickness="0"
+                            HorizontalOptions="Center"
+                            Padding="14,5">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                        <Label Text="✓ GPS &amp; Bluetooth ready"
+                               TextColor="White"
+                               FontSize="12"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- STATUS TICKER -->
+                <Grid Grid.Row="1"
+                      x:Name="StatusTicker"
+                      BackgroundColor="#E65100"
+                      HeightRequest="28"
+                      IsClippedToBounds="True"
+                      IsVisible="{Binding HasStatusMessage}">
+                    <AbsoluteLayout>
+                        <Label x:Name="TickerLabel"
+                               Text="{Binding StatusMessage}"
+                               TextColor="White"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               LineBreakMode="NoWrap"
+                               VerticalTextAlignment="Center"
+                               AbsoluteLayout.LayoutFlags="None"
+                               AbsoluteLayout.LayoutBounds="0, 0, 2000, 28" />
+                    </AbsoluteLayout>
                 </Grid>
 
                 <!-- CHILD PAGE CONTENT -->
-                <ContentPresenter Grid.Row="1"/>
+                <ContentPresenter Grid.Row="2"/>
             </Grid>
         </ControlTemplate>
     </ContentPage.ControlTemplate>

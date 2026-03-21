@@ -2,31 +2,26 @@
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+              xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
               x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
               Title="History">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
-            <ui:ExpandButtonTextConverter x:Key="ExpandButtonTextConverter"/>
             <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
             <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
             <ui:UnixTimeToDateTimeConverter x:Key="UnixTimeToDateTimeConverter"/>
-            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
-                                      TrueText="Fetching Data..."
-                                      FalseText="Search Buildings"/>
         </ResourceDictionary>
     </local:AppPage.Resources>
 
-    <!-- ⭐ BEST PRACTICE ⭐ -->
-    <!-- Use a Grid: top is fixed UI, bottom is the scrollable CollectionView -->
-    <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="20">
+    <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="10">
 
         <!-- Top UI (fixed area) -->
-        <VerticalStackLayout Grid.Row="0" Spacing="20">
+        <VerticalStackLayout Grid.Row="0" Spacing="12">
 
             <Label Text="History"
-                   FontSize="24"
+                   Style="{StaticResource PageTitleStyle}"
                    HorizontalOptions="Center" />
 
             <Button Text="Main Menu"
@@ -38,47 +33,238 @@
             <HorizontalStackLayout Spacing="15">
                 <Button Text="Export Data"
                         Command="{Binding ExportCommand}"
-                        BackgroundColor="#4CAF50"
-                        TextColor="White"
-                        CornerRadius="8" />
+                        Style="{StaticResource TonalButtonStyle}" />
 
                 <Button Text="Import Data"
                         Command="{Binding ImportCommand}"
-                        BackgroundColor="#2196F3"
-                        TextColor="White"
-                        CornerRadius="8" />
+                        Style="{StaticResource TonalButtonStyle}" />
             </HorizontalStackLayout>
+
+            <!-- Search / filter -->
+            <SearchBar Placeholder="Filter by location..."
+                       Text="{Binding FilterText}"
+                       HorizontalOptions="Fill" />
+
+            <!-- Sort + Group toggles — wrap to next line on narrow screens -->
+            <FlexLayout Wrap="Wrap" Direction="Row" AlignItems="Center">
+                <controls:LabeledSwitch Text="Group by location"
+                                        IsToggled="{Binding IsGrouped}"
+                                        Margin="0,0,24,4" />
+                <controls:LabeledSwitch Text="Sort A–Z"
+                                        IsToggled="{Binding SortAlphabetical}"
+                                        Margin="0,0,0,4" />
+            </FlexLayout>
+
         </VerticalStackLayout>
 
-        <!-- Scrollable recordings list -->
+        <!-- ===== FLAT list (default) ===== -->
         <CollectionView Grid.Row="1"
                         x:Name="RecordingsCollection"
-                        Margin="0,10,0,0"
-                        ItemsSource="{Binding Recordings}">
+                        Margin="0,8,0,0"
+                        ItemsSource="{Binding Recordings}"
+                        IsVisible="{Binding IsGrouped, Converter={StaticResource InvertBooleanConverter}}">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <StackLayout>
+                    <StackLayout Spacing="0">
 
-                        <Grid Padding="5" ColumnDefinitions="*,*,*">
-                            <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}"
-                                   Grid.Column="0"/>
-                            <Label Text="{Binding LocationName}" Grid.Column="1"/>
-                            <Label Text="{Binding AvgCO2}" Grid.Column="2"/>
+                        <!-- CO2 colour strip + content -->
+                        <Grid ColumnDefinitions="4,*">
+                            <BoxView Grid.Column="0"
+                                     Color="{Binding AvgCO2Color}"
+                                     VerticalOptions="Fill" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+
+                                <!-- Header row (always visible, tap to expand) -->
+                                <Grid Padding="6,8" ColumnDefinitions="*,Auto" RowSpacing="2">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}"
+                                               FontSize="11"
+                                               Style="{StaticResource MicroLabelStyle}" />
+                                        <Label Text="{Binding LocationNameWithChevron}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation" />
+                                        <Label Text="{Binding OsmId}"
+                                               FontSize="11"
+                                               IsVisible="{Binding HasOsmId}"
+                                               Style="{StaticResource MicroLabelStyle}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="0" Margin="8,0,0,0">
+                                        <Label Text="{Binding AvgCO2, StringFormat='{0:F0}'}"
+                                               FontSize="22"
+                                               FontAttributes="Bold"
+                                               TextColor="{Binding AvgCO2Color}"
+                                               HorizontalOptions="End" />
+                                        <Label Text="ppm avg"
+                                               FontSize="10"
+                                               Style="{StaticResource MicroLabelStyle}"
+                                               HorizontalOptions="End" />
+                                        <Label Text="{Binding TimeAgo}"
+                                               Style="{StaticResource MicroLabelStyle}"
+                                               HorizontalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <!-- Expanded section -->
+                                <StackLayout IsVisible="{Binding IsExpanded}" Padding="6,0,6,8" Spacing="6">
+                                    <Label Text="{Binding StatsLine}"
+                                           FontSize="12"
+                                           Style="{StaticResource CaptionLabelStyle}" />
+                                    <Label Text="{Binding ContextSummary}"
+                                           FontSize="12"
+                                           IsVisible="{Binding HasContext}"
+                                           Style="{StaticResource CaptionLabelStyle}" />
+                                    <controls:LineChartView
+                                        Readings="{Binding PpmReadings}"
+                                        HeightRequest="120"
+                                        IsVisible="{Binding HasReadings}" />
+                                </StackLayout>
+
+                            </StackLayout>
                         </Grid>
 
-                        <!-- Expandable details -->
-                        <Label Text="{Binding Values}" 
-                               IsVisible="{Binding IsExpanded}" 
-                               LineBreakMode="WordWrap"
-                               FontSize="12"
-                               Margin="10,0,0,10"/>
+                        <BoxView HeightRequest="1"
+                                 Color="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                 HorizontalOptions="Fill" />
 
-                        <Button Text="{Binding IsExpanded, Converter={StaticResource ExpandButtonTextConverter}}"
-                                Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
-                                CommandParameter="{Binding .}"
-                                FontSize="12"
-                                HorizontalOptions="Start"/>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <!-- ===== GROUPED list ===== -->
+        <CollectionView Grid.Row="1"
+                        x:Name="GroupedCollection"
+                        Margin="0,8,0,0"
+                        ItemsSource="{Binding GroupedRecordings}"
+                        IsVisible="{Binding IsGrouped}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Spacing="0">
+
+                        <!-- CO2 colour strip + content -->
+                        <Grid ColumnDefinitions="4,*">
+                            <BoxView Grid.Column="0"
+                                     Color="{Binding AvgCO2Color}"
+                                     VerticalOptions="Fill" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+
+                        <!-- Group header (always visible, tap to expand) -->
+                        <Grid Padding="6,8" ColumnDefinitions="*, Auto" RowSpacing="2">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding BindingContext.ToggleGroupExpandCommand, Source={x:Reference GroupedCollection}}"
+                                    CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding LocationNameWithChevron}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding OsmId}"
+                                       FontSize="11"
+                                       IsVisible="{Binding HasOsmId}"
+                                       Style="{StaticResource MicroLabelStyle}" />
+                                <Label Text="{Binding TotalCount, StringFormat='{0} recordings'}"
+                                       FontSize="12"
+                                       Style="{StaticResource CaptionLabelStyle}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1"
+                                               HorizontalOptions="End"
+                                               Spacing="0"
+                                               Margin="8,0,0,0">
+                                <Label Text="{Binding MeanCO2, StringFormat='{0:F0}'}"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding AvgCO2Color}"
+                                       HorizontalOptions="End" />
+                                <Label Text="ppm avg"
+                                       FontSize="10"
+                                       Style="{StaticResource MicroLabelStyle}"
+                                       HorizontalOptions="End" />
+                                <Label Text="{Binding StdDevLabel}"
+                                       FontSize="10"
+                                       Style="{StaticResource MicroLabelStyle}"
+                                       HorizontalOptions="End"
+                                       IsVisible="{Binding HasStdDev}" />
+                                <Label Text="{Binding LastSeenAgo, StringFormat='latest: {0}'}"
+                                       Style="{StaticResource MicroLabelStyle}"
+                                       HorizontalOptions="End" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Expanded section -->
+                        <StackLayout IsVisible="{Binding IsExpanded}" Padding="6,0,6,8" Spacing="8">
+
+                            <!-- Multi-line chart -->
+                            <controls:LineChartView
+                                MultiSeriesReadings="{Binding PageReadings}"
+                                HeightRequest="160" />
+
+                            <!-- Page navigation (only when >1 page) -->
+                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                  IsVisible="{Binding HasPagination}"
+                                  VerticalOptions="Center">
+                                <Button Grid.Column="0"
+                                        Text="&lt;"
+                                        Command="{Binding PrevPageCommand}"
+                                        IsVisible="{Binding HasPrevPage}"
+                                        FontSize="14"
+                                        WidthRequest="44"
+                                        HeightRequest="36" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding PageLabel}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       FontSize="13" />
+                                <Button Grid.Column="2"
+                                        Text="&gt;"
+                                        Command="{Binding NextPageCommand}"
+                                        IsVisible="{Binding HasNextPage}"
+                                        FontSize="14"
+                                        WidthRequest="44"
+                                        HeightRequest="36" />
+                            </Grid>
+
+                            <!-- Mini-list of current page recordings -->
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentPageRecordings}"
+                                                 Spacing="0">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="4,4" ColumnDefinitions="*, Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center"
+                                                   Style="{StaticResource CaptionLabelStyle}" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding AvgCO2, StringFormat='{0:F0} ppm'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End"
+                                                   VerticalOptions="Center"
+                                                   TextColor="{Binding AvgCO2Color}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                        </StackLayout>
+
+                            </StackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1"
+                                 Color="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                 HorizontalOptions="Fill" />
+
                     </StackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

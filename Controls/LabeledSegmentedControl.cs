@@ -21,6 +21,20 @@ namespace IndoorCO2MapAppV2.Controls
         private readonly HorizontalStackLayout _buttonsLayout;
         private readonly List<Button> _buttons = new();
 
+        private Color _selectedBg  = Color.FromArgb("#512BD4");
+        private Color _selectedFg  = Colors.White;
+        private Color _unselectedBg = Color.FromArgb("#E0E0E0");
+        private Color _unselectedFg = Color.FromArgb("#616161");
+
+        private void UpdateColors()
+        {
+            bool dark = Application.Current?.RequestedTheme == AppTheme.Dark;
+            _selectedBg  = Color.FromArgb("#512BD4");
+            _selectedFg  = Colors.White;
+            _unselectedBg = dark ? Color.FromArgb("#424242") : Color.FromArgb("#E0E0E0");
+            _unselectedFg = dark ? Color.FromArgb("#BDBDBD") : Color.FromArgb("#616161");
+        }
+
         public event EventHandler<string>? SelectionChanged;
 
         public string Label
@@ -64,6 +78,10 @@ namespace IndoorCO2MapAppV2.Controls
 
             Children.Add(_labelControl);
             Children.Add(_buttonsLayout);
+
+            UpdateColors();
+            if (Application.Current != null)
+                Application.Current.RequestedThemeChanged += (_, _) => { UpdateColors(); UpdateSelection(); };
         }
 
         private static void OnLabelChanged(BindableObject bindable, object oldValue, object newValue)
@@ -111,7 +129,8 @@ namespace IndoorCO2MapAppV2.Controls
                 {
                     Text = item,
                     Padding = new Thickness(10, 4),
-                    BackgroundColor = Colors.LightGray,
+                    BackgroundColor = _unselectedBg,
+                    TextColor = _unselectedFg,
                 };
                 button.Clicked += (s, e) => SelectedItem = item;
 
@@ -126,16 +145,8 @@ namespace IndoorCO2MapAppV2.Controls
         {
             foreach (var button in _buttons)
             {
-                if (button.Text == SelectedItem)
-                {
-                    button.BackgroundColor = Colors.DodgerBlue;
-                    button.TextColor = Colors.White;
-                }
-                else
-                {
-                    button.BackgroundColor = Colors.LightGray;
-                    button.TextColor = Colors.Black;
-                }
+                button.BackgroundColor = button.Text == SelectedItem ? _selectedBg : _unselectedBg;
+                button.TextColor       = button.Text == SelectedItem ? _selectedFg : _unselectedFg;
             }
         }
     }

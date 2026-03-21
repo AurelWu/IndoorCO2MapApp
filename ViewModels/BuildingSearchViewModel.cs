@@ -61,6 +61,24 @@ namespace IndoorCO2MapAppV2.ViewModels
         // Picker item source
         public ObservableCollection<LocationData> Buildings { get; } = new();
 
+        public bool IsFavourited =>
+            SelectedBuilding != null &&
+            UserSettings.Instance.FavouriteLocationKeys.Contains(SelectedBuilding.FavouriteKey);
+
+        public Color StarColor => IsFavourited ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+
+        public ICommand ToggleFavouriteCommand => new Command(() =>
+        {
+            if (SelectedBuilding == null) return;
+            var key = SelectedBuilding.FavouriteKey;
+            var keys = new List<string>(UserSettings.Instance.FavouriteLocationKeys);
+            if (!keys.Remove(key)) keys.Add(key);
+            UserSettings.Instance.FavouriteLocationKeys = keys;
+            OnPropertyChanged(nameof(IsFavourited));
+            OnPropertyChanged(nameof(StarColor));
+            RefreshBuildings(preserveSelection: true);
+        });
+
         public bool HasValidGPS =>
             Latitude is double lat &&
             Longitude is double lon &&
@@ -159,22 +177,19 @@ namespace IndoorCO2MapAppV2.ViewModels
         // Filtering + Sorting
         // ---------------------------
 
-        public void RefreshBuildings()
+        public void RefreshBuildings(bool preserveSelection = false)
         {
             if (_locationStore.BuildingLocationData == null)
                 return;
 
+            var previousSelection = preserveSelection ? SelectedBuilding : null;
+
             IEnumerable<LocationData> data = _locationStore.BuildingLocationData;
 
-            // Sorting
-            if (SortAlphabetical)
-            {
-                data = data.OrderBy(b => b.Name ?? "");
-            }
-            else
-            {
-                data = data.OrderBy(b => b.Distance);
-            }
+            // Base sort
+            data = SortAlphabetical
+                ? data.OrderBy(b => b.Name ?? "")
+                : data.OrderBy(b => b.Distance);
 
             // Filtering
             string ft = FilterText?.Trim() ?? "";
@@ -187,18 +202,30 @@ namespace IndoorCO2MapAppV2.ViewModels
                         .Contains(ft, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Update observable collection
+            // Favourites first, preserving base sort order within each group
+            var favKeys = UserSettings.Instance.FavouriteLocationKeys;
+            var list = data.ToList();
+            var sorted = list.Where(b => favKeys.Contains(b.FavouriteKey))
+                             .Concat(list.Where(b => !favKeys.Contains(b.FavouriteKey)));
+
             Buildings.Clear();
-            foreach (var b in data)
+            foreach (var b in sorted)
                 Buildings.Add(b);
 
-            // Auto-select first entry
-            SelectedBuilding = Buildings.FirstOrDefault();
+            // Restore previous selection if requested; fall back to first otherwise
+            SelectedBuilding = (previousSelection != null && Buildings.Contains(previousSelection))
+                ? previousSelection
+                : Buildings.FirstOrDefault();
         }
 
         // Reactive updates
         partial void OnSortAlphabeticalChanged(bool value) => RefreshBuildings();
         partial void OnFilterTextChanged(string value) => RefreshBuildings();
+        partial void OnSelectedBuildingChanged(LocationData? value)
+        {
+            OnPropertyChanged(nameof(IsFavourited));
+            OnPropertyChanged(nameof(StarColor));
+        }
 
 
 

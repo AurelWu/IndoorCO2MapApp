@@ -70,30 +70,40 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             async void Handler(object? sender, DeviceEventArgs e)
             {
-                if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
-                if (!e.Device.Name.Contains(deviceNameFilter)) return;
-
-                var advertisedServices = e.Device.AdvertisementRecords?
-                    .Where(r =>
-                        r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
-                        r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
-                    .SelectMany(r => r.Data.To128BitGuids())
-                    .ToList();
-
-                var detectedType = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(
-                    e.Device,
-                    _adapter
-                );
-
-                if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
-                    return;
-
-                var deviceModel = new BluetoothDeviceModel(e.Device);
-
-                if (!Devices.Contains(deviceModel))
+                try
                 {
-                    Devices.Add(deviceModel);
-                    DeviceDiscovered?.Invoke(this, deviceModel);
+                    if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
+                    if (!e.Device.Name.Contains(deviceNameFilter)) return;
+
+                    var advertisedServices = e.Device.AdvertisementRecords?
+                        .Where(r =>
+                            r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
+                            r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
+                        .SelectMany(r => r.Data.To128BitGuids())
+                        .ToList();
+
+                    var detectedType = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(
+                        e.Device,
+                        _adapter
+                    );
+
+                    if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
+                        return;
+
+                    var deviceModel = new BluetoothDeviceModel(e.Device);
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (!Devices.Contains(deviceModel))
+                        {
+                            Devices.Add(deviceModel);
+                            DeviceDiscovered?.Invoke(this, deviceModel);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteToLog("Error in BLE device discovered handler: " + ex.ToString());
                 }
             }
 
@@ -124,9 +134,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     await _adapter.ConnectToDeviceAsync(device);
                 return true;
             }
-            catch 
-            { 
-                return false; 
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("ConnectDeviceAsync failed: " + ex.Message);
+                return false;
             }
         }
     }

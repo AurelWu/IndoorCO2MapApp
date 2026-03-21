@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+              xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+              x:Class="IndoorCO2MapAppV2.Pages.StatisticsPage"
+              Title="Statistics">
+
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+        </ResourceDictionary>
+    </local:AppPage.Resources>
+
+    <!-- Top fixed UI, bottom scrollable list -->
+    <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="20">
+
+        <!-- Fixed top section -->
+        <VerticalStackLayout Grid.Row="0" Spacing="12">
+
+            <Label Text="Community Stats"
+                   Style="{StaticResource PageTitleStyle}"
+                   HorizontalOptions="Center" />
+
+            <Button Text="Main Menu"
+                    Clicked="OnNavigateClicked"
+                    CommandParameter="///home"
+                    HorizontalOptions="Fill" />
+
+            <!-- Total count row (hidden while loading) -->
+            <Grid ColumnDefinitions="*, Auto"
+                  IsVisible="{Binding IsLoading, Converter={StaticResource InvertBooleanConverter}}">
+                <Label Text="Measurements by Country"
+                       Style="{StaticResource CaptionLabelStyle}"
+                       VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                       Text="{Binding TotalMeasurements, StringFormat='Total: {0:N0}'}"
+                       FontSize="14"
+                       VerticalOptions="Center" />
+            </Grid>
+
+            <!-- Loading indicator -->
+            <HorizontalStackLayout Spacing="10"
+                                   HorizontalOptions="Center"
+                                   IsVisible="{Binding IsLoading}">
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   VerticalOptions="Center"
+                                   WidthRequest="20"
+                                   HeightRequest="20" />
+                <Label Text="Loading..."
+                       FontSize="14"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <!-- Error message -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                   FontSize="13"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding HasError}" />
+
+        </VerticalStackLayout>
+
+        <!-- Scrollable country list -->
+        <CollectionView Grid.Row="1"
+                        Margin="0,4,0,0"
+                        ItemsSource="{Binding CountryStats}">
+
+            <CollectionView.Header>
+                <Grid Padding="0,0,0,6"
+                      ColumnDefinitions="30,*,60,*"
+                      ColumnSpacing="8">
+                    <Label Text="#"       Grid.Column="0" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold"/>
+                    <Label Text="Country" Grid.Column="1" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold"/>
+                    <Label Text="Count"   Grid.Column="2" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                </Grid>
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="0,5"
+                          ColumnDefinitions="30,*,60,*"
+                          ColumnSpacing="8">
+
+                        <Label Text="{Binding Rank}"
+                               Grid.Column="0"
+                               FontSize="13"
+                               Style="{StaticResource CaptionLabelStyle}"
+                               VerticalOptions="Center" />
+
+                        <Label Text="{Binding CountryName}"
+                               Grid.Column="1"
+                               FontSize="14"
+                               VerticalOptions="Center"
+                               LineBreakMode="TailTruncation" />
+
+                        <Label Text="{Binding Count, StringFormat='{0:N0}'}"
+                               Grid.Column="2"
+                               FontSize="13"
+                               HorizontalTextAlignment="End"
+                               VerticalOptions="Center" />
+
+                        <ProgressBar Progress="{Binding BarRatio}"
+                                     Grid.Column="3"
+                                     VerticalOptions="Center" />
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+
+</local:AppPage>

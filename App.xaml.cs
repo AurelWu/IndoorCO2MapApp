@@ -16,6 +16,9 @@ namespace IndoorCO2MapAppV2
         public App()
         {
             InitializeComponent();
+            _ = ViewModels.StatusViewModel.FetchAppStatusAsync();
+            ViewModels.StatusViewModel.StartPeriodicRefresh();
+            _ = Spatial.OverpassQueryBuilder.FetchWhitelistAsync();
 
             historyDBPath = Path.Combine(FileSystem.AppDataDirectory, "co2data.db3");
             locationCacheDbPath = Path.Combine(FileSystem.AppDataDirectory, "location_cache.db3");

@@ -20,6 +20,14 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public OverpassFetchState FetchState { get; }
 
+        [ObservableProperty] private bool hasRecordings;
+
+        public async Task RefreshHasRecordingsAsync()
+        {
+            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
+            HasRecordings = all.Count > 0;
+        }
+
         public MainPageViewModel()
         {
             StartBuildingRecordingCommand = new AsyncRelayCommand(StartRecordingAsync);
@@ -27,6 +35,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             BuildingSearch = new BuildingSearchViewModel();
             Settings = SettingsViewModel.Instance;
             FetchState = OverpassDataFetcher.Instance.State;
+
+            _ = RefreshHasRecordingsAsync();
 
         Sensor.PropertyChanged += (s, e) =>
             {

@@ -77,6 +77,7 @@ namespace IndoorCO2MapAppV2.Spatial
             State.UsingAlternative = false;
             State.LastError = null;
 
+            _cts?.Dispose();
             _cts = CancellationTokenSource.CreateLinkedTokenSource(externalToken);
 
             try
@@ -116,6 +117,8 @@ namespace IndoorCO2MapAppV2.Spatial
             finally
             {
                 State.IsFetching = false;
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 

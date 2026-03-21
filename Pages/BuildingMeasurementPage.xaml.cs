@@ -42,7 +42,8 @@ namespace IndoorCO2MapAppV2.Pages
             });
 
             // TODO: check activeRecording for recoveryValues to set UI
-            var activeRec = RecordingManager.Instance.ActiveRecording!;
+            var activeRec = RecordingManager.Instance.ActiveRecording;
+            if (activeRec == null) return;
             TriState windowState = activeRec.DoorWindowState;
             TriState ventilationState = activeRec.VentilationState;
             string customNotes = activeRec.CustomNotes;
@@ -147,8 +148,9 @@ namespace IndoorCO2MapAppV2.Pages
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
+                bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
                 TrimSlider.Maximum = data.Count - 1;
-                if (TrimSlider.UpperValue > data.Count - 1)
+                if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
                     TrimSlider.UpperValue = data.Count - 1;
 
                 lineChartView.SetData(
@@ -181,11 +183,8 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (answer)
             {
-                RecordingManager.Instance.StopRecordingAsync()
-                    .SafeFireAndForget("CancelMeasurementAsync|StopRecordingAsync");
-
+                await RecordingManager.Instance.StopRecordingAsync();
                 ResetPageForNewMeasurement();
-                Preferences.Set("RecordingState", string.Empty);
                 await NavigateAsync("///home");
             }
         }
@@ -220,7 +219,7 @@ namespace IndoorCO2MapAppV2.Pages
             string originalButtonText = SubmitButton.Text;
             string customNote = NoteEditor.Text?.Trim() ?? "";
 
-            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting...");
+            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting data...");
 
             try
             {
@@ -253,20 +252,19 @@ namespace IndoorCO2MapAppV2.Pages
                         NWRId = rec.NwrId,
                         NWRType = rec.NwrType,
                         AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
-                        Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm))
+                        Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm)),
+                        DoorWindowState = _doorsWindowsState,
+                        VentilationState = _ventilationState,
+                        CustomNotes = customNote,
+                        SensorType = rec.CO2MonitorType,
                     };
 
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
                 }
 
-                await DisplayAlertAsync(
-                    "Upload Complete",
-                    "Your measurement was successfully submitted.",
-                    "OK"
-                );
-
+                MainPage.PendingSuccessBanner = true;
+                await RecordingManager.Instance.StopRecordingAsync();
                 ResetPageForNewMeasurement();
-                Preferences.Set("RecordingState", string.Empty);
                 await NavigateAsync("///home");
             }
             catch (Exception ex)
@@ -377,6 +375,7 @@ namespace IndoorCO2MapAppV2.Pages
             VentilationNoRb.IsChecked = false;
 
             TrimSlider.Minimum = 0;
+            TrimSlider.Maximum = 0;
             TrimSlider.UpperValue = 0;
             TrimSlider.LowerValue = 0;
             TrimSlider.ForceLayout();

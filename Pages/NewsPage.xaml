@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+              x:Class="IndoorCO2MapAppV2.Pages.NewsPage"
+              Title="News">
+
+    <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="12">
+
+        <!-- Fixed top -->
+        <VerticalStackLayout Grid.Row="0" Spacing="12">
+
+            <Label Text="News"
+                   FontSize="24"
+                   HorizontalOptions="Center" />
+
+            <Button Text="Main Menu"
+                    Clicked="OnNavigateClicked"
+                    CommandParameter="///home"
+                    HorizontalOptions="Fill" />
+
+            <HorizontalStackLayout Spacing="10"
+                                   HorizontalOptions="Center"
+                                   IsVisible="{Binding IsLoading}">
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   VerticalOptions="Center"
+                                   WidthRequest="20"
+                                   HeightRequest="20" />
+                <Label Text="Loading..."
+                       FontSize="14"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Markdown-rendered news content -->
+        <WebView Grid.Row="1"
+                 Source="{Binding HtmlSource}" />
+
+    </Grid>
+
+</local:AppPage>

@@ -80,6 +80,11 @@ namespace IndoorCO2MapAppV2.ViewModels
             }
         }
 
+        public Color StatusDotColor =>
+            SelectedDevice != null ? Color.FromArgb("#4CAF50") :
+            IsScanning             ? Color.FromArgb("#512BD4") :
+                                     Color.FromArgb("#9E9E9E");
+
         public async Task StartScanAsync(CO2MonitorType filter)
         {
             _monitorManager.ZeroOutCO2Values();
@@ -120,11 +125,13 @@ namespace IndoorCO2MapAppV2.ViewModels
         partial void OnIsScanningChanged(bool value)
         {
             OnPropertyChanged(nameof(SelectedDeviceStatusText));
+            OnPropertyChanged(nameof(StatusDotColor));
         }
 
         partial void OnSelectedDeviceChanged(BluetoothDeviceModel? value)
         {
             OnPropertyChanged(nameof(SelectedDeviceStatusText));
+            OnPropertyChanged(nameof(StatusDotColor));
         }
 
         partial void OnCurrentCO2Changed(int value)

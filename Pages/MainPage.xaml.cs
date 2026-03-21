@@ -18,6 +18,8 @@ namespace IndoorCO2MapAppV2.Pages
 
     public partial class MainPage : AppPage
     {
+        public static bool PendingSuccessBanner { get; set; }
+
         private readonly MainPageViewModel _mainPageViewModel;
         private bool _initialRefreshDone = false;
 
@@ -55,16 +57,30 @@ namespace IndoorCO2MapAppV2.Pages
             bool recovered = await TryRecoverRecordingAsync();
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();
+            _ = _mainPageViewModel.RefreshHasRecordingsAsync();
+
+            if (PendingSuccessBanner)
+            {
+                PendingSuccessBanner = false;
+                _ = ShowSuccessBannerAsync();
+            }
 
             //only do it at startup once
-
             if (!_initialRefreshDone && !recovered)
             {
                 _initialRefreshDone = true;
-
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
             }
+        }
 
+        private async Task ShowSuccessBannerAsync()
+        {
+            SuccessBanner.TranslationY = -100;
+            SuccessBanner.IsVisible = true;
+            await SuccessBanner.TranslateTo(0, 0, 300, Easing.CubicOut);
+            await Task.Delay(2500);
+            await SuccessBanner.TranslateTo(0, -100, 300, Easing.CubicIn);
+            SuccessBanner.IsVisible = false;
         }
 
         protected override async void OnDisappearing()

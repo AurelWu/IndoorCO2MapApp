@@ -1,5 +1,6 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ViewModels;
+using IndoorCO2MapAppV2.Enumerations;
 using Microsoft.Extensions.Logging;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
@@ -97,7 +98,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             if (match != null) return match;
 
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             IDevice? found = null;
 
             void Handler(object? s, DeviceEventArgs a)
@@ -114,7 +115,7 @@ namespace IndoorCO2MapAppV2.Recording
                         cts.Cancel();
                     }
                 }
-                catch { }
+                catch (Exception ex) { Logger.WriteToLog("RecoveryManager handler error: " + ex.Message, LogMode.Verbose); }
             }
 
             _adapter.DeviceDiscovered += Handler;
@@ -127,7 +128,7 @@ namespace IndoorCO2MapAppV2.Recording
             finally
             {
                 _adapter.DeviceDiscovered -= Handler;
-                try { await _adapter.StopScanningForDevicesAsync(); } catch { }
+                try { await _adapter.StopScanningForDevicesAsync(); } catch (Exception ex) { Logger.WriteToLog("RecoveryManager StopScanning failed: " + ex.Message, LogMode.Verbose); }
             }
 
             return found;
