@@ -189,6 +189,12 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            _ = CancelMeasurementAsync();
+            return true;
+        }
+
         private void OnCancelClicked(object sender, EventArgs e)
         {
             CancelMeasurementAsync().SafeFireAndForget("OnCancelClicked|CancelMeasurementAsync");

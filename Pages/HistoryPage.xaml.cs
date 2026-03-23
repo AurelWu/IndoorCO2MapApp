@@ -21,5 +21,11 @@ namespace IndoorCO2MapAppV2.Pages
                 vm.ReloadRecordingsAsync().SafeFireAndForget("HistoryPage|OnAppearing|vm.ReloadRecordingsAsync");
             }
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+            _ = NavigateAsync("///home");
+            return true;
+        }
     }
 }

@@ -8,8 +8,8 @@ using System.Text;
 
 public abstract class BaseCO2MonitorProvider : IAsyncDisposable
 {
-    protected const int RetryCount = 3;
-    protected const int RetryDelayMs = 100;
+    protected const int RetryCount = 5;
+    protected const int RetryDelayMs = 400;
 
     public IDevice? ActiveDevice { get; protected set; }
 

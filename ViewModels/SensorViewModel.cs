@@ -99,6 +99,16 @@ namespace IndoorCO2MapAppV2.ViewModels
             await RefreshLiveCO2Async();
             await RefreshUpdateIntervalAsync();
             //RefreshHistoryAsync(10).SafeFireAndForget(); // used to check if we can successfully get the history (but actual check still TODO), should trigger bonding request on mobiles.
+
+            // On slow devices (e.g. Android 12) the GATT stack may not be fully settled
+            // after the initial read, leaving CurrentCO2 = 0. Retry until we get a value
+            // or the user selects a different device.
+            for (int i = 0; i < 5 && CurrentCO2 == 0 && SelectedDevice == device; i++)
+            {
+                await Task.Delay(3000);
+                if (SelectedDevice == device)
+                    await RefreshLiveCO2Async();
+            }
         }
 
         public async Task RefreshLiveCO2Async()

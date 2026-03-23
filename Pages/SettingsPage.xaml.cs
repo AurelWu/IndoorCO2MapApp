@@ -67,6 +67,12 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            _ = NavigateAsync("///home");
+            return true;
+        }
+
         //Select Language Dropdown
         //Default Sorting Mode (Distance, Alphabetical - for Buildings, Transit Stops, Transit Lines separate)
         //Default Search Range

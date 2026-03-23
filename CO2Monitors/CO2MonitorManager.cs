@@ -115,6 +115,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         public void ZeroOutCO2Values()
         {
             CurrentCO2 = 0;
+            UpdateInterval = 0;
             Co2History = [];
         }
 
