@@ -22,10 +22,12 @@ namespace IndoorCO2MapAppV2.Pages
 
         private readonly MainPageViewModel _mainPageViewModel;
         private bool _initialRefreshDone = false;
+        private bool _permissionsRequested = false;
 
         private bool sortAlphabetical = false;
 
         private IDispatcherTimer? _co2liveValueUpdateTimer;
+        private CancellationTokenSource? _gpsCts;
 
         private bool pageActive = true;
 
@@ -71,6 +73,25 @@ namespace IndoorCO2MapAppV2.Pages
                 _initialRefreshDone = true;
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
             }
+
+            if (!_permissionsRequested)
+            {
+                _permissionsRequested = true;
+
+                var locationService = LocationServicePlatformProvider.CreateOrUse();
+                if (!await locationService.HasLocationPermissionAsync())
+                    await locationService.RequestLocationPermissionAsync();
+
+                var btHelper = BluetoothPlatformProvider.CreateOrUse();
+                if (!btHelper.CheckPermissions())
+                    await btHelper.RequestPermissionsAsync();
+
+                await StatusViewModel.Instance.RefreshNowAsync();
+            }
+
+            _gpsCts?.Cancel();
+            _gpsCts = new CancellationTokenSource();
+            _ = GpsRefreshLoopAsync(_gpsCts.Token);
         }
 
         private async Task ShowSuccessBannerAsync()
@@ -87,6 +108,19 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnDisappearing();
             pageActive = false;
+            _gpsCts?.Cancel();
+            _gpsCts = null;
+        }
+
+        private async Task GpsRefreshLoopAsync(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
+                int delaySecs = _mainPageViewModel.BuildingSearch.HasValidGPS ? 60 : 15;
+                try { await Task.Delay(TimeSpan.FromSeconds(delaySecs), ct); }
+                catch (OperationCanceledException) { break; }
+            }
         }
 
         protected async Task<bool> TryRecoverRecordingAsync()
@@ -117,6 +151,7 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnSearchRangeChanged(object sender, CheckedChangedEventArgs e)
         {
             if (!e.Value) return; // only when checked
+            if (_mainPageViewModel == null) return; // fires during InitializeComponent before assignment
 
             if (sender == RadioButton100m)
                 _mainPageViewModel.BuildingSearch.Range=100;

@@ -99,45 +99,37 @@
             <Border Style="{StaticResource CardBorderStyle}">
                 <VerticalStackLayout Spacing="10">
 
-                    <HorizontalStackLayout
-                        x:Name="SearchRangeStackLayout"
-                        Spacing="5"
-                        VerticalOptions="Start">
-                        <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" LineBreakMode="WordWrap" VerticalOptions="Center" />
-                        <StackLayout Orientation="Horizontal" Spacing="10" >
-                            <Label Text=" 100m" HorizontalOptions="Start" VerticalOptions="Center" />
-                            <RadioButton
-                                x:Name="RadioButton100m"
-                                GroupName="SearchRange"
-                                VerticalOptions="Center"
-                                CheckedChanged="OnSearchRangeChanged"
-                                IsChecked="True"
-                                HorizontalOptions="Start">
-                            </RadioButton>
-                            <Label Text=" 250m" HorizontalOptions="Start" VerticalOptions="Center" />
-                            <RadioButton
-                                x:Name="RadioButton250m"
-                                GroupName="SearchRange"
-                                VerticalOptions="Center"
-                                CheckedChanged="OnSearchRangeChanged"
-                                HorizontalOptions="Start">
-                            </RadioButton>
-                        </StackLayout>
+                    <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" />
+                    <HorizontalStackLayout x:Name="SearchRangeStackLayout" Spacing="10" VerticalOptions="Start">
+                        <Label Text="100m" VerticalOptions="Center" />
+                        <RadioButton
+                            x:Name="RadioButton100m"
+                            GroupName="SearchRange"
+                            VerticalOptions="Center"
+                            CheckedChanged="OnSearchRangeChanged"
+                            IsChecked="True" />
+                        <Label Text="250m" VerticalOptions="Center" />
+                        <RadioButton
+                            x:Name="RadioButton250m"
+                            GroupName="SearchRange"
+                            VerticalOptions="Center"
+                            CheckedChanged="OnSearchRangeChanged" />
                     </HorizontalStackLayout>
 
                     <Grid x:Name="LocationUpdateGrid" ColumnDefinitions="3*,1*" HorizontalOptions="Fill" ColumnSpacing="10">
                         <Button
                             x:Name="UpdateLocationsButton"
-                            Text="{x:Static t:Localisation.SearchBuildingButtonLabel_Ready}"
+                            Text="{Binding BuildingSearch.SearchButtonText}"
                             HorizontalOptions="Fill"
                             Clicked="OnSearchBuildingsClicked"
-                            IsEnabled="{Binding FetchState.IsFetching, Converter={StaticResource InvertBooleanConverter}}"
+                            IsEnabled="{Binding BuildingSearch.CanSearch}"
                             Grid.Column="0" />
                         <Button
                             x:Name="GetCachedLocationsButton"
                             Text="📁"
                             FontSize="20"
                             Clicked="OnGetCachedLocationsClicked"
+                            IsEnabled="{Binding BuildingSearch.HasValidGPS}"
                             HorizontalOptions="Fill"
                             Grid.Column="1" />
                     </Grid>

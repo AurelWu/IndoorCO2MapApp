@@ -25,6 +25,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             FetchState.PropertyChanged += (_, __) =>
             {
                 OnPropertyChanged(nameof(FetchState));
+                OnPropertyChanged(nameof(CanSearch));
             };
         }
 
@@ -84,6 +85,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             Longitude is double lon &&
             lat != 0 && lon != 0;
 
+        public bool CanSearch => HasValidGPS && !FetchState.IsFetching;
+
+        public string SearchButtonText => HasValidGPS
+            ? Localisation.SearchBuildingButtonLabel_Ready
+            : "Waiting for GPS...";
+
         // ---------------------------
         // GPS
         // ---------------------------
@@ -96,6 +103,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             Longitude = 13.404944;
             Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
             OnPropertyChanged(nameof(HasValidGPS));
+            OnPropertyChanged(nameof(CanSearch));
+            OnPropertyChanged(nameof(SearchButtonText));
             return;
 #endif
 
@@ -113,6 +122,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             Status = $"GPS OK: {Latitude:F6}, {Longitude:F6}";
             OnPropertyChanged(nameof(HasValidGPS));
+            OnPropertyChanged(nameof(CanSearch));
+            OnPropertyChanged(nameof(SearchButtonText));
         }
 
         // ---------------------------

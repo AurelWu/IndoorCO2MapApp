@@ -130,6 +130,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             _statusTimer.Start();
         }
 
+        public Task RefreshNowAsync() => UpdateStatusAsync();
+
         private void StatusTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             // Run all platform checks on the ThreadPool thread (timer callback),

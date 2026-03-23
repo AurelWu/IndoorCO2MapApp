@@ -2,7 +2,7 @@
 
 namespace IndoorCO2MapAppV2.Controls
 {
-    public class LabeledSwitch : HorizontalStackLayout
+    public class LabeledSwitch : Grid
     {
         public static readonly BindableProperty TextProperty = BindableProperty.Create(
             nameof(Text), typeof(string), typeof(LabeledSwitch), default(string), propertyChanged: OnTextChanged);
@@ -27,21 +27,26 @@ namespace IndoorCO2MapAppV2.Controls
 
         public LabeledSwitch()
         {
-            Spacing = 8;
+            ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+            ColumnSpacing = 8;
             VerticalOptions = LayoutOptions.Center;
 
-            _switch = new Switch();
+            _switch = new Switch { VerticalOptions = LayoutOptions.Center };
             _switch.Toggled += (s, e) => IsToggled = e.Value;
 
             _label = new Label
             {
-                VerticalTextAlignment = TextAlignment.Center
+                VerticalTextAlignment = TextAlignment.Center,
+                LineBreakMode = LineBreakMode.WordWrap
             };
 
             var tap = new TapGestureRecognizer();
             tap.Tapped += (s, e) => _switch.IsToggled = !_switch.IsToggled;
             _label.GestureRecognizers.Add(tap);
 
+            Grid.SetColumn(_label, 0);
+            Grid.SetColumn(_switch, 1);
             Children.Add(_label);
             Children.Add(_switch);
         }

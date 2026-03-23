@@ -129,7 +129,7 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
         // --- Navigation helper ---
-        private void OnNavigateClicked(object sender, EventArgs e)
+        public void OnNavigateClicked(object sender, EventArgs e)
         {
             if (sender is Button button && button.CommandParameter is string route)
                 NavigateAsync(route).SafeFireAndForget("OnNavigateClicked|NavigateAsync");

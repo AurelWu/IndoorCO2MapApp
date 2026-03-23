@@ -307,10 +307,7 @@ namespace IndoorCO2MapAppV2.Pages
                 if (trimmed.Count < 5)
                 {
                     SubmitButton.IsEnabled = false;
-                    SubmitButton.Text = string.Format(
-                        Localisation.SubmitRecordingButtonNeedData,
-                        trimmed.Count
-                    );
+                    SubmitButton.Text = Localisation.SubmitRecordingButtonNeedData;
                 }
                 else
                 {
@@ -326,8 +323,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 lineChartView.Clear();
                 SubmitButton.IsEnabled = false;
-                SubmitButton.Text =
-                    Localisation.SubmitRecordingButtonNeedData.Replace("{0}", "0");
+                SubmitButton.Text = Localisation.SubmitRecordingButtonNeedData;
             });
         }
 

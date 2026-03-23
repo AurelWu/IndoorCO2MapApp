@@ -130,7 +130,7 @@
     <value>Current CO2: </value>
   </data>
   <data name="CO2LevelsLabel" xml:space="preserve">
-    <value>CO2 Levels: </value>
+    <value>CO2: </value>
   </data>
   <data name="NoSensorFoundStatusLabel" xml:space="preserve">
     <value>No Sensor Found</value>
@@ -157,10 +157,10 @@
     <value>Submit Recording</value>
   </data>
   <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
-    <value>{0}/5 data points needed to submit</value>
+    <value>5 data points needed to submit</value>
   </data>
   <data name="UpdateInterval" xml:space="preserve">
-    <value>Update Interval: </value>
+    <value>Interval: </value>
   </data>
   <data name="HistoryExportDatabaseTitle" xml:space="preserve">
     <value>Export to File</value>
