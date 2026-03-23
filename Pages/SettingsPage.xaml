@@ -51,6 +51,9 @@
             <VerticalStackLayout Spacing="10">
                 <Label Text="Data" Style="{StaticResource SectionLabelStyle}" />
                 <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
+                <c:LabeledSegmentedControl Label="Cache Search Range Override"
+                    Items="{Binding CacheRangeOverrideOptions}"
+                    SelectedItem="{Binding CacheRangeOverride}" />
                 <c:LabeledSwitch Text="Enable Local Recording History" IsToggled="{Binding EnableHistory}" />
                 <Button Text="Delete Location Cache"
                         Clicked="OnDeleteLocationCacheClicked"
@@ -63,6 +66,26 @@
                         Style="{StaticResource SecondaryButtonStyle}"
                         TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
                         BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                        HorizontalOptions="Fill"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- ===== Debug ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Debug" Style="{StaticResource SectionLabelStyle}" />
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Round GPS Position to 0.5°"
+                           Grid.Column="0"
+                           VerticalOptions="Center" />
+                    <Switch x:Name="RoundGpsSwitch"
+                            IsToggled="True"
+                            Grid.Column="1"
+                            Toggled="OnRoundGpsToggled" />
+                </Grid>
+                <Button Text="Copy Debug Log to Clipboard"
+                        Clicked="OnCopyDebugLogClicked"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         HorizontalOptions="Fill"/>
             </VerticalStackLayout>
         </Border>

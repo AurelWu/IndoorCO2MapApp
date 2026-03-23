@@ -1,5 +1,6 @@
 ﻿using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using System;
@@ -26,7 +27,7 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
 
     public async Task<bool> EnsureConnectionIsValidAsync()
     {
-        bool debugGattCheck = IsGattValid();
+        Logger.WriteToLog($"EnsureConnection: IsGattValid={IsGattValid()}, DeviceState={ActiveDevice?.State}", LogMode.Verbose);
         // 1. If valid, nothing to do
         if (IsInitialized)
             return true;
@@ -58,9 +59,15 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
         for (int i = 0; i < RetryCount; i++)
         {
             var svc = await device.GetServiceAsync(uuid);
-            if (svc != null) return svc;
+            if (svc != null)
+            {
+                Logger.WriteToLog($"TryGetServiceAsync: found {uuid} on attempt {i + 1}", LogMode.Verbose);
+                return svc;
+            }
+            Logger.WriteToLog($"TryGetServiceAsync: attempt {i + 1}/{RetryCount} failed for {uuid}", LogMode.Verbose);
             await Task.Delay(RetryDelayMs);
         }
+        Logger.WriteToLog($"TryGetServiceAsync: FAILED all {RetryCount} attempts for {uuid}");
         return null;
     }
 
@@ -72,15 +79,21 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
             try
             {
                 chr = await service.GetCharacteristicAsync(uuid);
-                if (chr != null) return chr;
+                if (chr != null)
+                {
+                    Logger.WriteToLog($"TryGetCharacteristicAsync: found {uuid} on attempt {i + 1}", LogMode.Verbose);
+                    return chr;
+                }
+                Logger.WriteToLog($"TryGetCharacteristicAsync: attempt {i + 1}/{RetryCount} returned null for {uuid}", LogMode.Verbose);
             }
             catch (Exception e)
             {
-                Logger.WriteToLog("failed to get characteristic: " + e.ToString());
+                Logger.WriteToLog($"TryGetCharacteristicAsync: attempt {i + 1}/{RetryCount} exception for {uuid}: {e.Message}");
             }
-            
+
             await Task.Delay(RetryDelayMs);
         }
+        Logger.WriteToLog($"TryGetCharacteristicAsync: FAILED all {RetryCount} attempts for {uuid}");
         return null;
     }
 

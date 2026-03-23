@@ -99,6 +99,28 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.EnablePrerecording = value; OnPropertyChanged(); }
         }
 
+        public IReadOnlyCollection<string> CacheRangeOverrideOptions => ["No", "250m", "500m"];
+
+        public string CacheRangeOverride
+        {
+            get => UserSettings.Instance.CacheRangeOverrideMeters switch
+            {
+                250 => "250m",
+                500 => "500m",
+                _   => "No"
+            };
+            set
+            {
+                UserSettings.Instance.CacheRangeOverrideMeters = value switch
+                {
+                    "250m" => 250,
+                    "500m" => 500,
+                    _      => -1
+                };
+                OnPropertyChanged();
+            }
+        }
+
         public string SensorFilter
         {
             get => UserSettings.Instance.SensorFilter ?? string.Empty;

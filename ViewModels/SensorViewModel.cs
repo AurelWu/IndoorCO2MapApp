@@ -105,9 +105,13 @@ namespace IndoorCO2MapAppV2.ViewModels
             // or the user selects a different device.
             for (int i = 0; i < 5 && CurrentCO2 == 0 && SelectedDevice == device; i++)
             {
+                Logger.WriteToLog($"SensorViewModel|SelectDeviceAsync retry {i + 1}/5: CO2 still 0, waiting 3s...");
                 await Task.Delay(3000);
                 if (SelectedDevice == device)
+                {
                     await RefreshLiveCO2Async();
+                    Logger.WriteToLog($"SensorViewModel|SelectDeviceAsync retry {i + 1}/5: CO2 after read = {CurrentCO2}");
+                }
             }
         }
 

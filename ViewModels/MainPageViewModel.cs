@@ -44,6 +44,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                     e.PropertyName == nameof(Sensor.CurrentCO2))
                 {
                     OnPropertyChanged(nameof(CanStartBuildingRecording));
+                    OnPropertyChanged(nameof(IsStartRecordingBlocked));
+                    OnPropertyChanged(nameof(StartRecordingBlockedReason));
                 }
             };
 
@@ -52,6 +54,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 if (e.PropertyName == nameof(BuildingSearch.SelectedBuilding))
                 {
                     OnPropertyChanged(nameof(CanStartBuildingRecording));
+                    OnPropertyChanged(nameof(IsStartRecordingBlocked));
+                    OnPropertyChanged(nameof(StartRecordingBlockedReason));
                 }
             };
 
@@ -86,5 +90,18 @@ namespace IndoorCO2MapAppV2.ViewModels
             BuildingSearch.SelectedBuilding != null &&
             Sensor.SelectedDevice != null &&
             Sensor.CurrentCO2 > 0;
+
+        public bool IsStartRecordingBlocked => !CanStartBuildingRecording;
+
+        public string StartRecordingBlockedReason
+        {
+            get
+            {
+                if (BuildingSearch.SelectedBuilding == null) return "No building selected";
+                if (Sensor.SelectedDevice == null)           return "No sensor connected";
+                if (Sensor.CurrentCO2 == 0)                  return "Waiting for CO2 reading (0 ppm)";
+                return string.Empty;
+            }
+        }
     }
 }

@@ -1,14 +1,20 @@
+using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Resources.Strings;
 using Microsoft.Maui.Controls;
 using Microsoft.VisualBasic;
 using IndoorCO2MapAppV2.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace IndoorCO2MapAppV2.Pages
 {
     public partial class SettingsPage : AppPage
     {
         private readonly SettingsViewModel _settingsViewModel;
+        private bool _roundGpsInLog = true;
+
+        [GeneratedRegex(@"-?\d{1,3}\.\d{5,}")]
+        private static partial Regex GpsCoordinateRegex();
 
         public SettingsPage()
         {
@@ -65,6 +71,48 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 await App.LocationCacheDb.ClearAsync();
             }
+        }
+
+        private async void OnRoundGpsToggled(object sender, ToggledEventArgs e)
+        {
+            if (!e.Value)
+            {
+                bool confirmed = await DisplayAlertAsync(
+                    "Privacy Warning",
+                    "Disabling GPS rounding may expose your precise location when sharing this log. Are you sure?",
+                    "Yes, disable rounding",
+                    "Cancel"
+                );
+                if (!confirmed)
+                {
+                    RoundGpsSwitch.IsToggled = true;
+                    return;
+                }
+            }
+            _roundGpsInLog = e.Value;
+        }
+
+        private void OnCopyDebugLogClicked(object sender, EventArgs e)
+        {
+            CopyDebugLog().SafeFireAndForget("OnCopyDebugLogClicked|CopyDebugLog");
+        }
+
+        private async Task CopyDebugLog()
+        {
+            var log = string.Join("\n", Logger.circularBuffer);
+
+            if (_roundGpsInLog)
+                log = GpsCoordinateRegex().Replace(log, m =>
+                {
+                    if (double.TryParse(m.Value, System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture, out double val))
+                        return (Math.Round(val / 0.5) * 0.5)
+                            .ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+                    return m.Value;
+                });
+
+            await Clipboard.SetTextAsync(log);
+            await DisplayAlertAsync("Debug Log Copied", "The debug log has been copied to your clipboard.", "OK");
         }
 
         protected override bool OnBackButtonPressed()

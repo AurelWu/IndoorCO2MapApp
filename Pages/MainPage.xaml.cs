@@ -47,9 +47,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private async Task SearchBuildingsAsync()
         {
-            await _mainPageViewModel.BuildingSearch.GetGpsAsync();
             await _mainPageViewModel.BuildingSearch.SearchBuildingsAsync();
-
         }
 
         protected override async void OnAppearing()
@@ -214,12 +212,17 @@ namespace IndoorCO2MapAppV2.Pages
 
             double userLat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
             double userLon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
+            int overrideMeters = UserSettings.Instance.CacheRangeOverrideMeters;
+            int range = overrideMeters > 0
+                ? overrideMeters
+                : _mainPageViewModel.BuildingSearch.Range;
 
-            // Load cached locations from SQLite
+            // Load cached locations from SQLite and filter to the selected range
             var cachedLocations = await App.LocationCacheDb.GetAllAsync(userLat, userLon);
+            var filtered = cachedLocations.Where(loc => loc.Distance <= range).ToHashSet();
 
             // Update the LocationStore
-            LocationStore.Instance.SetBuildingLocations(cachedLocations);
+            LocationStore.Instance.SetBuildingLocations(filtered);
 
             // Refresh UI list
             _mainPageViewModel.BuildingSearch.RefreshBuildings();            

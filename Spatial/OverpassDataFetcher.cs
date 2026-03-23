@@ -68,9 +68,6 @@ namespace IndoorCO2MapAppV2.Spatial
 
         private async Task<string?> FetchInternalAsync(string query, CancellationToken externalToken)
         {
-            if (State.IsFetching)
-                return null;
-
             // Reset state
             State.IsFetching = true;
             State.LastFailed = false;

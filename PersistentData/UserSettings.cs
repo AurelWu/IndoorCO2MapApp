@@ -97,6 +97,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _favouriteLocationKeys, value);
         }
 
+        private int _cacheRangeOverrideMeters = -1;
+        public int CacheRangeOverrideMeters
+        {
+            get => _cacheRangeOverrideMeters;
+            set => SetProperty(ref _cacheRangeOverrideMeters, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

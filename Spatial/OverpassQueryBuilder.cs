@@ -39,43 +39,57 @@ namespace IndoorCO2MapAppV2.Spatial
             }
         }
 
+        // --- Bbox helper ---
+
+        // Converts a center point + radius (metres) to an Overpass bbox string "south,west,north,east".
+        // Using bbox in the query header is more efficient than repeating (around:R,Lat,Lon) on every filter.
+        private static string ComputeBbox(double latitude, double longitude, double radius)
+        {
+            double latDelta = radius / 111320.0;
+            double lonDelta = radius / (111320.0 * Math.Cos(latitude * Math.PI / 180.0));
+            string s = (latitude  - latDelta).ToString("F6", CultureInfo.InvariantCulture);
+            string n = (latitude  + latDelta).ToString("F6", CultureInfo.InvariantCulture);
+            string w = (longitude - lonDelta).ToString("F6", CultureInfo.InvariantCulture);
+            string e = (longitude + lonDelta).ToString("F6", CultureInfo.InvariantCulture);
+            return $"{s},{w},{n},{e}"; // Overpass order: south,west,north,east
+        }
+
         // --- Query builders ---
 
         internal static string CreateTransportOverpassQuery(double latitude, double longitude, double radius, bool startLocation)
         {
-            string rString = radius.ToString(CultureInfo.InvariantCulture);
-            string latString = latitude.ToString(CultureInfo.InvariantCulture);
-            string lonString = longitude.ToString(CultureInfo.InvariantCulture);
+            string bbox = ComputeBbox(latitude, longitude, radius);
+            string header = $"[out:json][timeout:30][bbox:{bbox}];";
 
             if (startLocation)
             {
-                return "[out:json];" +
+                return header +
                     "(" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=tram_stop];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=tram];" +
-                    $"nwr(around:{rString},{latString},{lonString})[highway=bus_stop];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=bus];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=subway_station];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=subway];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=station];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=halt];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=stop];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=train];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=light_rail];" +
-                    $"relation(around:{rString},{latString},{lonString})[route=monorail];" +
+                    "nwr[railway=tram_stop];" +
+                    "relation[route=tram];" +
+                    "nwr[highway=bus_stop];" +
+                    "relation[route=bus];" +
+                    "nwr[railway=subway_station];" +
+                    "relation[route=subway];" +
+                    "nwr[railway=station];" +
+                    "nwr[railway=halt];" +
+                    "nwr[railway=stop];" +
+                    "relation[route=train];" +
+                    "relation[route=light_rail];" +
+                    "relation[route=monorail];" +
                     ");" +
                     "out center tags qt;";
             }
             else
             {
-                return "[out:json];" +
+                return header +
                     "(" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=tram_stop];" +
-                    $"nwr(around:{rString},{latString},{lonString})[highway=bus_stop];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=subway_station];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=station];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=stop];" +
-                    $"nwr(around:{rString},{latString},{lonString})[railway=halt];" +
+                    "nwr[railway=tram_stop];" +
+                    "nwr[highway=bus_stop];" +
+                    "nwr[railway=subway_station];" +
+                    "nwr[railway=station];" +
+                    "nwr[railway=stop];" +
+                    "nwr[railway=halt];" +
                     ");" +
                     "out center tags qt;";
             }
@@ -83,115 +97,111 @@ namespace IndoorCO2MapAppV2.Spatial
 
         internal static string CreateBuildingOverpassQuery(double latitude, double longitude, double radius)
         {
-            string rString = radius.ToString(CultureInfo.InvariantCulture);
-            string latString = latitude.ToString(CultureInfo.InvariantCulture);
-            string lonString = longitude.ToString(CultureInfo.InvariantCulture);
+            string bbox = ComputeBbox(latitude, longitude, radius);
 
             if (_cachedEntries is { Count: > 0 } entries)
-                return BuildQueryFromEntries(entries, rString, latString, lonString);
+                return BuildQueryFromEntries(entries, bbox);
 
-            return BuildHardcodedQuery(rString, latString, lonString);
+            return BuildHardcodedQuery(bbox);
         }
 
-        private static string BuildQueryFromEntries(
-            List<WhitelistEntry> entries, string rString, string latString, string lonString)
+        private static string BuildQueryFromEntries(List<WhitelistEntry> entries, string bbox)
         {
-            var sb = new StringBuilder("[out:json];(");
+            var sb = new StringBuilder($"[out:json][timeout:30][bbox:{bbox}];(");
             foreach (var entry in entries)
             {
                 var filter = string.Join("][", entry.Conditions);
-                sb.Append($"nwr(around:{rString},{latString},{lonString})[{filter}];");
+                sb.Append($"nwr[{filter}];");
             }
             sb.Append(");out center qt;");
             return sb.ToString();
         }
 
-        private static string BuildHardcodedQuery(string rString, string latString, string lonString)
+        private static string BuildHardcodedQuery(string bbox)
         {
-            return "[out:json];" +
+            return $"[out:json][timeout:30][bbox:{bbox}];" +
                 "(" +
-                $"nwr(around:{rString},{latString},{lonString})[office=employment_agency];" +
-                $"nwr(around:{rString},{latString},{lonString})[office=lawyer];" +
-                $"nwr(around:{rString},{latString},{lonString})[office=educational_institution];" +
-                $"nwr(around:{rString},{latString},{lonString})[office=government];" +
-                $"nwr(around:{rString},{latString},{lonString})[office=political_party];" +
-                $"nwr(around:{rString},{latString},{lonString})[office=coworking];" +
-                $"nwr(around:{rString},{latString},{lonString})[government=register_office];" +
-                $"nwr(around:{rString},{latString},{lonString})[shop];" +
-                $"nwr(around:{rString},{latString},{lonString})[craft];" +
-                $"nwr(around:{rString},{latString},{lonString})[aeroway=aerodrome];" +
-                $"nwr(around:{rString},{latString},{lonString})[aeroway=terminal];" +
-                $"nwr(around:{rString},{latString},{lonString})[railway=station];" +
-                $"nwr(around:{rString},{latString},{lonString})[public_transport=station];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=fitness_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=bowling_alley];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=sports_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=sports_hall];" +
-                $"nwr(around:{rString},{latString},{lonString})[sport=swimming];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=swimming_pool];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=sauna];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=hackerspace];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=escape_game];" +
-                $"nwr(around:{rString},{latString},{lonString})[leisure=dance];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=studio];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=townhall];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=car_rental];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=convention_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=conference_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=congress_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=events_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=bar];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=place_of_worship];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=pub];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=restaurant];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=cafe];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=fast_food];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=food_court];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=ice_cream];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=college];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=dancing_school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=driving_school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=kindergarten];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=language_school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=library];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=cinema];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=theatre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=concert_hall];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=music_venue];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=arts_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=brothel];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=love_hotel];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=nightclub];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=planetarium];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=stripclub];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=social_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=community_centre];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=playground][indoor=yes];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=research_institute];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=music_school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=school];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=courthouse];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=post_office];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=university];" +
-                $"nwr(around:{rString},{latString},{lonString})[building=university];" +
-                $"nwr(around:{rString},{latString},{lonString})[building=college];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=hospital];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=clinic];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=dentist];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=doctors];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=pharmacy];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=veterinary];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=social_facility];" +
-                $"nwr(around:{rString},{latString},{lonString})[amenity=bank];" +
-                $"nwr(around:{rString},{latString},{lonString})[healthcare];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism=museum];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism=attraction];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism=zoo];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism=gallery];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism=hotel];" +
-                $"nwr(around:{rString},{latString},{lonString})[tourism][building];" +
-                ");" +
-                "out center qt;";
+                "nwr[office=employment_agency];" +
+                "nwr[office=lawyer];" +
+                "nwr[office=educational_institution];" +
+                "nwr[office=government];" +
+                "nwr[office=political_party];" +
+                "nwr[office=coworking];" +
+                "nwr[government=register_office];" +
+                "nwr[shop];" +
+                "nwr[craft];" +
+                "nwr[aeroway=aerodrome];" +
+                "nwr[aeroway=terminal];" +
+                "nwr[railway=station];" +
+                "nwr[public_transport=station];" +
+                "nwr[leisure=fitness_centre];" +
+                "nwr[leisure=bowling_alley];" +
+                "nwr[leisure=sports_centre];" +
+                "nwr[leisure=sports_hall];" +
+                "nwr[sport=swimming];" +
+                "nwr[leisure=swimming_pool];" +
+                "nwr[leisure=sauna];" +
+                "nwr[leisure=hackerspace];" +
+                "nwr[leisure=escape_game];" +
+                "nwr[leisure=dance];" +
+                "nwr[amenity=studio];" +
+                "nwr[amenity=townhall];" +
+                "nwr[amenity=car_rental];" +
+                "nwr[amenity=convention_centre];" +
+                "nwr[amenity=conference_centre];" +
+                "nwr[amenity=congress_centre];" +
+                "nwr[amenity=events_centre];" +
+                "nwr[amenity=bar];" +
+                "nwr[amenity=place_of_worship];" +
+                "nwr[amenity=pub];" +
+                "nwr[amenity=restaurant];" +
+                "nwr[amenity=cafe];" +
+                "nwr[amenity=fast_food];" +
+                "nwr[amenity=food_court];" +
+                "nwr[amenity=ice_cream];" +
+                "nwr[amenity=college];" +
+                "nwr[amenity=dancing_school];" +
+                "nwr[amenity=driving_school];" +
+                "nwr[amenity=kindergarten];" +
+                "nwr[amenity=language_school];" +
+                "nwr[amenity=library];" +
+                "nwr[amenity=cinema];" +
+                "nwr[amenity=theatre];" +
+                "nwr[amenity=concert_hall];" +
+                "nwr[amenity=music_venue];" +
+                "nwr[amenity=arts_centre];" +
+                "nwr[amenity=brothel];" +
+                "nwr[amenity=love_hotel];" +
+                "nwr[amenity=nightclub];" +
+                "nwr[amenity=planetarium];" +
+                "nwr[amenity=stripclub];" +
+                "nwr[amenity=social_centre];" +
+                "nwr[amenity=community_centre];" +
+                "nwr[amenity=playground][indoor=yes];" +
+                "nwr[amenity=research_institute];" +
+                "nwr[amenity=music_school];" +
+                "nwr[amenity=school];" +
+                "nwr[amenity=courthouse];" +
+                "nwr[amenity=post_office];" +
+                "nwr[amenity=university];" +
+                "nwr[building=university];" +
+                "nwr[building=college];" +
+                "nwr[amenity=hospital];" +
+                "nwr[amenity=clinic];" +
+                "nwr[amenity=dentist];" +
+                "nwr[amenity=doctors];" +
+                "nwr[amenity=pharmacy];" +
+                "nwr[amenity=veterinary];" +
+                "nwr[amenity=social_facility];" +
+                "nwr[amenity=bank];" +
+                "nwr[healthcare];" +
+                "nwr[tourism=museum];" +
+                "nwr[tourism=attraction];" +
+                "nwr[tourism=zoo];" +
+                "nwr[tourism=gallery];" +
+                "nwr[tourism=hotel];" +
+                "nwr[tourism][building];" +
+                ");out center qt;";
         }
     }
 }

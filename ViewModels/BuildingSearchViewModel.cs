@@ -15,6 +15,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         private readonly OverpassDataFetcher _fetcher = OverpassDataFetcher.Instance;
         private readonly ILocationService _locationService;
         private readonly LocationStore _locationStore = LocationStore.Instance;
+        private DateTime? _lastGpsFixTime;
 
         public BuildingSearchViewModel()
         {
@@ -97,11 +98,18 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task GetGpsAsync()
         {
+            // Skip if we already have a recent valid fix (< 60 s old)
+            if (HasValidGPS && _lastGpsFixTime.HasValue &&
+                (DateTime.UtcNow - _lastGpsFixTime.Value).TotalSeconds < 60)
+                return;
+
 #if WINDOWS
             // Fake coordinates for desktop debugging
             Latitude = 52.521006;
             Longitude = 13.404944;
+            _lastGpsFixTime = DateTime.UtcNow;
             Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
+            Logger.WriteToLog(FormattableString.Invariant($"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}"));
             OnPropertyChanged(nameof(HasValidGPS));
             OnPropertyChanged(nameof(CanSearch));
             OnPropertyChanged(nameof(SearchButtonText));
@@ -119,8 +127,10 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             Latitude = loc.Latitude;
             Longitude = loc.Longitude;
+            _lastGpsFixTime = DateTime.UtcNow;
 
             Status = $"GPS OK: {Latitude:F6}, {Longitude:F6}";
+            Logger.WriteToLog(FormattableString.Invariant($"GPS OK: {Latitude:F6}, {Longitude:F6}"));
             OnPropertyChanged(nameof(HasValidGPS));
             OnPropertyChanged(nameof(CanSearch));
             OnPropertyChanged(nameof(SearchButtonText));
@@ -132,56 +142,68 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task SearchBuildingsAsync()
         {
-            await GetGpsAsync();
-            if (!HasValidGPS)
+            Status = "Acquiring GPS...";
+            FetchState.IsFetching = true;
+            FetchState.LastFailed = false;
+            FetchState.LastError = null;
+            try
             {
-                Status = "No valid GPS data yet.";
-                return;
-            }
-
-            Status = "Fetching buildings...";
-
-            string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(
-                Latitude!.Value,
-                Longitude!.Value,
-                Range
-            );
-
-            string? json = await _fetcher.FetchOverpassDataAsync(query);
-            if (json == null)
-            {
-                Status = $"Fetch failed: {FetchState.LastError}";
-                return;
-            }
-
-            Status = "Fetch OK, parsing...";
-
-            var result = OverpassDataParser.ParseBuildingLocationOverpassResponse( //that method already puts it in location store
-                json,
-                Latitude.Value,
-                Longitude.Value
-            );
-
-            if(UserSettings.Instance.EnableLocationCaching)
-            {
-                foreach (var location in result)
+                await GetGpsAsync();
+                if (!HasValidGPS)
                 {
-                    try
+                    FetchState.LastError = "Unable to get GPS position.";
+                    FetchState.LastFailed = true;
+                    Status = "No valid GPS data yet.";
+                    return;
+                }
+
+                Status = "Fetching buildings...";
+
+                string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(
+                    Latitude!.Value,
+                    Longitude!.Value,
+                    Range
+                );
+
+                string? json = await _fetcher.FetchOverpassDataAsync(query);
+                if (json == null)
+                {
+                    Status = $"Fetch failed: {FetchState.LastError}";
+                    return;
+                }
+
+                Status = "Fetch OK, parsing...";
+
+                var result = OverpassDataParser.ParseBuildingLocationOverpassResponse( //that method already puts it in location store
+                    json,
+                    Latitude.Value,
+                    Longitude.Value
+                );
+
+                if (UserSettings.Instance.EnableLocationCaching)
+                {
+                    foreach (var location in result)
                     {
-                        await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
+                        try
+                        {
+                            await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
+                        }
                     }
                 }
+
+                // Now refresh UI list using filter + sorting
+                RefreshBuildings();
+
+                Status = $"Parsed {Buildings.Count} buildings.";
             }
-            
-
-            // Now refresh UI list using filter + sorting
-            RefreshBuildings();
-
-            Status = $"Parsed {Buildings.Count} buildings.";
+            finally
+            {
+                FetchState.IsFetching = false;
+            }
         }
 
         // ---------------------------

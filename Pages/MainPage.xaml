@@ -145,7 +145,7 @@
                             WidthRequest="20"
                             HeightRequest="20" />
                         <Label
-                            Text="{x:Static t:Localisation.SearchBuildingButtonLabel_Searching}"
+                            Text="{Binding BuildingSearch.Status}"
                             FontSize="14"
                             VerticalOptions="Center" />
                     </HorizontalStackLayout>
@@ -204,6 +204,12 @@
                     <Button Text="{x:Static t:Localisation.MainMenuButtonStartBuildingRecording}"
                         Command="{Binding StartBuildingRecordingCommand}"
                         IsEnabled="{Binding CanStartBuildingRecording}" />
+
+                    <Label Text="{Binding StartRecordingBlockedReason}"
+                           IsVisible="{Binding IsStartRecordingBlocked}"
+                           FontSize="12"
+                           TextColor="Gray"
+                           HorizontalOptions="Center" />
 
                     <c:LabeledSwitch Text="{x:Static t:Localisation.MainMenuPrerecordingSwitchText}" IsToggled="{Binding Settings.EnablePreRecording}" />
 

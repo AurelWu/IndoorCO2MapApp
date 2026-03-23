@@ -79,7 +79,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 SelectedDevice = device;
 
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: connecting to {device.Device.Name}...");
                 var connected = await _ble.ConnectDeviceAsync(device.Device);
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: connected={connected}");
                 if (!connected)
                     return;
 
@@ -89,6 +91,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                         BLEDeviceManager.Instance._adapter)
                     ?? SelectedMonitorType;
 
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: provider type={type}", LogMode.Verbose);
                 ActiveCO2MonitorProvider = CO2MonitorProviderFactory.CreateProvider(type);
                 if (ActiveCO2MonitorProvider == null)
                     return;
@@ -96,6 +99,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 // InitializeAsync is called ONCE here when connecting.
                 // Refresh methods below must NOT call it again.
                 bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: initialized={ok}");
                 if (!ok)
                 {
                     await ActiveCO2MonitorProvider.DisposeAsync();
@@ -104,7 +108,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 }
 
                 CurrentCO2 = await ActiveCO2MonitorProvider.ReadCurrentCO2SafeAsync();
-                Logger.WriteToLog("CO2MonitorManager|SelectDeviceAsync completed", LogMode.Verbose);
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: initial CO2={CurrentCO2}");
             }
             finally
             {
