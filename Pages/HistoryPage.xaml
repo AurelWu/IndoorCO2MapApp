@@ -29,7 +29,7 @@
                     CommandParameter="///home"
                     HorizontalOptions="Fill" />
 
-            <!-- Backup + Import -->
+            <!-- Backup + Import + Map -->
             <HorizontalStackLayout Spacing="15">
                 <Button Text="Export Data"
                         Command="{Binding ExportCommand}"
@@ -37,6 +37,11 @@
 
                 <Button Text="Import Data"
                         Command="{Binding ImportCommand}"
+                        Style="{StaticResource TonalButtonStyle}" />
+
+                <Button Text="🗺 Map"
+                        Clicked="OnNavigateClicked"
+                        CommandParameter="///map"
                         Style="{StaticResource TonalButtonStyle}" />
             </HorizontalStackLayout>
 

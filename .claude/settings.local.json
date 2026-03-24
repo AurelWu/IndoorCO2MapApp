@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find d:ClaudeIndoorCo2MapAppIndoorCO2MapApp -name *.csproj -o -name *.sln)"
+    ]
+  }
+}

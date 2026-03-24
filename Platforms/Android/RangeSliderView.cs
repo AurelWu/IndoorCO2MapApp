@@ -79,7 +79,7 @@ namespace IndoorCO2MapAppV2.Platforms.Android
 
         protected override void OnDraw(ACanvas canvas)
         {
-            float cy = Height / 2f;
+            float cy = Height - _thumbRadius - 4f;
 
             canvas.DrawRect(_padding, cy - _trackHeight / 2,
                             Width - _padding, cy + _trackHeight / 2, _trackPaint);
@@ -104,7 +104,24 @@ namespace IndoorCO2MapAppV2.Platforms.Android
                 case MotionEventActions.Down:
                     _dragLower = Math.Abs(x - _lowerX) < touch;
                     _dragUpper = Math.Abs(x - _upperX) < touch;
-                    return _dragLower || _dragUpper;
+
+                    if (!_dragLower && !_dragUpper)
+                    {
+                        // Tap missed both thumbs — snap the nearest one to the tap position
+                        _dragLower = Math.Abs(x - _lowerX) <= Math.Abs(x - _upperX);
+                        _dragUpper = !_dragLower;
+
+                        float w = Width - 2 * _padding;
+                        float r = (Math.Clamp(x, _padding, Width - _padding) - _padding) / w;
+                        int v = _minimum + (int)Math.Round(r * (_maximum - _minimum));
+
+                        if (_dragLower && v < _upperValue) _lowerValue = v;
+                        if (_dragUpper && v > _lowerValue) _upperValue = v;
+
+                        UpdateThumbs();
+                        OnRangeChangedByUser?.Invoke(_lowerValue, _upperValue);
+                    }
+                    return true;
 
                 case MotionEventActions.Move:
                     if (!_dragLower && !_dragUpper) return false;

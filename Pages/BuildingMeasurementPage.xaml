@@ -13,25 +13,29 @@
     <Label x:Name="MeasuredLocationLabel" Text="[ReplacedByLocationName]"
            Style="{StaticResource PageTitleStyle}"/>
 
-            <StackLayout>
+    <!-- Chart + trim slider share the same grid area so the slider touch zone
+         extends all the way up to the top of the chart. The slider draws its
+         track at the bottom of its allocated height; the invisible upper portion
+         acts as extended hit area. -->
+    <Grid RowDefinitions="150, 55">
         <controls:LineChartView x:Name="lineChartView"
-                             HeightRequest="150"
-                             WidthRequest="400" />
-    </StackLayout>
-
-    <controls:RangeSlider
-     x:Name="TrimSlider"
-     RangeChanged="OnTrimChanged"
-     Minimum="0"
-     Maximum="20"
-     LowerValue="0"
-     UpperValue="20"
-     ThumbSize="30"
-     TrackHeight="15"
-     TrackColor="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-     HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-     WidthRequest="375"
-     HeightRequest="60"/>
+                                Grid.Row="0"
+                                HeightRequest="150"
+                                WidthRequest="400" />
+        <controls:RangeSlider
+            x:Name="TrimSlider"
+            Grid.Row="0" Grid.RowSpan="2"
+            RangeChanged="OnTrimChanged"
+            Minimum="0"
+            Maximum="20"
+            LowerValue="0"
+            UpperValue="20"
+            ThumbSize="30"
+            TrackHeight="15"
+            TrackColor="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+            HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+            WidthRequest="375" />
+    </Grid>
 
             <Border Style="{StaticResource CardBorderStyle}">
                 <VerticalStackLayout Spacing="12">

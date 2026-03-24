@@ -1,16 +1,77 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-             x:Class="IndoorCO2MapAppV2.Pages.MapPage"
-             Title="Map">
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
+               x:Class="IndoorCO2MapAppV2.Pages.MapPage"
+               Title="Map">
 
-    <VerticalStackLayout Padding="30" Spacing="25">
+    <Grid RowDefinitions="Auto, *">
 
-        <Label Text="Hello World — Map" FontSize="24" HorizontalOptions="Center" />
-        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Padding="10,10,10,4" ColumnSpacing="10">
+            <Button Grid.Column="0"
+                    Text="← History"
+                    Clicked="OnNavigateClicked"
+                    CommandParameter="///history"
+                    Style="{StaticResource TonalButtonStyle}" />
+            <Label Grid.Column="1"
+                   Text="Measurement Map"
+                   FontSize="18" FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </Grid>
 
+        <!-- Map area -->
+        <Grid Grid.Row="1">
+            <ContentView x:Name="MapContainer" />
 
-    </VerticalStackLayout>
+            <!-- Label toggle — top-right, standard layer-control position -->
+            <Border HorizontalOptions="End" VerticalOptions="Start" Margin="8"
+                    BackgroundColor="{AppThemeBinding Light=#CCFFFFFF, Dark=#CC1C1C1C}"
+                    StrokeShape="RoundRectangle 6" Padding="8,4">
+                <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                    <Label Text="Labels" FontSize="12" VerticalOptions="Center" />
+                    <CheckBox x:Name="ShowLabelsCheckBox" IsChecked="True"
+                              CheckedChanged="OnShowLabelsChanged" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Detail panel — bottom overlay, hidden until pin tapped -->
+            <Border x:Name="DetailPanel" IsVisible="False"
+                    VerticalOptions="End" Margin="8"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1C1C1C}"
+                    StrokeShape="RoundRectangle 10" Padding="12">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <Label x:Name="DetailLocationName"
+                               Grid.Column="0" FontSize="15" FontAttributes="Bold"
+                               VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                        <Button Grid.Column="1" Text="✕"
+                                Clicked="OnDetailPanelClose"
+                                FontSize="14" WidthRequest="36" HeightRequest="36"
+                                Padding="0"
+                                Style="{StaticResource TonalButtonStyle}" />
+                    </Grid>
+                    <Label x:Name="DetailStats"
+                           Grid.Row="1" FontSize="12"
+                           Style="{StaticResource CaptionLabelStyle}" />
+                    <controls:LineChartView x:Name="DetailChart"
+                           Grid.Row="2" HeightRequest="140" />
+                    <Label x:Name="DetailLastSeen"
+                           Grid.Row="3" FontSize="11"
+                           Style="{StaticResource MicroLabelStyle}" HorizontalOptions="End" />
+                </Grid>
+            </Border>
+
+            <Label x:Name="NoMapLabel"
+                   Text="Map view not available on Windows"
+                   HorizontalOptions="Center" VerticalOptions="Center"
+                   IsVisible="False" />
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="True" IsVisible="True"
+                               VerticalOptions="Center" HorizontalOptions="Center" />
+        </Grid>
+
+    </Grid>
 
 </local:AppPage>

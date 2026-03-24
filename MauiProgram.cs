@@ -1,5 +1,8 @@
 ﻿using CommunityToolkit.Maui;
 using IndoorCO2MapAppV2.Bluetooth;
+#if !WINDOWS
+using SkiaSharp.Views.Maui.Controls.Hosting;
+#endif
 using IndoorCO2MapAppV2.Controls;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
@@ -27,9 +30,10 @@ namespace IndoorCO2MapAppV2
                      handlers.AddHandler(typeof(RangeSlider), typeof(RangeSliderHandler));
                  })
 #endif
-                .UseMauiCommunityToolkit()                
-            // After initializing the .NET MAUI Community Toolkit, optionally add additional fonts
-
+                .UseMauiCommunityToolkit()
+#if !WINDOWS
+                .UseSkiaSharp()
+#endif
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

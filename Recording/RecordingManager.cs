@@ -217,7 +217,7 @@ namespace IndoorCO2MapAppV2.Recording
 
                 // Prefer user-friendly name if available
                 if (!string.IsNullOrWhiteSpace(ActiveRecording.LocationName))
-                    return $"Location: {Localisation.RecordingLocationLabel}{ActiveRecording.LocationName}";
+                    return $"{Localisation.RecordingLocationLabel}{ActiveRecording.LocationName}";
 
                 // Otherwise fall back to OSM type + ID
                 return $"Location ID: {ActiveRecording.NwrType} {ActiveRecording.NwrId}";

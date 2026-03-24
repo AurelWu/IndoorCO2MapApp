@@ -57,7 +57,7 @@ namespace IndoorCO2MapAppV2.Spatial
             }
             else if (UserSettings.Instance.FavouriteLocationKeys.Contains(FavouriteKey))
             {
-                return $"★ {Name} | {(int)Distance}m";
+                return $"{Name} | {(int)Distance}m ★";
             }
             else
             {

@@ -12,8 +12,6 @@ namespace IndoorCO2MapAppV2.Pages
 {
     public partial class BuildingMeasurementPage : AppPage
     {
-        private IDispatcherTimer? _trimDebounceTimer;
-
         private TriState _doorsWindowsState = TriState.Unknown;
         private TriState _ventilationState = TriState.Unknown;
 
@@ -25,8 +23,6 @@ namespace IndoorCO2MapAppV2.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
-            InitializeTrimDebounce();
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
@@ -94,12 +90,6 @@ namespace IndoorCO2MapAppV2.Pages
             base.OnDisappearing();
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
-
-            if (_trimDebounceTimer != null)
-            {
-                _trimDebounceTimer.Stop();
-                _trimDebounceTimer = null;
-            }
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -112,22 +102,6 @@ namespace IndoorCO2MapAppV2.Pages
             lineChartView.WidthRequest = targetWidth;
             TrimSlider.WidthRequest = sliderWidth;
             TrimSlider.ForceLayout();
-        }
-
-        private void InitializeTrimDebounce()
-        {
-            if (_trimDebounceTimer != null)
-                return;
-
-            _trimDebounceTimer = Dispatcher.CreateTimer();
-            _trimDebounceTimer.Interval = TimeSpan.FromMilliseconds(150);
-            _trimDebounceTimer.IsRepeating = false;
-
-            _trimDebounceTimer.Tick += (_, __) =>
-            {
-                _trimDebounceTimer.Stop();
-                _ = UpdateChartAsync();
-            };
         }
 
         private void OnMeasurementUpdated()
@@ -165,11 +139,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
-            if (_trimDebounceTimer == null)
-                return;
-
-            _trimDebounceTimer.Stop();
-            _trimDebounceTimer.Start();
+            _ = UpdateChartAsync();
         }
 
         private async Task CancelMeasurementAsync()
@@ -257,6 +227,8 @@ namespace IndoorCO2MapAppV2.Pages
                         LocationName = rec.LocationName,
                         NWRId = rec.NwrId,
                         NWRType = rec.NwrType,
+                        Latitude = rec.Latitude,
+                        Longitude = rec.Longitude,
                         AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
                         Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm)),
                         DoorWindowState = _doorsWindowsState,

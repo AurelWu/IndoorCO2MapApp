@@ -151,14 +151,14 @@ namespace IndoorCO2MapAppV2.Controls
                 int usableWidth = width - paddingLeft - paddingRight;
                 int usableHeight = height - paddingTop - paddingBottom;
 
-                canvas.FillColor = LineColor;
+                canvas.FillColor = Colors.Black;
 
                 float xScale = usableWidth / (float)(Data.Length - 1);
                 float maxValue = GetMaxDataValue();
                 float minValue = 300;
                 float yScale = usableHeight / (maxValue - minValue);
 
-                canvas.StrokeColor = Colors.Gray;
+                canvas.StrokeColor = Colors.Black;
                 canvas.StrokeSize = 2;
                 for (int i = 0; i < Data.Length; i++)
                 {
@@ -169,8 +169,8 @@ namespace IndoorCO2MapAppV2.Controls
                         canvas.DrawLine(x, height - paddingBottom, x, height - paddingBottom - 5);
                 }
 
-                canvas.StrokeColor = LineColor;
-                canvas.FontColor = LineColor;
+                canvas.StrokeColor = Colors.Black;
+                canvas.FontColor = Colors.Black;
                 canvas.FontSize = 8;
                 canvas.StrokeSize = 2;
                 for (int i = 400; i <= maxValue; i += 400)
@@ -182,7 +182,7 @@ namespace IndoorCO2MapAppV2.Controls
 
                 if (Data.Length > 0)
                 {
-                    canvas.StrokeColor = LineColor;
+                    canvas.StrokeColor = Colors.Black;
                     canvas.StrokeSize = 2;
                     float prevX = paddingLeft;
                     float prevY = height - paddingBottom - (Data[0] - minValue) * yScale;
@@ -198,8 +198,8 @@ namespace IndoorCO2MapAppV2.Controls
                         else
                         {
                             canvas.StrokeDashPattern = [1, 0];
-                            canvas.StrokeColor = LineColor;
-                            canvas.FillColor = LineColor;
+                            canvas.StrokeColor = Colors.Black;
+                            canvas.FillColor = Colors.Black;
                         }
                         float x = paddingLeft + i * xScale;
                         float y = height - paddingBottom - (Data[i] - minValue) * yScale;
@@ -211,7 +211,7 @@ namespace IndoorCO2MapAppV2.Controls
                         if (i < _trimStart || i > _trimEnd)
                             canvas.FillColor = Color.FromRgb(155, 155, 155);
                         else
-                            canvas.FillColor = LineColor;
+                            canvas.FillColor = Colors.Black;
 
                         if (Data.Length <= 25)
                             canvas.FillCircle(x, y, 5);
@@ -222,7 +222,7 @@ namespace IndoorCO2MapAppV2.Controls
                     }
                 }
 
-                canvas.StrokeColor = LineColor;
+                canvas.StrokeColor = Colors.Black;
                 canvas.StrokeDashPattern = [1, 0];
                 canvas.StrokeSize = 2;
                 canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, height - paddingBottom);
