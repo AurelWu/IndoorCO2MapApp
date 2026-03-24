@@ -11,6 +11,12 @@ namespace IndoorCO2MapAppV2.Pages
             BindingContext = new StatisticsViewModel();
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            _ = NavigateAsync("///home");
+            return true;
+        }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();

@@ -272,6 +272,13 @@ namespace IndoorCO2MapAppV2.Pages
 
             try
             {
+                if (!sensorVm.IsDeviceConnected)
+                {
+                    // Provider dropped (e.g. GATT error 133) — reconnect the same device.
+                    Logger.WriteToLog("OnCo2TimerTick: provider gone, reconnecting...");
+                    await sensorVm.SelectDeviceAsync(sensorVm.SelectedDevice);
+                    return;
+                }
                 await sensorVm.RefreshLiveCO2Async();
             }
             catch (Exception ex)

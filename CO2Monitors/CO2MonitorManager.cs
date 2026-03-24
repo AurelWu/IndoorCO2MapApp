@@ -63,7 +63,8 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
-            if (SelectedDevice == device) return;
+            // Skip only if already connected to this device — allow reconnect when provider is gone.
+            if (SelectedDevice == device && ActiveCO2MonitorProvider != null) return;
 
             await _opLock.WaitAsync();
             try

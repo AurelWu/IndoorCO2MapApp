@@ -66,6 +66,9 @@ namespace IndoorCO2MapAppV2.ViewModels
         internal ObservableCollection<BluetoothDeviceModel> Devices { get; }
         internal List<CO2MonitorType> MonitorOptions { get; }
 
+        public bool IsDeviceConnected =>
+            _monitorManager.ActiveCO2MonitorProvider != null && _monitorManager.SelectedDevice != null;
+
         public string SelectedDeviceStatusText
         {
             get
