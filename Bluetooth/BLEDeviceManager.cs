@@ -46,7 +46,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             _adapter = CrossBluetoothLE.Current.Adapter;
         }
 
-        internal async Task StartScanningAsync(int scanDurationMs = 15000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None, string deviceNameFilter ="")
+        internal async Task StartScanningAsync(int scanDurationMs = 20000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None, string deviceNameFilter ="")
         {
             //TODO: if we have a deviceNameFilter set we can probably cancel once we find it
             if (clearBeforeScan)
@@ -110,7 +110,6 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             _adapter.DeviceDiscovered -= Handler; //safeguard probably not strictly needed
             _adapter.DeviceDiscovered += Handler;
-            await _adapter.StopScanningForDevicesAsync(); //might be needed if something still running (or might not be needed)
             try { await _adapter.StartScanningForDevicesAsync(cts.Token); }
             catch (Exception e)
             {

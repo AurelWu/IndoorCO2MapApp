@@ -88,10 +88,10 @@ namespace IndoorCO2MapAppV2.ViewModels
             IsScanning             ? Color.FromArgb("#512BD4") :
                                      Color.FromArgb("#9E9E9E");
 
-        public async Task StartScanAsync(CO2MonitorType filter)
+        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true)
         {
             _monitorManager.ZeroOutCO2Values();
-            await _monitorManager.StartScanAsync(filter);
+            await _monitorManager.StartScanAsync(filter, clearBeforeScan);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)

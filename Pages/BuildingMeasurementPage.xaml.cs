@@ -114,7 +114,11 @@ namespace IndoorCO2MapAppV2.Pages
             var rec = RecordingManager.Instance.ActiveRecording;
             if (rec == null || rec.MeasurementData == null || rec.MeasurementData.Count == 0)
             {
-                await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.IsEnabled = false);
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    if (SubmitButton != null)
+                        SubmitButton.IsEnabled = false;
+                });
                 return;
             }
 

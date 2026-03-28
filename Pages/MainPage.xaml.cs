@@ -179,6 +179,16 @@ namespace IndoorCO2MapAppV2.Pages
         {
             await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
 
+            // Auto-retry once if nothing found — sensor may not have been advertising
+            if (_mainPageViewModel.Sensor.Devices.Count == 0)
+            {
+                Logger.WriteToLog("RefreshSensorListAsync: no devices found, retrying scan...");
+                await CommunityToolkit.Maui.Alerts.Toast.Make("No sensors found, retrying scan…").Show();
+                await _mainPageViewModel.Sensor.StartScanAsync(
+                    _mainPageViewModel.Sensor.SelectedMonitorType,
+                    clearBeforeScan: false);
+            }
+
             var deviceNames = _mainPageViewModel.Sensor.Devices.Select(d => d.Name).ToList();
             CO2MonitorPicker.ItemsSource = deviceNames;
 

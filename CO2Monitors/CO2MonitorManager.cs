@@ -54,9 +54,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public ObservableCollection<BluetoothDeviceModel> Devices { get; }
 
-        public async Task StartScanAsync(CO2MonitorType filter)
+        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true)
         {
             await _ble.StartScanningAsync(
+                clearBeforeScan: clearBeforeScan,
                 filter: filter,
                 deviceNameFilter: UserSettings.Instance.SensorFilter);
         }
