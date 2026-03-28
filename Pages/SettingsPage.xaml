@@ -50,6 +50,7 @@
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
                 <Label Text="Data" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="Use live location service (Overpass, updates every minute)" IsToggled="{Binding UseLiveLocationService}" />
                 <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
                 <c:LabeledSegmentedControl Label="Cache Search Range Override"
                     Items="{Binding CacheRangeOverrideOptions}"

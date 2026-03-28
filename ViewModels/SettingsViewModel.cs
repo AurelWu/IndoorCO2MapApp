@@ -134,6 +134,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             }
         }
 
+        public bool UseLiveLocationService
+        {
+            get => UserSettings.Instance.UseLiveLocationService;
+            set { UserSettings.Instance.UseLiveLocationService = value; OnPropertyChanged(); }
+        }
+
 
 
     }

@@ -104,6 +104,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _cacheRangeOverrideMeters, value);
         }
 
+        private bool _useLiveLocationService = false;
+        public bool UseLiveLocationService
+        {
+            get => _useLiveLocationService;
+            set => SetProperty(ref _useLiveLocationService, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

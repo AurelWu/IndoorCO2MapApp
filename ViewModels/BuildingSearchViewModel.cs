@@ -105,8 +105,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
 #if WINDOWS
             // Fake coordinates for desktop debugging
-            Latitude = 52.521006;
-            Longitude = 13.404944;
+            Latitude = 51.332506;
+            Longitude = 12.373544;
             _lastGpsFixTime = DateTime.UtcNow;
             Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
             Logger.WriteToLog(FormattableString.Invariant($"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}"));
@@ -157,52 +157,80 @@ namespace IndoorCO2MapAppV2.ViewModels
                     return;
                 }
 
-                Status = "Fetching buildings...";
+                double lat = Latitude!.Value;
+                double lon = Longitude!.Value;
 
-                string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(
-                    Latitude!.Value,
-                    Longitude!.Value,
-                    Range
-                );
-
-                string? json = await _fetcher.FetchOverpassDataAsync(query);
-                if (json == null)
+                if (UserSettings.Instance.UseLiveLocationService)
                 {
-                    Status = $"Fetch failed: {FetchState.LastError}";
-                    return;
+                    await SearchBuildingsOverpassAsync(lat, lon);
                 }
-
-                Status = "Fetch OK, parsing...";
-
-                var result = OverpassDataParser.ParseBuildingLocationOverpassResponse( //that method already puts it in location store
-                    json,
-                    Latitude.Value,
-                    Longitude.Value
-                );
-
-                if (UserSettings.Instance.EnableLocationCaching)
+                else
                 {
-                    foreach (var location in result)
-                    {
-                        try
-                        {
-                            await App.LocationCacheDb.InsertOrReplaceAsync(location); //if this is slow we might need to bundle it into a single transaction
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}");
-                        }
-                    }
+                    await SearchBuildingsPMTilesAsync(lat, lon);
                 }
-
-                // Now refresh UI list using filter + sorting
-                RefreshBuildings();
-
-                Status = $"Parsed {Buildings.Count} buildings.";
             }
             finally
             {
                 FetchState.IsFetching = false;
+            }
+        }
+
+        private async Task SearchBuildingsOverpassAsync(double lat, double lon)
+        {
+            Status = "Fetching buildings...";
+
+            string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(lat, lon, Range);
+            string? json = await _fetcher.FetchOverpassDataAsync(query);
+            if (json == null)
+            {
+                Status = $"Fetch failed: {FetchState.LastError}";
+                return;
+            }
+
+            Status = "Fetch OK, parsing...";
+
+            var result = OverpassDataParser.ParseBuildingLocationOverpassResponse(
+                json, lat, lon);
+
+            if (UserSettings.Instance.EnableLocationCaching)
+            {
+                foreach (var location in result)
+                {
+                    try { await App.LocationCacheDb.InsertOrReplaceAsync(location); }
+                    catch (Exception ex) { Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}"); }
+                }
+            }
+
+            RefreshBuildings();
+            Status = $"Parsed {Buildings.Count} buildings.";
+        }
+
+        private async Task SearchBuildingsPMTilesAsync(double lat, double lon)
+        {
+            Status = "Searching buildings (PMTiles)...";
+            try
+            {
+                var results = await PMTilesLocationService.Instance.SearchAsync(lat, lon, Range);
+
+                if (UserSettings.Instance.EnableLocationCaching)
+                {
+                    foreach (var location in results)
+                    {
+                        try { await App.LocationCacheDb.InsertOrReplaceAsync(location); }
+                        catch (Exception ex) { Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}"); }
+                    }
+                }
+
+                LocationStore.Instance.SetBuildingLocations(results.ToHashSet());
+                RefreshBuildings();
+                Status = $"Found {Buildings.Count} buildings.";
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog($"PMTiles search failed: {ex.Message}");
+                FetchState.LastFailed = true;
+                FetchState.LastError = ex.Message;
+                Status = $"Search failed: {ex.Message}";
             }
         }
 
