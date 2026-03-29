@@ -11,6 +11,7 @@ namespace IndoorCO2MapAppV2.Pages
     public partial class AppPage : ContentPage
     {
         // References to bars in the ControlTemplate
+        private Grid? _rootGrid;
         private View? LargeBar;
         private View? SmallBar;
         private View? TickerContainer;
@@ -29,15 +30,44 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnApplyTemplate();
 
-            // Find template elements
-            LargeBar = this.GetTemplateChild("LargeBar") as View;
-            SmallBar = this.GetTemplateChild("SmallBar") as View;
+            _rootGrid       = this.GetTemplateChild("RootGrid")    as Grid;
+            LargeBar        = this.GetTemplateChild("LargeBar")     as View;
+            SmallBar        = this.GetTemplateChild("SmallBar")     as View;
             TickerContainer = this.GetTemplateChild("StatusTicker") as View;
-            TickerLabel = this.GetTemplateChild("TickerLabel") as Label;
+            TickerLabel     = this.GetTemplateChild("TickerLabel")  as Label;
 
-            // Initial update
+            // Push the entire template below the system status bar
+            if (_rootGrid != null)
+            {
+                double top = GetSafeAreaTop();
+                _rootGrid.Padding = new Thickness(0, top, 0, 0);
+            }
+
             UpdateBars();
             UpdateTicker();
+        }
+
+        private static double GetSafeAreaTop()
+        {
+#if ANDROID
+            var activity = Microsoft.Maui.ApplicationModel.Platform.CurrentActivity;
+            if (activity?.Resources != null && activity.Resources.DisplayMetrics != null)
+            {
+                int id = activity.Resources.GetIdentifier("status_bar_height", "dimen", "android");
+                if (id > 0)
+                    return activity.Resources.GetDimensionPixelSize(id)
+                           / (double)activity.Resources.DisplayMetrics.Density;
+            }
+            return 24.0; // safe fallback
+#elif IOS
+            var scene = UIKit.UIApplication.SharedApplication.ConnectedScenes
+                .OfType<UIKit.UIWindowScene>()
+                .FirstOrDefault();
+            var win = scene?.Windows.FirstOrDefault(w => w.IsKeyWindow);
+            return (double)(win?.SafeAreaInsets.Top ?? 20.0);
+#else
+            return 0.0;
+#endif
         }
 
         private void StatusViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

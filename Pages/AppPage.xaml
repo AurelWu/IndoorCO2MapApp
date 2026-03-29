@@ -28,8 +28,8 @@
 
                     <!-- GPS enabled -->
                     <Border Grid.Row="0" Grid.Column="0"
-                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                            StrokeThickness="1"
+                            Stroke="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                            StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
                         <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
@@ -47,8 +47,8 @@
 
                     <!-- Location permission -->
                     <Border Grid.Row="0" Grid.Column="1"
-                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                            StrokeThickness="1"
+                            Stroke="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
                         <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
@@ -66,8 +66,8 @@
 
                     <!-- Bluetooth enabled -->
                     <Border Grid.Row="1" Grid.Column="0"
-                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                            StrokeThickness="1"
+                            Stroke="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                            StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
                         <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
@@ -85,8 +85,8 @@
 
                     <!-- Bluetooth permissions -->
                     <Border Grid.Row="1" Grid.Column="1"
-                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                            StrokeThickness="1"
+                            Stroke="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
                         <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>

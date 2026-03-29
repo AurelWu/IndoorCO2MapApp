@@ -21,6 +21,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             _locationService = LocationServicePlatformProvider.CreateOrUse();
             Range = 100;
+            SortAlphabetical = UserSettings.Instance.SortBuildingsAlphabetical;
 
             // React to Overpass fetch state
             FetchState.PropertyChanged += (_, __) =>
