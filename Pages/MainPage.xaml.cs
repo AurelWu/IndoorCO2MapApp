@@ -28,6 +28,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private IDispatcherTimer? _co2liveValueUpdateTimer;
         private CancellationTokenSource? _gpsCts;
+        private List<BluetoothDeviceModel> _filteredDevices = [];
 
         private bool pageActive = true;
 
@@ -162,9 +163,9 @@ namespace IndoorCO2MapAppV2.Pages
         {
             int index = CO2MonitorPicker.SelectedIndex;
 
-            if (index >= 0 && index < _mainPageViewModel.Sensor.Devices.Count)
+            if (index >= 0 && index < _filteredDevices.Count)
             {
-                var device = _mainPageViewModel.Sensor.Devices[index];
+                var device = _filteredDevices[index];
                 _mainPageViewModel.Sensor.SelectDeviceAsync(device).SafeFireAndForget("DevicePicker_SelectedIndexChanged|_mainPageViewModel.Sensor.SelectDeviceAsync");
             }
         }
@@ -189,14 +190,17 @@ namespace IndoorCO2MapAppV2.Pages
                     clearBeforeScan: false);
             }
 
-            var deviceNames = _mainPageViewModel.Sensor.Devices.Select(d => d.Name).ToList();
-            CO2MonitorPicker.ItemsSource = deviceNames;
+            var sf = UserSettings.Instance.SensorFilter?.Trim() ?? "";
+            _filteredDevices = _mainPageViewModel.Sensor.Devices
+                .Where(d => string.IsNullOrEmpty(sf) ||
+                            d.Name.Contains(sf, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            CO2MonitorPicker.ItemsSource = _filteredDevices.Select(d => d.Name).ToList();
 
-            if (deviceNames.Count > 0)
+            if (_filteredDevices.Count > 0)
             {
                 CO2MonitorPicker.SelectedIndex = 0;
-                var firstDevice = _mainPageViewModel.Sensor.Devices[0];
-                _mainPageViewModel.Sensor.SelectDeviceAsync(firstDevice).SafeFireAndForget("RefreshSensorListAsync|_mainPageViewModel.Sensor.SelectDeviceAsync");
+                _mainPageViewModel.Sensor.SelectDeviceAsync(_filteredDevices[0]).SafeFireAndForget("RefreshSensorListAsync|_mainPageViewModel.Sensor.SelectDeviceAsync");
             }
         }
 

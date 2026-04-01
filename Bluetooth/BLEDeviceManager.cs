@@ -46,7 +46,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
             _adapter = CrossBluetoothLE.Current.Adapter;
         }
 
-        internal async Task StartScanningAsync(int scanDurationMs = 20000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None, string deviceNameFilter ="")
+        internal async Task StartScanningAsync(int scanDurationMs = 20000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
         {
             //TODO: if we have a deviceNameFilter set we can probably cancel once we find it
             if (clearBeforeScan)
@@ -73,7 +73,6 @@ namespace IndoorCO2MapAppV2.Bluetooth
                 try
                 {
                     if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
-                    if (!e.Device.Name.Contains(deviceNameFilter)) return;
 
                     var advertisedServices = e.Device.AdvertisementRecords?
                         .Where(r =>

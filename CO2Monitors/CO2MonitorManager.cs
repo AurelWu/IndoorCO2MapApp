@@ -58,8 +58,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             await _ble.StartScanningAsync(
                 clearBeforeScan: clearBeforeScan,
-                filter: filter,
-                deviceNameFilter: UserSettings.Instance.SensorFilter);
+                filter: filter);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
