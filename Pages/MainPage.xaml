@@ -103,6 +103,7 @@
                     <c:LabeledSegmentedControl Label=""
                         Items="{Binding RecordingModeOptions}"
                         SelectedItem="Building"
+                        FillWidth="True"
                         SelectionChangedCommand="{Binding RecordingModeChangedCommand}" />
 
                     <!-- Building search section -->
@@ -244,6 +245,8 @@
                         <c:LabeledSegmentedControl Label=""
                             Items="{Binding Transit.ModeFilterOptions}"
                             SelectedItem="{Binding Transit.ModeFilter}"
+                            FillWidth="True"
+                            MaxItemsPerRow="3"
                             SelectionChangedCommand="{Binding Transit.ModeFilterChangedCommand}" />
 
                         <!-- Route text filter -->

@@ -21,7 +21,7 @@
                                 WidthRequest="400" />
         <controls:RangeSlider
             x:Name="TrimSlider"
-            Grid.Row="0" Grid.RowSpan="2"
+            Grid.Row="1"
             RangeChanged="OnTrimChanged"
             Minimum="0"
             Maximum="20"
@@ -33,6 +33,32 @@
             HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
             WidthRequest="375" />
     </Grid>
+
+        <!-- Destination (optional) -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Destination (Optional)" Style="{StaticResource SectionLabelStyle}" />
+                <Button x:Name="SearchEndpointButton"
+                        Text="Search Nearby Stops"
+                        Clicked="OnSearchEndpointClicked"
+                        HorizontalOptions="Fill" />
+                <ActivityIndicator x:Name="EndpointSearchIndicator"
+                                   IsVisible="False" IsRunning="False"
+                                   HorizontalOptions="Center" />
+                <Label x:Name="EndpointStatusLabel"
+                       IsVisible="False"
+                       FontSize="13" TextColor="Gray"
+                       HorizontalOptions="Center" />
+                <Border x:Name="EndpointPickerBorder"
+                        Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                        StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                    <Picker x:Name="EndpointPicker"
+                            ItemDisplayBinding="{Binding Name}"
+                            Title="Select destination stop..." />
+                </Border>
+            </VerticalStackLayout>
+        </Border>
 
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="12">

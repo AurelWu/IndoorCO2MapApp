@@ -132,7 +132,17 @@ namespace IndoorCO2MapAppV2.ViewModels
                 Sensor.SelectedDevice.Id,
                 Settings.EnablePreRecording);
 
-            RecordingManager.Instance.ActiveRecording?.AdditionalDataByParameter.TryAdd("vehicleType", route.VehicleType);
+            var rec = RecordingManager.Instance.ActiveRecording;
+            if (rec != null)
+            {
+                rec.AdditionalDataByParameter.TryAdd("vehicleType", route.VehicleType);
+                rec.AdditionalDataByParameter.TryAdd("startNWRType", "node");
+                rec.AdditionalDataByParameter.TryAdd("startID", station.ID.ToString());
+                rec.AdditionalDataByParameter.TryAdd("startName", station.Name);
+                rec.AdditionalDataByParameter.TryAdd("routeNWRType", route.NWRType);
+                rec.AdditionalDataByParameter.TryAdd("routeID", route.ID.ToString());
+                rec.AdditionalDataByParameter.TryAdd("routeName", route.Name);
+            }
 
             await AppPage.NavigateAsync("///transit");
         }

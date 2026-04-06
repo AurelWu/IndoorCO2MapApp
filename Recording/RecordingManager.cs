@@ -289,9 +289,9 @@ namespace IndoorCO2MapAppV2.Recording
                 Latitude = recording.Latitude,
                 Longitude = recording.Longitude,
                 MonitorType = recording.CO2MonitorType,
-                MonitorDeviceId = deviceId,    
-                CO2Values = recording.MeasurementData
-                //DoorWindowState = 
+                MonitorDeviceId = deviceId,
+                CO2Values = recording.MeasurementData,
+                IsTransitRecording = recording.AdditionalDataByParameter.ContainsKey("routeID")
             };
 
             CurrentSnapShot = snapshot;

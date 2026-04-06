@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +17,16 @@ namespace IndoorCO2MapAppV2.Controls
         public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create(
             nameof(SelectedItem), typeof(string), typeof(LabeledSegmentedControl), default(string), BindingMode.TwoWay, propertyChanged: OnSelectedItemChanged);
 
+        public static readonly BindableProperty FillWidthProperty = BindableProperty.Create(
+            nameof(FillWidth), typeof(bool), typeof(LabeledSegmentedControl), false,
+            propertyChanged: (b, _, __) => ((LabeledSegmentedControl)b).UpdateButtons());
+
+        public static readonly BindableProperty MaxItemsPerRowProperty = BindableProperty.Create(
+            nameof(MaxItemsPerRow), typeof(int), typeof(LabeledSegmentedControl), 0,
+            propertyChanged: (b, _, __) => ((LabeledSegmentedControl)b).UpdateButtons());
+
         private readonly Label _labelControl;
-        private readonly HorizontalStackLayout _buttonsLayout;
+        private readonly Grid _buttonsGrid;
         private readonly List<Button> _buttons = new();
 
         private Color _selectedBg  = Color.FromArgb("#512BD4");
@@ -55,12 +63,24 @@ namespace IndoorCO2MapAppV2.Controls
             set => SetValue(SelectedItemProperty, value);
         }
 
+        public bool FillWidth
+        {
+            get => (bool)GetValue(FillWidthProperty);
+            set => SetValue(FillWidthProperty, value);
+        }
+
+        public int MaxItemsPerRow
+        {
+            get => (int)GetValue(MaxItemsPerRowProperty);
+            set => SetValue(MaxItemsPerRowProperty, value);
+        }
+
         public static readonly BindableProperty SelectionChangedCommandProperty =
-    BindableProperty.Create(
-        nameof(SelectionChangedCommand),
-        typeof(ICommand),
-        typeof(LabeledSegmentedControl),
-        default(ICommand));
+            BindableProperty.Create(
+                nameof(SelectionChangedCommand),
+                typeof(ICommand),
+                typeof(LabeledSegmentedControl),
+                default(ICommand));
 
         public ICommand? SelectionChangedCommand
         {
@@ -68,16 +88,15 @@ namespace IndoorCO2MapAppV2.Controls
             set => SetValue(SelectionChangedCommandProperty, value);
         }
 
-
         public LabeledSegmentedControl()
         {
             Spacing = 4;
 
             _labelControl = new Label();
-            _buttonsLayout = new HorizontalStackLayout { Spacing = 4 };
+            _buttonsGrid = new Grid();
 
             Children.Add(_labelControl);
-            Children.Add(_buttonsLayout);
+            Children.Add(_buttonsGrid);
 
             UpdateColors();
             if (Application.Current != null)
@@ -87,55 +106,68 @@ namespace IndoorCO2MapAppV2.Controls
         private static void OnLabelChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = (LabeledSegmentedControl)bindable;
-
             string text = (string)newValue;
-
             control._labelControl.Text = text;
-            control._labelControl.IsVisible = !string.IsNullOrWhiteSpace(text); //hides Label if it has empty text
+            control._labelControl.IsVisible = !string.IsNullOrWhiteSpace(text);
         }
 
         private static void OnItemsChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var control = (LabeledSegmentedControl)bindable;
-            control.UpdateButtons();
+            ((LabeledSegmentedControl)bindable).UpdateButtons();
         }
 
         private static void OnSelectedItemChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = (LabeledSegmentedControl)bindable;
-
             control.UpdateSelection();
-
-            // old event is fine to keep
             control.SelectionChanged?.Invoke(control, (string)newValue);
-
-            // NEW: trigger ICommand
             if (control.SelectionChangedCommand?.CanExecute(newValue) == true)
                 control.SelectionChangedCommand.Execute(newValue);
         }
 
-
-
         private void UpdateButtons()
         {
-            _buttonsLayout.Children.Clear();
+            _buttonsGrid.Children.Clear();
+            _buttonsGrid.ColumnDefinitions.Clear();
+            _buttonsGrid.RowDefinitions.Clear();
             _buttons.Clear();
 
             if (Items == null) return;
 
-            foreach (var item in Items)
+            var items = Items.ToList();
+            int count = items.Count;
+            if (count == 0) return;
+
+            bool useGrid = FillWidth || MaxItemsPerRow > 0;
+            int cols = (MaxItemsPerRow > 0) ? Math.Min(MaxItemsPerRow, count) : count;
+            int rows = (int)Math.Ceiling((double)count / cols);
+
+            for (int c = 0; c < cols; c++)
+                _buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(useGrid ? GridLength.Star : GridLength.Auto));
+
+            for (int r = 0; r < rows; r++)
+                _buttonsGrid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+
+            _buttonsGrid.ColumnSpacing = 4;
+            _buttonsGrid.RowSpacing = 4;
+
+            for (int i = 0; i < count; i++)
             {
+                var item = items[i];
                 var button = new Button
                 {
                     Text = item,
                     Padding = new Thickness(10, 4),
                     BackgroundColor = _unselectedBg,
                     TextColor = _unselectedFg,
+                    HorizontalOptions = useGrid ? LayoutOptions.Fill : LayoutOptions.Start,
                 };
                 button.Clicked += (s, e) => SelectedItem = item;
-
                 _buttons.Add(button);
-                _buttonsLayout.Children.Add(button);
+
+                Grid.SetRow(button, i / cols);
+                Grid.SetColumn(button, i % cols);
+                _buttonsGrid.Children.Add(button);
             }
 
             UpdateSelection();

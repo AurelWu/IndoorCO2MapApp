@@ -4,6 +4,9 @@ using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
+using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Spatial;
+using IndoorCO2MapAppV2.Utility;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -11,6 +14,7 @@ namespace IndoorCO2MapAppV2.Pages
     {
         private TriState _windowsState = TriState.Unknown;
         private TriState _ventilationState = TriState.Unknown;
+        private List<LocationData> _endpointStations = [];
 
         public TransitMeasurementPage()
         {
@@ -134,6 +138,70 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnCustomNotesChanged(object sender, TextChangedEventArgs e) { }
 
+        private void OnSearchEndpointClicked(object sender, EventArgs e)
+            => SearchEndpointAsync().SafeFireAndForget("TransitMeasurementPage|OnSearchEndpointClicked");
+
+        private async Task SearchEndpointAsync()
+        {
+            EndpointSearchIndicator.IsVisible = true;
+            EndpointSearchIndicator.IsRunning = true;
+            EndpointStatusLabel.IsVisible = false;
+            SearchEndpointButton.IsEnabled = false;
+            try
+            {
+#if WINDOWS
+                double lat = 51.332506, lon = 12.373544;
+#else
+                var locationService = LocationServicePlatformProvider.CreateOrUse();
+                var loc = await locationService.GetCurrentLocationAsync();
+                if (loc == null)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        EndpointStatusLabel.Text = "Could not get GPS position.";
+                        EndpointStatusLabel.IsVisible = true;
+                    });
+                    return;
+                }
+                double lat = loc.Latitude, lon = loc.Longitude;
+#endif
+                var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(
+                    lat, lon, 250);
+
+                _endpointStations = stations;
+
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    EndpointPicker.ItemsSource = _endpointStations;
+                    if (_endpointStations.Count > 0)
+                        EndpointPicker.SelectedIndex = 0;
+                    if (_endpointStations.Count == 0)
+                    {
+                        EndpointStatusLabel.Text = "No stops found nearby.";
+                        EndpointStatusLabel.IsVisible = true;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("TransitMeasurementPage|SearchEndpointAsync failed: " + ex.Message);
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    EndpointStatusLabel.Text = "Search failed.";
+                    EndpointStatusLabel.IsVisible = true;
+                });
+            }
+            finally
+            {
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    EndpointSearchIndicator.IsVisible = false;
+                    EndpointSearchIndicator.IsRunning = false;
+                    SearchEndpointButton.IsEnabled = true;
+                });
+            }
+        }
+
         private void OnCancelClicked(object sender, EventArgs e)
         {
             CancelMeasurementAsync().SafeFireAndForget("TransitMeasurementPage|OnCancelClicked|CancelMeasurementAsync");
@@ -188,16 +256,15 @@ namespace IndoorCO2MapAppV2.Pages
                 var rec = RecordingManager.Instance.ActiveRecording;
                 if (rec == null) return;
 
-                var builder = new APISubmissionBuilder(
+                var endpoint = EndpointPicker.SelectedItem as LocationData;
+                var submission = TransitSubmissionData.FromRecording(
                     rec,
                     trimMin: (int)TrimSlider.LowerValue,
-                    trimMax: (int)TrimSlider.UpperValue);
+                    trimMax: (int)TrimSlider.UpperValue,
+                    notes: customNote,
+                    endpoint: endpoint);
 
-                var submission = builder
-                    .WithOpenWindowsDoors(_windowsState)
-                    .WithVentilationSystem(_ventilationState)
-                    .WithNotes(customNote)
-                    .Build();
+                Logger.WriteToLog("TransitMeasurementPage|SubmitRecordingAsync: " + submission.ToJson(), minimumLogMode: IndoorCO2MapAppV2.Enumerations.LogMode.Verbose);
 
                 await Co2ApiGatewayClient.SubmitAsync(submission.ToJson(), SubmissionMode.Transit);
 

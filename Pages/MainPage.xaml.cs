@@ -142,7 +142,8 @@ namespace IndoorCO2MapAppV2.Pages
                 // Show Manual Resume Button => will use active Recording but with current sensor... might need to write that to the active recording
             }
 
-            await NavigateAsync("///building");
+            var snapshot2 = recoveryManager.LoadSnapshot();
+            await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
             return true;
         }
 

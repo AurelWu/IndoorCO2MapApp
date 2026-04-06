@@ -24,7 +24,7 @@
                                 WidthRequest="400" />
         <controls:RangeSlider
             x:Name="TrimSlider"
-            Grid.Row="0" Grid.RowSpan="2"
+            Grid.Row="1"
             RangeChanged="OnTrimChanged"
             Minimum="0"
             Maximum="20"
