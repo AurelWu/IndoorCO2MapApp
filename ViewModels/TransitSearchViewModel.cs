@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Spatial;
 using System.Collections.ObjectModel;
 
@@ -36,6 +37,12 @@ namespace IndoorCO2MapAppV2.ViewModels
         [NotifyPropertyChangedFor(nameof(SearchButtonText))]
         private bool isSearching;
 
+        [ObservableProperty]
+        private RouteGeometry? selectedRouteGeometry;
+
+        [ObservableProperty]
+        private bool isLoadingRouteGeometry;
+
         public string SearchButtonText => IsSearching ? "Searching…" : "Search Transit";
 
         public bool CanStartRecording => SelectedStation != null && SelectedRoute != null;
@@ -53,6 +60,21 @@ namespace IndoorCO2MapAppV2.ViewModels
         }
 
         partial void OnRouteFilterTextChanged(string value) => RefreshRoutes(preserveSelection: true);
+
+        partial void OnSelectedRouteChanged(TransitLineData? value)
+        {
+            SelectedRouteGeometry = null;
+            if (value == null) return;
+            LoadRouteGeometryAsync(value.ID).SafeFireAndForget("TransitSearchViewModel|LoadRouteGeometry");
+        }
+
+        private async Task LoadRouteGeometryAsync(long routeId)
+        {
+            IsLoadingRouteGeometry = true;
+            try { SelectedRouteGeometry = await RT01RouteService.Instance.FetchRouteGeometryAsync(routeId); }
+            catch (Exception ex) { Logger.WriteToLog($"TransitSearchViewModel|LoadRouteGeometryAsync: {ex.Message}"); }
+            finally { IsLoadingRouteGeometry = false; }
+        }
 
         public async Task SearchTransitAsync(double lat, double lon, int rangeMeters, CancellationToken ct = default)
         {

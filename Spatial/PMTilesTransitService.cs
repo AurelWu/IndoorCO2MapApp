@@ -270,6 +270,9 @@ namespace IndoorCO2MapAppV2.Spatial
                     if (seenRouteIds.Contains(osmId)) continue;
                     seenRouteIds.Add(osmId);
 
+                    double dist = Haversine.GetDistanceInMeters(userLat, userLon, flat, flon);
+                    if (dist > rangeMeters) continue;
+
                     if (!props.TryGetValue("name", out var routeName) || string.IsNullOrWhiteSpace(routeName))
                         continue;
 

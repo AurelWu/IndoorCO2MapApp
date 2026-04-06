@@ -11,6 +11,13 @@ using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
 using System.Globalization;
 using System.Threading.Tasks;
+#if !WINDOWS
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Nts;
+using Mapsui.Projections;
+using Mapsui.Tiling;
+#endif
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -31,6 +38,9 @@ namespace IndoorCO2MapAppV2.Pages
         private List<BluetoothDeviceModel> _filteredDevices = [];
 
         private bool pageActive = true;
+#if !WINDOWS
+        private Mapsui.UI.Maui.MapControl? _routePreviewMap;
+#endif
 
 
         public MainPage()
@@ -44,6 +54,98 @@ namespace IndoorCO2MapAppV2.Pages
 
             sortAlphabetical = UserSettings.Instance.SortBuildingsAlphabetical;
 
+            _mainPageViewModel.Transit.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(TransitSearchViewModel.SelectedRouteGeometry))
+                    MainThread.BeginInvokeOnMainThread(RebuildRoutePreview);
+            };
+        }
+
+        private void RebuildRoutePreview()
+        {
+            var geometry = _mainPageViewModel.Transit.SelectedRouteGeometry;
+#if !WINDOWS
+            if (geometry == null || geometry.Points.Count < 2)
+            {
+                RoutePreviewContainer.Content = null;
+                return;
+            }
+
+            var map = new Mapsui.Map();
+            map.Navigator.RotationLock = true;
+            map.Layers.Add(OpenStreetMap.CreateTileLayer());
+
+            // Parse route color (fallback purple)
+            var routeColor = Mapsui.Styles.Color.FromArgb(255, 81, 43, 212);
+            if (!string.IsNullOrEmpty(geometry.Color))
+            {
+                try
+                {
+                    var hex = geometry.Color.TrimStart('#');
+                    if (hex.Length == 6)
+                    {
+                        int r = Convert.ToInt32(hex[..2], 16);
+                        int g = Convert.ToInt32(hex[2..4], 16);
+                        int b = Convert.ToInt32(hex[4..6], 16);
+                        routeColor = Mapsui.Styles.Color.FromArgb(255, r, g, b);
+                    }
+                }
+                catch { }
+            }
+
+            // Route polyline via NTS LineString
+            var coords = geometry.Points
+                .Select(p =>
+                {
+                    var (mx, my) = SphericalMercator.FromLonLat(p.Lon, p.Lat);
+                    return new NetTopologySuite.Geometries.Coordinate(mx, my);
+                }).ToArray();
+
+            var line = new NetTopologySuite.Geometries.GeometryFactory().CreateLineString(coords);
+            var routeFeature = new GeometryFeature { Geometry = line };
+            routeFeature.Styles.Add(new Mapsui.Styles.VectorStyle
+            {
+                Line = new Mapsui.Styles.Pen(routeColor, 3)
+            });
+            map.Layers.Add(new MemoryLayer { Name = "Route", Features = [routeFeature], Style = null });
+
+            // User position dot
+            double? userLat = _mainPageViewModel.BuildingSearch.Latitude;
+            double? userLon = _mainPageViewModel.BuildingSearch.Longitude;
+            if (userLat is double lat && userLon is double lon && lat != 0)
+            {
+                var (ux, uy) = SphericalMercator.FromLonLat(lon, lat);
+                var userPin = new PointFeature(new MPoint(ux, uy));
+                userPin.Styles.Add(new Mapsui.Styles.SymbolStyle
+                {
+                    SymbolType  = Mapsui.Styles.SymbolType.Ellipse,
+                    Fill        = new Mapsui.Styles.Brush(Mapsui.Styles.Color.FromArgb(255, 81, 43, 212)),
+                    Outline     = new Mapsui.Styles.Pen(Mapsui.Styles.Color.White, 2),
+                    SymbolScale = 0.6
+                });
+                map.Layers.Add(new MemoryLayer { Name = "User", Features = [userPin], Style = null });
+            }
+
+            // Fit to route bounds with padding
+            var minLon = geometry.Points.Min(p => p.Lon);
+            var maxLon = geometry.Points.Max(p => p.Lon);
+            var minLat = geometry.Points.Min(p => p.Lat);
+            var maxLat = geometry.Points.Max(p => p.Lat);
+            var (x0, y0) = SphericalMercator.FromLonLat(minLon, minLat);
+            var (x1, y1) = SphericalMercator.FromLonLat(maxLon, maxLat);
+            map.Home = n => n.ZoomToBox(new MRect(x0, y0, x1, y1), MBoxFit.Fit);
+
+            _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map };
+            RoutePreviewContainer.Content = _routePreviewMap;
+#else
+            RoutePreviewContainer.Content = geometry != null ? new Label
+            {
+                Text = $"Route: {geometry.Points.Count} points (map not available on Windows)",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                FontSize = 12
+            } : null;
+#endif
         }
 
         private async Task SearchBuildingsAsync()

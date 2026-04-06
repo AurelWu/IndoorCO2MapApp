@@ -263,6 +263,17 @@
                                     Title="Select route..." />
                         </Border>
 
+                        <!-- Route preview map -->
+                        <ActivityIndicator IsRunning="{Binding Transit.IsLoadingRouteGeometry}"
+                                           IsVisible="{Binding Transit.IsLoadingRouteGeometry}"
+                                           HorizontalOptions="Center" />
+                        <Border HeightRequest="200"
+                                Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                StrokeThickness="1">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <ContentView x:Name="RoutePreviewContainer" />
+                        </Border>
+
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
