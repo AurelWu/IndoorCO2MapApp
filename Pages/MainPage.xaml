@@ -95,103 +95,172 @@
             </Border>
 
 
-            <!-- ===== Card 2: Building search ===== -->
+            <!-- ===== Card 2: Search ===== -->
             <Border Style="{StaticResource CardBorderStyle}">
                 <VerticalStackLayout Spacing="10">
 
-                    <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" />
-                    <HorizontalStackLayout x:Name="SearchRangeStackLayout" Spacing="10" VerticalOptions="Start">
-                        <Label Text="100m" VerticalOptions="Center" />
-                        <RadioButton
-                            x:Name="RadioButton100m"
-                            GroupName="SearchRange"
-                            VerticalOptions="Center"
-                            CheckedChanged="OnSearchRangeChanged"
-                            IsChecked="True" />
-                        <Label Text="250m" VerticalOptions="Center" />
-                        <RadioButton
-                            x:Name="RadioButton250m"
-                            GroupName="SearchRange"
-                            VerticalOptions="Center"
-                            CheckedChanged="OnSearchRangeChanged" />
-                    </HorizontalStackLayout>
+                    <!-- Mode toggle -->
+                    <c:LabeledSegmentedControl Label=""
+                        Items="{Binding RecordingModeOptions}"
+                        SelectedItem="Building"
+                        SelectionChangedCommand="{Binding RecordingModeChangedCommand}" />
 
-                    <Grid x:Name="LocationUpdateGrid" ColumnDefinitions="3*,1*" HorizontalOptions="Fill" ColumnSpacing="10">
-                        <Button
-                            x:Name="UpdateLocationsButton"
-                            Text="{Binding BuildingSearch.SearchButtonText}"
-                            HorizontalOptions="Fill"
-                            Clicked="OnSearchBuildingsClicked"
-                            IsEnabled="{Binding BuildingSearch.CanSearch}"
-                            Grid.Column="0" />
-                        <Button
-                            x:Name="GetCachedLocationsButton"
-                            Text="📁"
-                            FontSize="20"
-                            Clicked="OnGetCachedLocationsClicked"
-                            IsEnabled="{Binding BuildingSearch.HasValidGPS}"
-                            HorizontalOptions="Fill"
-                            Grid.Column="1" />
-                    </Grid>
+                    <!-- Building search section -->
+                    <VerticalStackLayout IsVisible="{Binding IsBuildingMode}" Spacing="10">
 
-                    <HorizontalStackLayout
-                        Spacing="10"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        IsVisible="{Binding FetchState.IsFetching}">
-                        <ActivityIndicator
-                            IsRunning="{Binding FetchState.IsFetching}"
+                        <Label x:Name="LabelSearchRange" Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" />
+                        <HorizontalStackLayout x:Name="SearchRangeStackLayout" Spacing="10" VerticalOptions="Start">
+                            <Label Text="100m" VerticalOptions="Center" />
+                            <RadioButton
+                                x:Name="RadioButton100m"
+                                GroupName="SearchRange"
+                                VerticalOptions="Center"
+                                CheckedChanged="OnSearchRangeChanged"
+                                IsChecked="True" />
+                            <Label Text="250m" VerticalOptions="Center" />
+                            <RadioButton
+                                x:Name="RadioButton250m"
+                                GroupName="SearchRange"
+                                VerticalOptions="Center"
+                                CheckedChanged="OnSearchRangeChanged" />
+                        </HorizontalStackLayout>
+
+                        <Grid x:Name="LocationUpdateGrid" ColumnDefinitions="3*,1*" HorizontalOptions="Fill" ColumnSpacing="10">
+                            <Button
+                                x:Name="UpdateLocationsButton"
+                                Text="{Binding BuildingSearch.SearchButtonText}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnSearchBuildingsClicked"
+                                IsEnabled="{Binding BuildingSearch.CanSearch}"
+                                Grid.Column="0" />
+                            <Button
+                                x:Name="GetCachedLocationsButton"
+                                Text="📁"
+                                FontSize="20"
+                                Clicked="OnGetCachedLocationsClicked"
+                                IsEnabled="{Binding BuildingSearch.HasValidGPS}"
+                                HorizontalOptions="Fill"
+                                Grid.Column="1" />
+                        </Grid>
+
+                        <HorizontalStackLayout
+                            Spacing="10"
                             VerticalOptions="Center"
-                            WidthRequest="20"
-                            HeightRequest="20" />
+                            HorizontalOptions="Center"
+                            IsVisible="{Binding FetchState.IsFetching}">
+                            <ActivityIndicator
+                                IsRunning="{Binding FetchState.IsFetching}"
+                                VerticalOptions="Center"
+                                WidthRequest="20"
+                                HeightRequest="20" />
+                            <Label
+                                Text="{Binding BuildingSearch.Status}"
+                                FontSize="14"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
                         <Label
-                            Text="{Binding BuildingSearch.Status}"
-                            FontSize="14"
-                            VerticalOptions="Center" />
-                    </HorizontalStackLayout>
+                            Text="{Binding FetchState.LastError}"
+                            TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                            FontSize="13"
+                            HorizontalOptions="Center"
+                            IsVisible="{Binding FetchState.LastFailed}" />
 
-                    <Label
-                        Text="{Binding FetchState.LastError}"
-                        TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
-                        FontSize="13"
-                        HorizontalOptions="Center"
-                        IsVisible="{Binding FetchState.LastFailed}" />
+                        <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" HorizontalOptions="Fill">
+                            <Border
+                                BackgroundColor="Transparent"
+                                Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="4"/>
+                                </Border.StrokeShape>
+                                <Picker
+                                    ItemsSource="{Binding BuildingSearch.Buildings}"
+                                    SelectedItem="{Binding BuildingSearch.SelectedBuilding}"
+                                    ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}" />
+                            </Border>
+                            <Label Grid.Column="1"
+                                   Text="★"
+                                   TextColor="{Binding BuildingSearch.StarColor}"
+                                   FontSize="30"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="End"
+                                   Margin="8,0,0,0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BuildingSearch.ToggleFavouriteCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
 
-                    <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" HorizontalOptions="Fill">
-                        <Border
-                            BackgroundColor="Transparent"
-                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                            StrokeThickness="{OnPlatform iOS=2, Android=0}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="4"/>
-                            </Border.StrokeShape>
-                            <Picker
-                                ItemsSource="{Binding BuildingSearch.Buildings}"
-                                SelectedItem="{Binding BuildingSearch.SelectedBuilding}"
-                                ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}" />
+                        <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}"
+                                                   SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}"
+                                                   SelectionChangedCommand="{Binding BuildingSearch.SortModeChangedCommand}"
+                                                   IsVisible="{Binding Settings.DisplaySortingModeToggle}" />
+
+                        <Entry x:Name="FilterEntry"
+                            Placeholder="{x:Static t:Localisation.MainMenuResultFilterPlaceholderText}"
+                            Text="{Binding BuildingSearch.FilterText}"
+                            IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Transit search section -->
+                    <VerticalStackLayout IsVisible="{Binding IsTransitMode}" Spacing="10">
+
+                        <Button Text="{Binding Transit.SearchButtonText}"
+                                Clicked="OnSearchTransitClicked"
+                                IsEnabled="{Binding BuildingSearch.HasValidGPS}"
+                                HorizontalOptions="Fill" />
+
+                        <HorizontalStackLayout
+                            Spacing="10"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            IsVisible="{Binding Transit.IsSearching}">
+                            <ActivityIndicator
+                                IsRunning="{Binding Transit.IsSearching}"
+                                VerticalOptions="Center"
+                                WidthRequest="20"
+                                HeightRequest="20" />
+                        </HorizontalStackLayout>
+
+                        <Label Text="{Binding Transit.Status}"
+                               FontSize="13"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding Transit.IsSearching, Converter={StaticResource InvertBooleanConverter}}" />
+
+                        <!-- Station picker -->
+                        <Label Text="Nearby Station / Stop" FontSize="14" />
+                        <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Picker ItemsSource="{Binding Transit.Stations}"
+                                    SelectedItem="{Binding Transit.SelectedStation}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="Select station or stop..." />
                         </Border>
-                        <Label Grid.Column="1"
-                               Text="★"
-                               TextColor="{Binding BuildingSearch.StarColor}"
-                               FontSize="30"
-                               VerticalOptions="Center"
-                               HorizontalOptions="End"
-                               Margin="8,0,0,0">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BuildingSearch.ToggleFavouriteCommand}"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                    </Grid>
 
-                    <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}"
-                                               SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}"
-                                               SelectionChangedCommand="{Binding BuildingSearch.SortModeChangedCommand}"
-                                               IsVisible="{Binding Settings.DisplaySortingModeToggle}" />
+                        <!-- Route mode filter -->
+                        <c:LabeledSegmentedControl Label=""
+                            Items="{Binding Transit.ModeFilterOptions}"
+                            SelectedItem="{Binding Transit.ModeFilter}"
+                            SelectionChangedCommand="{Binding Transit.ModeFilterChangedCommand}" />
 
-                    <Entry x:Name="FilterEntry"
-                        Placeholder="{x:Static t:Localisation.MainMenuResultFilterPlaceholderText}"
-                        Text="{Binding BuildingSearch.FilterText}"
-                        IsVisible="{Binding Settings.DisplayBuildingFilterInputField}" />
+                        <!-- Route text filter -->
+                        <Entry Placeholder="Search routes by name..."
+                               Text="{Binding Transit.RouteFilterText}" />
+
+                        <!-- Route picker -->
+                        <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Picker ItemsSource="{Binding Transit.FilteredRoutes}"
+                                    SelectedItem="{Binding Transit.SelectedRoute}"
+                                    ItemDisplayBinding="{Binding ShortenedName}"
+                                    Title="Select route..." />
+                        </Border>
+
+                    </VerticalStackLayout>
 
                 </VerticalStackLayout>
             </Border>
@@ -201,17 +270,34 @@
             <Border Style="{StaticResource CardBorderStyle}">
                 <VerticalStackLayout Spacing="10">
 
-                    <Button Text="{x:Static t:Localisation.MainMenuButtonStartBuildingRecording}"
-                        Command="{Binding StartBuildingRecordingCommand}"
-                        IsEnabled="{Binding CanStartBuildingRecording}" />
+                    <!-- Building recording -->
+                    <VerticalStackLayout IsVisible="{Binding IsBuildingMode}" Spacing="10">
+                        <Button Text="{x:Static t:Localisation.MainMenuButtonStartBuildingRecording}"
+                            Command="{Binding StartBuildingRecordingCommand}"
+                            IsEnabled="{Binding CanStartBuildingRecording}" />
 
-                    <Label Text="{Binding StartRecordingBlockedReason}"
-                           IsVisible="{Binding IsStartRecordingBlocked}"
-                           FontSize="12"
-                           TextColor="Gray"
-                           HorizontalOptions="Center" />
+                        <Label Text="{Binding StartRecordingBlockedReason}"
+                               IsVisible="{Binding IsStartRecordingBlocked}"
+                               FontSize="12"
+                               TextColor="Gray"
+                               HorizontalOptions="Center" />
 
-                    <c:LabeledSwitch Text="{x:Static t:Localisation.MainMenuPrerecordingSwitchText}" IsToggled="{Binding Settings.EnablePreRecording}" />
+                        <c:LabeledSwitch Text="{x:Static t:Localisation.MainMenuPrerecordingSwitchText}" IsToggled="{Binding Settings.EnablePreRecording}" />
+                    </VerticalStackLayout>
+
+                    <!-- Transit recording -->
+                    <VerticalStackLayout IsVisible="{Binding IsTransitMode}" Spacing="10">
+                        <Button Text="Start Transit Recording"
+                                Command="{Binding StartTransitRecordingCommand}"
+                                IsEnabled="{Binding CanStartTransitRecording}"
+                                HorizontalOptions="Fill" />
+
+                        <Label Text="{Binding TransitRecordingBlockedReason}"
+                               IsVisible="{Binding IsTransitRecordingBlocked}"
+                               FontSize="12"
+                               TextColor="Gray"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
 
                     <Button
                         x:Name="ManualResumeButton"
@@ -251,12 +337,6 @@
                     Style="{StaticResource TonalButtonStyle}"
                     HorizontalOptions="Fill"
                     IsVisible="{Binding HasRecordings}"/>
-
-            <!--
-            <Button Text="Start Transit Recording" Clicked="OnNavigateClicked" CommandParameter="///transit" HorizontalOptions="Fill"/>
-            <Button Text="Map" Clicked="OnNavigateClicked" CommandParameter="///map" HorizontalOptions="Fill"/>
-            <Button Text="Debug Menu" Clicked="OnNavigateClicked" CommandParameter="///debugMainMenu" HorizontalOptions="Fill"/>
-            -->
 
         </VerticalStackLayout>
     </ScrollView>

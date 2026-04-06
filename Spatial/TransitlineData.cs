@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IndoorCO2MapAppV2.Spatial
 {
-    internal partial record TransitLineData
+    public partial record TransitLineData
     {
         public string VehicleType { get; set; }
         public long ID { get; set; }

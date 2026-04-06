@@ -1,20 +1,123 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
-             x:Class="IndoorCO2MapAppV2.Pages.TransitMeasurementPage"
-             Title="Transit Measurement">
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
+               xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
+               xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
+               xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
+               x:Class="IndoorCO2MapAppV2.Pages.TransitMeasurementPage"
+               Title="Transit Measurement">
 
+    <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
-        <Label Text="Hello World — Transit Measurement"
-               FontSize="24"
-               HorizontalOptions="Center" />
+    <Label x:Name="MeasuredLocationLabel" Text="[Route / Station]"
+           Style="{StaticResource PageTitleStyle}"/>
 
-        <Button Text="Cancel"
+    <Grid RowDefinitions="150, 55">
+        <controls:LineChartView x:Name="lineChartView"
+                                Grid.Row="0"
+                                HeightRequest="150"
+                                WidthRequest="400" />
+        <controls:RangeSlider
+            x:Name="TrimSlider"
+            Grid.Row="0" Grid.RowSpan="2"
+            RangeChanged="OnTrimChanged"
+            Minimum="0"
+            Maximum="20"
+            LowerValue="0"
+            UpperValue="20"
+            ThumbSize="30"
+            TrackHeight="15"
+            TrackColor="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+            HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+            WidthRequest="375" />
+    </Grid>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Windows open? -->
+                <Label Text="{x:Static t:Localisation.RadioButtonLabelOpenDoorsWindows}"
+                       Style="{StaticResource SectionLabelStyle}" />
+
+                <HorizontalStackLayout Spacing="5">
+                    <RadioButton
+                        x:Name="WindowsUnknownRb"
+                        Content="No data"
+                        IsChecked="True"
+                        GroupName="TransitWindowsGroup"
+                        Value="{x:Static enums:TriState.Unknown}"
+                        CheckedChanged="OnWindowsChanged" />
+                    <RadioButton
+                        x:Name="WindowsYesRb"
+                        Content="Yes"
+                        GroupName="TransitWindowsGroup"
+                        Value="{x:Static enums:TriState.Yes}"
+                        CheckedChanged="OnWindowsChanged" />
+                    <RadioButton
+                        x:Name="WindowsNoRb"
+                        Content="No"
+                        GroupName="TransitWindowsGroup"
+                        Value="{x:Static enums:TriState.No}"
+                        CheckedChanged="OnWindowsChanged" />
+                </HorizontalStackLayout>
+
+                <!-- Ventilation / A/C active? -->
+                <Label Text="{x:Static t:Localisation.RadioButtonLabelVentilationSystem}"
+                       Style="{StaticResource SectionLabelStyle}" />
+
+                <HorizontalStackLayout Spacing="5">
+                    <RadioButton
+                        x:Name="VentilationUnknownRb"
+                        Content="No data"
+                        IsChecked="True"
+                        GroupName="TransitVentilationGroup"
+                        Value="{x:Static enums:TriState.Unknown}"
+                        CheckedChanged="OnVentilationChanged" />
+                    <RadioButton
+                        x:Name="VentilationYesRb"
+                        Content="Yes"
+                        GroupName="TransitVentilationGroup"
+                        Value="{x:Static enums:TriState.Yes}"
+                        CheckedChanged="OnVentilationChanged" />
+                    <RadioButton
+                        x:Name="VentilationNoRb"
+                        Content="No"
+                        GroupName="TransitVentilationGroup"
+                        Value="{x:Static enums:TriState.No}"
+                        CheckedChanged="OnVentilationChanged" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Custom Note -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
+                       Style="{StaticResource SectionLabelStyle}" />
+                <Editor
+                    x:Name="NoteEditor"
+                    Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
+                    AutoSize="TextChanges"
+                    MinimumHeightRequest="80"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource InputBackground}, Dark={StaticResource InputBackgroundDark}}"
+                    TextChanged="OnCustomNotesChanged" />
+            </VerticalStackLayout>
+        </Border>
+
+        <Button x:Name="SubmitButton"
+                Text="{x:Static t:Localisation.SubmitRecordingButton}"
+                Clicked="OnSubmitRecordingClicked"
+                HorizontalOptions="Fill" />
+
+        <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
+                Style="{StaticResource SecondaryButtonStyle}"
                 Clicked="OnCancelClicked"
                 HorizontalOptions="Fill" />
 
     </VerticalStackLayout>
+    </ScrollView>
 
 </local:AppPage>

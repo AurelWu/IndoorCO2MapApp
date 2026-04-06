@@ -209,6 +209,24 @@ namespace IndoorCO2MapAppV2.Pages
             SearchBuildingsAsync().SafeFireAndForget("OnSearchBuildingsClicked|SearchBuildingsAsync");
         }
 
+        private void OnSearchTransitClicked(object sender, EventArgs e)
+        {
+            SearchTransitAsync().SafeFireAndForget("OnSearchTransitClicked|SearchTransitAsync");
+        }
+
+        private async Task SearchTransitAsync()
+        {
+            await _mainPageViewModel.BuildingSearch.GetGpsAsync();
+            if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
+            {
+                _mainPageViewModel.Transit.Status = "No valid GPS data yet.";
+                return;
+            }
+            double lat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
+            double lon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
+            await _mainPageViewModel.Transit.SearchTransitAsync(lat, lon, 250);
+        }
+
         private void OnGetCachedLocationsClicked(object sender, EventArgs e)
         {
             LoadCachedLocationsAsync().SafeFireAndForget("OnGetCachedLocationsClicked|LoadCachedLocationsAsync");
