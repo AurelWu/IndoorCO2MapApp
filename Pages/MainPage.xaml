@@ -263,16 +263,31 @@
                                     Title="Select route..." />
                         </Border>
 
-                        <!-- Route preview map -->
-                        <ActivityIndicator IsRunning="{Binding Transit.IsLoadingRouteGeometry}"
-                                           IsVisible="{Binding Transit.IsLoadingRouteGeometry}"
-                                           HorizontalOptions="Center" />
-                        <Border HeightRequest="200"
-                                Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                                StrokeThickness="1">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                            <ContentView x:Name="RoutePreviewContainer" />
-                        </Border>
+                        <!-- Route preview map (hidden entirely when disabled in settings) -->
+                        <VerticalStackLayout IsVisible="{Binding Transit.ShowRoutePreview}" Spacing="4">
+                            <ActivityIndicator IsRunning="{Binding Transit.IsLoadingRouteGeometry}"
+                                               IsVisible="{Binding Transit.IsLoadingRouteGeometry}"
+                                               HorizontalOptions="Center" />
+                            <!-- Collapse header + map — only shown once geometry is loaded -->
+                            <VerticalStackLayout IsVisible="{Binding Transit.HasRouteGeometry}" Spacing="4">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <Label Text="Route Preview" VerticalOptions="Center" FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource SecondaryDarkText}}" />
+                                    <Button Grid.Column="1"
+                                            Text="{Binding Transit.RoutePreviewExpanderText}"
+                                            Command="{Binding Transit.ToggleRoutePreviewExpandedCommand}"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            HeightRequest="32" Padding="10,0" />
+                                </Grid>
+                                <Border IsVisible="{Binding Transit.IsRoutePreviewExpanded}"
+                                        HeightRequest="200"
+                                        Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                        StrokeThickness="1">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <ContentView x:Name="RoutePreviewContainer" />
+                                </Border>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
 
                     </VerticalStackLayout>
 

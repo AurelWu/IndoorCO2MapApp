@@ -38,10 +38,33 @@ namespace IndoorCO2MapAppV2.ViewModels
         private bool isSearching;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasRouteGeometry))]
         private RouteGeometry? selectedRouteGeometry;
 
         [ObservableProperty]
         private bool isLoadingRouteGeometry;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RoutePreviewExpanderText))]
+        private bool isRoutePreviewExpanded = true;
+
+        // Refreshed from UserSettings on MainPage.OnAppearing so the binding updates
+        // when the user toggles the setting and navigates back.
+        private bool _showRoutePreview = PersistentData.UserSettings.Instance.ShowRoutePreview;
+        public bool ShowRoutePreview
+        {
+            get => _showRoutePreview;
+            set
+            {
+                if (_showRoutePreview == value) return;
+                _showRoutePreview = value;
+                OnPropertyChanged();
+                if (!value) SelectedRouteGeometry = null;
+            }
+        }
+
+        public bool HasRouteGeometry => SelectedRouteGeometry != null;
+        public string RoutePreviewExpanderText => IsRoutePreviewExpanded ? "▲" : "▼";
 
         public string SearchButtonText => IsSearching ? "Searching…" : "Search Transit";
 
@@ -59,12 +82,16 @@ namespace IndoorCO2MapAppV2.ViewModels
             });
         }
 
+        [RelayCommand]
+        private void ToggleRoutePreviewExpanded() => IsRoutePreviewExpanded = !IsRoutePreviewExpanded;
+
         partial void OnRouteFilterTextChanged(string value) => RefreshRoutes(preserveSelection: true);
 
         partial void OnSelectedRouteChanged(TransitLineData? value)
         {
             SelectedRouteGeometry = null;
-            if (value == null) return;
+            if (value == null || !ShowRoutePreview) return;
+            IsRoutePreviewExpanded = true;
             LoadRouteGeometryAsync(value.ID).SafeFireAndForget("TransitSearchViewModel|LoadRouteGeometry");
         }
 
@@ -76,13 +103,13 @@ namespace IndoorCO2MapAppV2.ViewModels
             finally { IsLoadingRouteGeometry = false; }
         }
 
-        public async Task SearchTransitAsync(double lat, double lon, int rangeMeters, CancellationToken ct = default)
+        public async Task SearchTransitAsync(double lat, double lon, int searchRange, CancellationToken ct = default)
         {
             IsSearching = true;
             Status = "Searching transit…";
             try
             {
-                var (stations, routes) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, rangeMeters, ct);
+                var (stations, routes) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, searchRange, ct);
 
                 _locationStore.SetTransportStartLocations(stations);
                 _locationStore.SetTransitLines(routes);

@@ -86,6 +86,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
                         _adapter
                     );
 
+                    // Guard against stale additions: detection may complete after the scan
+                    // ended and Devices was already cleared for the next scan.
+                    if (cts.IsCancellationRequested) return;
+
                     if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
                         return;
 
@@ -106,22 +110,23 @@ namespace IndoorCO2MapAppV2.Bluetooth
                 }
             }
 
-
-            _adapter.DeviceDiscovered -= Handler; //safeguard probably not strictly needed
+            _adapter.DeviceDiscovered -= Handler;
             _adapter.DeviceDiscovered += Handler;
-            try { await _adapter.StartScanningForDevicesAsync(cts.Token); }
+            try
+            {
+                await _adapter.StartScanningForDevicesAsync(cts.Token);
+            }
             catch (Exception e)
             {
                 Logger.WriteToLog("Error when calling _adapter.StartScanningForDevicesAsync:" + e.ToString());
+            }
+            finally
+            {
+                if (_adapter.IsScanning)
+                    await _adapter.StopScanningForDevicesAsync();
                 _adapter.DeviceDiscovered -= Handler;
                 IsScanning = false;
             }
-
-            if (_adapter.IsScanning)
-                await _adapter.StopScanningForDevicesAsync();
-
-            _adapter.DeviceDiscovered -= Handler;
-            IsScanning = false;
         }
 
         internal async Task<bool> ConnectDeviceAsync(IDevice device)

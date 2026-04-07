@@ -51,12 +51,12 @@ namespace IndoorCO2MapAppV2.Spatial
         // ── Public API ────────────────────────────────────────────────────────
 
         public async Task<(List<LocationData> stations, List<TransitLineData> routes)> SearchAsync(
-            double userLat, double userLon, int rangeMeters,
+            double userLat, double userLon, int searchRange,
             CancellationToken ct = default)
         {
             var (header, rootDir) = await EnsureHeaderAsync(ct);
-            var tiles = GetTilesForRadius(userLat, userLon, rangeMeters);
-            Logger.WriteToLog($"PMTilesTransit: querying {tiles.Count} tile(s) range={rangeMeters}m");
+            var tiles = GetTilesForRadius(userLat, userLon, searchRange);
+            Logger.WriteToLog($"PMTilesTransit: querying {tiles.Count} tile(s) range={searchRange}m");
 
             // Collect raw data per layer
             var stationCandidates = new Dictionary<string, StationCandidate>(); // key = name (lower)
@@ -75,7 +75,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 var raw = await FetchRangeAsync(start, end, ct);
                 var tileData = Decompress(raw, header.TileComp);
 
-                DecodeTile(tileData, userLat, userLon, tx, ty, rangeMeters,
+                DecodeTile(tileData, userLat, userLon, tx, ty, searchRange,
                     stationCandidates, routeMap, seenRouteIds);
             }
 

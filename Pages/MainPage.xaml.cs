@@ -56,7 +56,8 @@ namespace IndoorCO2MapAppV2.Pages
 
             _mainPageViewModel.Transit.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(TransitSearchViewModel.SelectedRouteGeometry))
+                if (e.PropertyName == nameof(TransitSearchViewModel.SelectedRouteGeometry) ||
+                    e.PropertyName == nameof(TransitSearchViewModel.ShowRoutePreview))
                     MainThread.BeginInvokeOnMainThread(RebuildRoutePreview);
             };
         }
@@ -64,8 +65,13 @@ namespace IndoorCO2MapAppV2.Pages
         private void RebuildRoutePreview()
         {
             var geometry = _mainPageViewModel.Transit.SelectedRouteGeometry;
+            if (!_mainPageViewModel.Transit.ShowRoutePreview || geometry == null)
+            {
+                RoutePreviewContainer.Content = null;
+                return;
+            }
 #if !WINDOWS
-            if (geometry == null || geometry.Points.Count < 2)
+            if (geometry.Points.Count < 2)
             {
                 RoutePreviewContainer.Content = null;
                 return;
@@ -157,6 +163,8 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnAppearing();
             pageActive = true;
+            // Sync the route-preview setting so it updates when user navigates back from Settings
+            _mainPageViewModel.Transit.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
             bool recovered = await TryRecoverRecordingAsync();
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();
@@ -283,11 +291,13 @@ namespace IndoorCO2MapAppV2.Pages
         {
             await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
 
-            // Auto-retry once if nothing found — sensor may not have been advertising
+            // Auto-retry once if nothing found — sensor may not have been advertising.
+            // Wait 3 s before retrying to avoid Android BLE scan throttle (5 starts / 30 s).
             if (_mainPageViewModel.Sensor.Devices.Count == 0)
             {
                 Logger.WriteToLog("RefreshSensorListAsync: no devices found, retrying scan...");
                 await CommunityToolkit.Maui.Alerts.Toast.Make("No sensors found, retrying scan…").Show();
+                await Task.Delay(3000);
                 await _mainPageViewModel.Sensor.StartScanAsync(
                     _mainPageViewModel.Sensor.SelectedMonitorType,
                     clearBeforeScan: false);
@@ -327,7 +337,7 @@ namespace IndoorCO2MapAppV2.Pages
             }
             double lat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
             double lon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
-            await _mainPageViewModel.Transit.SearchTransitAsync(lat, lon, 250);
+            await _mainPageViewModel.Transit.SearchTransitAsync(lat, lon, 400);
         }
 
         private void OnGetCachedLocationsClicked(object sender, EventArgs e)

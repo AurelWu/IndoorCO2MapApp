@@ -77,7 +77,11 @@ namespace IndoorCO2MapAppV2.ViewModels
                     return Localisation.ScanningStatusLabel;
 
                 if (SelectedDevice != null)
+                {
+                    if (CurrentCO2 == 0 && MeasurementInterval == 0)
+                        return "Waiting for sensor data…";
                     return Localisation.CO2LevelsLabel + CurrentCO2 + " | " + Localisation.UpdateInterval + MeasurementInterval + "s";
+                }
 
                 return Localisation.NoSensorFoundStatusLabel;
             }

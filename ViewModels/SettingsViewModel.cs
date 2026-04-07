@@ -140,6 +140,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.UseLiveLocationService = value; OnPropertyChanged(); }
         }
 
+        public bool ShowRoutePreview
+        {
+            get => UserSettings.Instance.ShowRoutePreview;
+            set { UserSettings.Instance.ShowRoutePreview = value; OnPropertyChanged(); }
+        }
+
 
 
     }

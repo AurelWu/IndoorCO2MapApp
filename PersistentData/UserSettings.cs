@@ -111,6 +111,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _useLiveLocationService, value);
         }
 
+        private bool _showRoutePreview = true;
+        public bool ShowRoutePreview
+        {
+            get => _showRoutePreview;
+            set => SetProperty(ref _showRoutePreview, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

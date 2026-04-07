@@ -38,6 +38,14 @@
             </VerticalStackLayout>
         </Border>
 
+        <!-- ===== Transit ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Transit" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="Show Route Preview Map" IsToggled="{Binding ShowRoutePreview}" />
+            </VerticalStackLayout>
+        </Border>
+
         <!-- ===== Recording ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
