@@ -38,6 +38,7 @@ namespace IndoorCO2MapAppV2.Pages
         private List<BluetoothDeviceModel> _filteredDevices = [];
 
         private bool pageActive = true;
+        private int _transitSearchRange = 250;
 #if !WINDOWS
         private Mapsui.UI.Maui.MapControl? _routePreviewMap;
 #endif
@@ -258,6 +259,14 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
 
+        private void OnTransitSearchRangeChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (!e.Value) return;
+            if (_mainPageViewModel == null) return;
+            if (sender == TransitRadioButton250m) _transitSearchRange = 250;
+            if (sender == TransitRadioButton500m) _transitSearchRange = 500;
+        }
+
         private void OnSearchRangeChanged(object sender, CheckedChangedEventArgs e)
         {
             if (!e.Value) return; // only when checked
@@ -337,7 +346,7 @@ namespace IndoorCO2MapAppV2.Pages
             }
             double lat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
             double lon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
-            await _mainPageViewModel.Transit.SearchTransitAsync(lat, lon, 400);
+            await _mainPageViewModel.Transit.SearchTransitAsync(lat, lon, _transitSearchRange);
         }
 
         private void OnGetCachedLocationsClicked(object sender, EventArgs e)

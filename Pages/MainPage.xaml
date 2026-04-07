@@ -106,6 +106,26 @@
                         FillWidth="True"
                         SelectionChangedCommand="{Binding RecordingModeChangedCommand}" />
 
+                    <!-- Transit search range (shown only in transit mode) -->
+                    <VerticalStackLayout IsVisible="{Binding IsTransitMode}" Spacing="10">
+                        <Label Text="{x:Static t:Localisation.SearchRangeLabel}" FontSize="14" />
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Start">
+                            <Label Text="250m" VerticalOptions="Center" />
+                            <RadioButton
+                                x:Name="TransitRadioButton250m"
+                                GroupName="TransitSearchRange"
+                                VerticalOptions="Center"
+                                CheckedChanged="OnTransitSearchRangeChanged"
+                                IsChecked="True" />
+                            <Label Text="500m" VerticalOptions="Center" />
+                            <RadioButton
+                                x:Name="TransitRadioButton500m"
+                                GroupName="TransitSearchRange"
+                                VerticalOptions="Center"
+                                CheckedChanged="OnTransitSearchRangeChanged" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
                     <!-- Building search section -->
                     <VerticalStackLayout IsVisible="{Binding IsBuildingMode}" Spacing="10">
 
@@ -225,20 +245,14 @@
                                 HeightRequest="20" />
                         </HorizontalStackLayout>
 
-                        <Label Text="{Binding Transit.Status}"
-                               FontSize="13"
-                               HorizontalOptions="Center"
-                               IsVisible="{Binding Transit.IsSearching, Converter={StaticResource InvertBooleanConverter}}" />
-
                         <!-- Station picker -->
-                        <Label Text="Nearby Station / Stop" FontSize="14" />
                         <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
                                 StrokeThickness="{OnPlatform iOS=2, Android=0}">
                             <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                             <Picker ItemsSource="{Binding Transit.Stations}"
                                     SelectedItem="{Binding Transit.SelectedStation}"
                                     ItemDisplayBinding="{Binding Name}"
-                                    Title="Select station or stop..." />
+                                    />
                         </Border>
 
                         <!-- Route mode filter -->
@@ -249,10 +263,6 @@
                             MaxItemsPerRow="3"
                             SelectionChangedCommand="{Binding Transit.ModeFilterChangedCommand}" />
 
-                        <!-- Route text filter -->
-                        <Entry Placeholder="Search routes by name..."
-                               Text="{Binding Transit.RouteFilterText}" />
-
                         <!-- Route picker -->
                         <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
                                 StrokeThickness="{OnPlatform iOS=2, Android=0}">
@@ -262,6 +272,10 @@
                                     ItemDisplayBinding="{Binding ShortenedName}"
                                     Title="Select route..." />
                         </Border>
+
+                        <!-- Route text filter -->
+                        <Entry Placeholder="Search routes by name..."
+                               Text="{Binding Transit.RouteFilterText}" />
 
                         <!-- Route preview map (hidden entirely when disabled in settings) -->
                         <VerticalStackLayout IsVisible="{Binding Transit.ShowRoutePreview}" Spacing="4">

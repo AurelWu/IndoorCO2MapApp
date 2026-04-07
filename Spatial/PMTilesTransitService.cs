@@ -220,7 +220,7 @@ namespace IndoorCO2MapAppV2.Spatial
 
             foreach (var fd in rawFeatures)
             {
-                var (px, py, props) = DecodeFeature(fd, keys, values);
+                var (px, py, vertices, props) = DecodeFeature(fd, keys, values);
                 if (props.Count == 0) continue;
 
                 double flon = (tx + (double)px / extent) / Math.Pow(2, Zoom) * 360.0 - 180.0;
@@ -235,7 +235,7 @@ namespace IndoorCO2MapAppV2.Spatial
                     if (!props.TryGetValue("name", out var name) || string.IsNullOrWhiteSpace(name))
                         continue;
 
-                    // Distance filter
+                    // Distance filter (stations are points — first vertex is exact position)
                     double dist = Haversine.GetDistanceInMeters(userLat, userLon, flat, flon);
                     if (dist > rangeMeters) continue;
 
@@ -270,7 +270,8 @@ namespace IndoorCO2MapAppV2.Spatial
                     if (seenRouteIds.Contains(osmId)) continue;
                     seenRouteIds.Add(osmId);
 
-                    double dist = Haversine.GetDistanceInMeters(userLat, userLon, flat, flon);
+                    // Compute shortest distance from user to any segment of this route tile-clip
+                    double dist = MinDistanceToRoute(userLat, userLon, vertices, tx, ty, extent, rangeMeters);
                     if (dist > rangeMeters) continue;
 
                     if (!props.TryGetValue("name", out var routeName) || string.IsNullOrWhiteSpace(routeName))
@@ -349,7 +350,9 @@ namespace IndoorCO2MapAppV2.Spatial
 
         // ── Feature decode ────────────────────────────────────────────────────
 
-        private static (long x, long y, Dictionary<string, string> props) DecodeFeature(
+        // Decodes a MVT feature returning its first point, all geometry vertices, and its tags.
+        // All MoveTo and LineTo coordinates are accumulated with delta encoding.
+        private static (long x, long y, List<(long x, long y)> vertices, Dictionary<string, string> props) DecodeFeature(
             byte[] data, List<string> keys, List<string> values)
         {
             int pos = 0;
@@ -357,6 +360,7 @@ namespace IndoorCO2MapAppV2.Spatial
             bool gotPt = false;
             var props = new Dictionary<string, string>();
             var tagInts = new List<int>();
+            var vertices = new List<(long, long)>();
 
             while (pos < data.Length)
             {
@@ -376,15 +380,27 @@ namespace IndoorCO2MapAppV2.Spatial
                     int len = (int)ReadVarint(data.AsSpan(), ref pos);
                     int end = pos + len;
                     if (end > data.Length) break;
-                    if (!gotPt && pos < end)
+                    // Decode all MoveTo (cmd=1) and LineTo (cmd=2) commands
+                    while (pos < end)
                     {
                         uint cmd = (uint)ReadVarint(data.AsSpan(), ref pos);
-                        if ((cmd & 0x7) == 1 && (cmd >> 3) > 0)
+                        int cmdId = (int)(cmd & 0x7);
+                        int count = (int)(cmd >> 3);
+                        if (cmdId == 1 || cmdId == 2) // MoveTo or LineTo
                         {
-                            curX += DecodeZigZag((uint)ReadVarint(data.AsSpan(), ref pos));
-                            curY += DecodeZigZag((uint)ReadVarint(data.AsSpan(), ref pos));
-                            gotPt = true;
+                            for (int i = 0; i < count && pos < end; i++)
+                            {
+                                curX += DecodeZigZag((uint)ReadVarint(data.AsSpan(), ref pos));
+                                curY += DecodeZigZag((uint)ReadVarint(data.AsSpan(), ref pos));
+                                vertices.Add((curX, curY));
+                                if (!gotPt) gotPt = true;
+                            }
                         }
+                        else if (cmdId == 7) // ClosePath — no coordinates
+                        {
+                            // nothing
+                        }
+                        else break; // unknown command, stop
                     }
                     pos = end;
                 }
@@ -398,7 +414,84 @@ namespace IndoorCO2MapAppV2.Spatial
                     props[keys[ki]] = values[vi];
             }
 
-            return (curX, curY, props);
+            return (curX, curY, vertices, props);
+        }
+
+        // Returns the minimum distance in metres from (userLat, userLon) to the route polyline.
+        // Iterates over adjacent vertex pairs and computes point-to-segment distance.
+        // Segments where both endpoints are more than 2× rangeMeters away are pruned cheaply.
+        private static double MinDistanceToRoute(
+            double userLat, double userLon,
+            List<(long x, long y)> vertices,
+            long tx, long ty, uint extent,
+            int rangeMeters)
+        {
+            double minDist = double.MaxValue;
+            double pruneThreshold = rangeMeters * 2.0;
+
+            if (vertices.Count == 0) return minDist;
+
+            // Convert a tile pixel to (lon, lat)
+            (double lon, double lat) TileToLonLat(long px, long py)
+            {
+                double lon = (tx + (double)px / extent) / Math.Pow(2, Zoom) * 360.0 - 180.0;
+                double merc = Math.PI - 2.0 * Math.PI * (ty + (double)py / extent) / Math.Pow(2, Zoom);
+                double lat = 180.0 / Math.PI * Math.Atan(Math.Sinh(merc));
+                return (lon, lat);
+            }
+
+            var (lonA, latA) = TileToLonLat(vertices[0].x, vertices[0].y);
+            double distA = Haversine.GetDistanceInMeters(userLat, userLon, latA, lonA);
+            minDist = Math.Min(minDist, distA);
+
+            for (int i = 1; i < vertices.Count; i++)
+            {
+                var (lonB, latB) = TileToLonLat(vertices[i].x, vertices[i].y);
+                double distB = Haversine.GetDistanceInMeters(userLat, userLon, latB, lonB);
+
+                // Prune: both endpoints far away — closest point on segment can't be within range
+                if (distA > pruneThreshold && distB > pruneThreshold)
+                {
+                    distA = distB;
+                    lonA = lonB; latA = latB;
+                    continue;
+                }
+
+                // Point-to-segment distance in a flat (lon, lat) approximation.
+                // Good enough at these scales (sub-kilometre).
+                double seg = PointToSegmentDistanceMeters(userLat, userLon, latA, lonA, latB, lonB);
+                minDist = Math.Min(minDist, seg);
+
+                distA = distB;
+                lonA = lonB; latA = latB;
+            }
+
+            return minDist;
+        }
+
+        // Projects P onto segment AB and returns the perpendicular distance if the foot lies
+        // on the segment, otherwise returns min(dist(P,A), dist(P,B)).
+        private static double PointToSegmentDistanceMeters(
+            double pLat, double pLon,
+            double aLat, double aLon,
+            double bLat, double bLon)
+        {
+            // Work in degrees (flat approx), scale lon by cos(lat) for isotropy
+            double cosLat = Math.Cos(pLat * Math.PI / 180.0);
+            double px = pLon * cosLat, py = pLat;
+            double ax = aLon * cosLat, ay = aLat;
+            double bx = bLon * cosLat, by = bLat;
+
+            double dx = bx - ax, dy = by - ay;
+            double lenSq = dx * dx + dy * dy;
+
+            double t = lenSq > 0 ? ((px - ax) * dx + (py - ay) * dy) / lenSq : 0;
+            t = Math.Clamp(t, 0, 1);
+
+            double closestLon = (ax + t * dx) / cosLat;
+            double closestLat = ay + t * dy;
+
+            return Haversine.GetDistanceInMeters(pLat, pLon, closestLat, closestLon);
         }
 
         private static string DecodeValue(byte[] data)
