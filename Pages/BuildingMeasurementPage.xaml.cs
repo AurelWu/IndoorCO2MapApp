@@ -126,10 +126,13 @@ namespace IndoorCO2MapAppV2.Pages
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
-                TrimSlider.Maximum = data.Count - 1;
-                if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
-                    TrimSlider.UpperValue = data.Count - 1;
+                if (data.Count >= 2)
+                {
+                    bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
+                    TrimSlider.Maximum = data.Count - 1;
+                    if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+                        TrimSlider.UpperValue = data.Count - 1;
+                }
 
                 lineChartView.SetData(
                     data,
