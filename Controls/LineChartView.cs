@@ -151,6 +151,20 @@ namespace IndoorCO2MapAppV2.Controls
                 int usableWidth = width - paddingLeft - paddingRight;
                 int usableHeight = height - paddingTop - paddingBottom;
 
+                if (Data.Length < 2)
+                {
+                    // Draw axes skeleton then centered placeholder
+                    canvas.StrokeColor = Colors.Black;
+                    canvas.StrokeSize = 2;
+                    canvas.StrokeDashPattern = [1, 0];
+                    canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, height - paddingBottom);
+                    canvas.DrawLine(paddingLeft, height - paddingBottom, width - paddingRight, height - paddingBottom);
+                    canvas.FontColor = Colors.Gray;
+                    canvas.FontSize = 13;
+                    canvas.DrawString("Waiting for data…", paddingLeft, 0, usableWidth, height, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    return;
+                }
+
                 canvas.FillColor = Colors.Black;
 
                 float xScale = usableWidth / (float)(Data.Length - 1);

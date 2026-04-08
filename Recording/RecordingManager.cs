@@ -256,9 +256,12 @@ namespace IndoorCO2MapAppV2.Recording
                 
             };
 
+            foreach (var kv in snapshot.AdditionalDataByParameter)
+                ActiveRecording.AdditionalDataByParameter.TryAdd(kv.Key, kv.Value);
+
             if(ActiveRecording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString())
             {
-                ActiveRecording.MeasurementData = snapshot.CO2Values;                
+                ActiveRecording.MeasurementData = snapshot.CO2Values;
             }
 
             //TODO: if Inkbird then we also set the Measurementdata to what we had.
@@ -291,7 +294,8 @@ namespace IndoorCO2MapAppV2.Recording
                 MonitorType = recording.CO2MonitorType,
                 MonitorDeviceId = deviceId,
                 CO2Values = recording.MeasurementData,
-                IsTransitRecording = recording.AdditionalDataByParameter.ContainsKey("routeID")
+                IsTransitRecording = recording.AdditionalDataByParameter.ContainsKey("routeID"),
+                AdditionalDataByParameter = new Dictionary<string, string>(recording.AdditionalDataByParameter)
             };
 
             CurrentSnapShot = snapshot;

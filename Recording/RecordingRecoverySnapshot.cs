@@ -29,6 +29,7 @@ namespace IndoorCO2MapAppV2.Recording
 
         public List<CO2Reading> CO2Values { get; set; } = [];
         public bool IsTransitRecording { get; set; } = false;
+        public Dictionary<string, string> AdditionalDataByParameter { get; set; } = new();
         // public double? TrimSliderValueLow { get; set; }
         // public double? TrimSliderValueHigh { get; set; }
     }

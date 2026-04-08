@@ -58,7 +58,8 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel.Transit.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(TransitSearchViewModel.SelectedRouteGeometry) ||
-                    e.PropertyName == nameof(TransitSearchViewModel.ShowRoutePreview))
+                    e.PropertyName == nameof(TransitSearchViewModel.ShowRoutePreview) ||
+                    e.PropertyName == nameof(TransitSearchViewModel.SelectedStation))
                     MainThread.BeginInvokeOnMainThread(RebuildRoutePreview);
             };
         }
@@ -116,21 +117,20 @@ namespace IndoorCO2MapAppV2.Pages
             });
             map.Layers.Add(new MemoryLayer { Name = "Route", Features = [routeFeature], Style = null });
 
-            // User position dot
-            double? userLat = _mainPageViewModel.BuildingSearch.Latitude;
-            double? userLon = _mainPageViewModel.BuildingSearch.Longitude;
-            if (userLat is double lat && userLon is double lon && lat != 0)
+            // Start station pin
+            var startStation = _mainPageViewModel.Transit.SelectedStation;
+            if (startStation != null)
             {
-                var (ux, uy) = SphericalMercator.FromLonLat(lon, lat);
-                var userPin = new PointFeature(new MPoint(ux, uy));
-                userPin.Styles.Add(new Mapsui.Styles.SymbolStyle
+                var (sx, sy) = SphericalMercator.FromLonLat(startStation.Longitude, startStation.Latitude);
+                var startPin = new PointFeature(new MPoint(sx, sy));
+                startPin.Styles.Add(new Mapsui.Styles.SymbolStyle
                 {
                     SymbolType  = Mapsui.Styles.SymbolType.Ellipse,
                     Fill        = new Mapsui.Styles.Brush(Mapsui.Styles.Color.FromArgb(255, 81, 43, 212)),
                     Outline     = new Mapsui.Styles.Pen(Mapsui.Styles.Color.White, 2),
                     SymbolScale = 0.6
                 });
-                map.Layers.Add(new MemoryLayer { Name = "User", Features = [userPin], Style = null });
+                map.Layers.Add(new MemoryLayer { Name = "Station", Features = [startPin], Style = null });
             }
 
             // Fit to route bounds with padding
@@ -140,7 +140,9 @@ namespace IndoorCO2MapAppV2.Pages
             var maxLat = geometry.Points.Max(p => p.Lat);
             var (x0, y0) = SphericalMercator.FromLonLat(minLon, minLat);
             var (x1, y1) = SphericalMercator.FromLonLat(maxLon, maxLat);
-            map.Home = n => n.ZoomToBox(new MRect(x0, y0, x1, y1), MBoxFit.Fit);
+            double padX = (x1 - x0) * 0.05;
+            double padY = (y1 - y0) * 0.05;
+            map.Home = n => n.ZoomToBox(new MRect(x0 - padX, y0 - padY, x1 + padX, y1 + padY), MBoxFit.Fit);
 
             _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map };
             RoutePreviewContainer.Content = _routePreviewMap;

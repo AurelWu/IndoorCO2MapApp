@@ -20,10 +20,14 @@ namespace IndoorCO2MapAppV2.Recording
         private readonly string _startNWRType;
         private readonly long _startID;
         private readonly string _startName;
+        private readonly double _startLat;
+        private readonly double _startLon;
 
         private readonly string _endNWRType;
         private readonly long _endID;
         private readonly string _endName;
+        private readonly double? _endLat;
+        private readonly double? _endLon;
 
         private readonly string _routeNWRType;
         private readonly long _routeID;
@@ -34,8 +38,8 @@ namespace IndoorCO2MapAppV2.Recording
 
         public TransitSubmissionData(
             string sensorType, string sensorId, long startTime,
-            string startNWRType, long startID, string startName,
-            string endNWRType, long endID, string endName,
+            string startNWRType, long startID, string startName, double startLat, double startLon,
+            string endNWRType, long endID, string endName, double? endLat, double? endLon,
             string routeNWRType, long routeID, string routeName,
             List<CO2Reading> measurements, string notes)
         {
@@ -45,9 +49,13 @@ namespace IndoorCO2MapAppV2.Recording
             _startNWRType = startNWRType;
             _startID = startID;
             _startName = startName;
+            _startLat = startLat;
+            _startLon = startLon;
             _endNWRType = endNWRType;
             _endID = endID;
             _endName = endName;
+            _endLat = endLat;
+            _endLon = endLon;
             _routeNWRType = routeNWRType;
             _routeID = routeID;
             _routeName = routeName;
@@ -81,8 +89,12 @@ namespace IndoorCO2MapAppV2.Recording
                 ["ln"] = _routeName,
                 ["c"] = string.Join(";", ppm),
                 ["t"] = string.Join(";", ts),
-                ["la"] = "",
-                ["lo"] = "",
+                ["la"] = _endLat.HasValue
+                    ? $"{_startLat.ToString(CultureInfo.InvariantCulture)};{_endLat.Value.ToString(CultureInfo.InvariantCulture)}"
+                    : _startLat.ToString(CultureInfo.InvariantCulture),
+                ["lo"] = _endLon.HasValue
+                    ? $"{_startLon.ToString(CultureInfo.InvariantCulture)};{_endLon.Value.ToString(CultureInfo.InvariantCulture)}"
+                    : _startLon.ToString(CultureInfo.InvariantCulture),
                 ["a"] = _notes
             };
 
@@ -107,6 +119,8 @@ namespace IndoorCO2MapAppV2.Recording
 
             long.TryParse(d.GetValueOrDefault("startID", "0"), out long startID);
             long.TryParse(d.GetValueOrDefault("routeID", "0"), out long routeID);
+            double.TryParse(d.GetValueOrDefault("startLat", "0"), System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out double startLat);
+            double.TryParse(d.GetValueOrDefault("startLon", "0"), System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out double startLon);
 
             int end = Math.Min(trimMax, rec.MeasurementData.Count - 1);
             var measurements = rec.MeasurementData
@@ -121,9 +135,13 @@ namespace IndoorCO2MapAppV2.Recording
                 startNWRType: startNWRType ?? "node",
                 startID:      startID,
                 startName:    startName ?? "",
+                startLat:     startLat,
+                startLon:     startLon,
                 endNWRType:   endpoint?.Type ?? "",
                 endID:        endpoint?.ID ?? 0,
                 endName:      endpoint?.Name ?? "",
+                endLat:       endpoint?.Latitude,
+                endLon:       endpoint?.Longitude,
                 routeNWRType: routeNWRType ?? "relation",
                 routeID:      routeID,
                 routeName:    routeName ?? "",

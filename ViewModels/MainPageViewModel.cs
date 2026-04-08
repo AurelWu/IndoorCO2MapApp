@@ -139,6 +139,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 rec.AdditionalDataByParameter.TryAdd("startNWRType", "node");
                 rec.AdditionalDataByParameter.TryAdd("startID", station.ID.ToString());
                 rec.AdditionalDataByParameter.TryAdd("startName", station.Name);
+                rec.AdditionalDataByParameter.TryAdd("startLat", station.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                rec.AdditionalDataByParameter.TryAdd("startLon", station.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 rec.AdditionalDataByParameter.TryAdd("routeNWRType", route.NWRType);
                 rec.AdditionalDataByParameter.TryAdd("routeID", route.ID.ToString());
                 rec.AdditionalDataByParameter.TryAdd("routeName", route.Name);

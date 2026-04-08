@@ -251,8 +251,7 @@
                             <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                             <Picker ItemsSource="{Binding Transit.Stations}"
                                     SelectedItem="{Binding Transit.SelectedStation}"
-                                    ItemDisplayBinding="{Binding Name}"
-                                    />
+                                    ItemDisplayBinding="{Binding Name}" />
                         </Border>
 
                         <!-- Route mode filter -->
