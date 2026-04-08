@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find d:ClaudeIndoorCo2MapAppIndoorCO2MapApp -name *.csproj -o -name *.sln)"
+      "Bash(find d:ClaudeIndoorCo2MapAppIndoorCO2MapApp -name *.csproj -o -name *.sln)",
+      "Bash(unzip -l /c/Users/aurel/.nuget/packages/microsoft.maui.controls/10.0.10/microsoft.maui.controls.10.0.10.nupkg)",
+      "Bash(xargs strings:*)",
+      "Bash(find . -name \"*.cs\" -exec grep -l \"class.*Handler.*Android\" {} \\\\;)",
+      "WebSearch"
     ]
   }
 }

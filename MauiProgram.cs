@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 #if ANDROID
 using IndoorCO2MapAppV2.Platforms.Android.Handlers;
 #endif
+#if IOS
+using IndoorCO2MapAppV2.Platforms.iOS.Handlers;
+#endif
 
 
 namespace IndoorCO2MapAppV2
@@ -28,6 +31,12 @@ namespace IndoorCO2MapAppV2
                 .ConfigureMauiHandlers(handlers =>
                  {
                      handlers.AddHandler(typeof(RangeSlider), typeof(RangeSliderHandler));
+                 })
+#endif
+#if IOS
+                .ConfigureMauiHandlers(handlers =>
+                 {
+                     handlers.AddHandler(typeof(MapContainerView), typeof(MapContainerViewHandler));
                  })
 #endif
                 .UseMauiCommunityToolkit()

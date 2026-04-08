@@ -1,4 +1,5 @@
-﻿using IndoorCO2MapAppV2.Spatial;
+﻿using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Spatial;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +15,9 @@ namespace IndoorCO2MapAppV2.UIUtility
                 return "";
 
             string name = loc.Name ?? "(no name)";
-            return $"{name} — {loc.Distance:F0} m";
+            bool isFav = UserSettings.Instance.FavouriteLocationKeys.Contains(loc.FavouriteKey);
+            string prefix = isFav ? "★ " : "";
+            return $"{prefix}{name} — {loc.Distance:F0} m";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

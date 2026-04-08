@@ -297,7 +297,7 @@
                                         Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
                                         StrokeThickness="1">
                                     <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                                    <ContentView x:Name="RoutePreviewContainer" />
+                                    <c:MapContainerView x:Name="RoutePreviewContainer" />
                                 </Border>
                             </VerticalStackLayout>
                         </VerticalStackLayout>
