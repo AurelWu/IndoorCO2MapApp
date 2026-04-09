@@ -61,7 +61,6 @@ namespace IndoorCO2MapAppV2.Spatial
             // Collect raw data per layer
             var stationCandidates = new Dictionary<string, StationCandidate>(); // key = name (lower)
             var routeMap = new Dictionary<long, TransitLineData>(); // key = @id
-            var seenRouteIds = new HashSet<long>();
 
             foreach (var (tx, ty) in tiles)
             {
@@ -76,7 +75,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 var tileData = Decompress(raw, header.TileComp);
 
                 DecodeTile(tileData, userLat, userLon, tx, ty, searchRange,
-                    stationCandidates, routeMap, seenRouteIds);
+                    stationCandidates, routeMap);
             }
 
             // Finalize stations: keep best candidate per name
@@ -155,8 +154,7 @@ namespace IndoorCO2MapAppV2.Spatial
             byte[] data, double userLat, double userLon,
             long tx, long ty, int rangeMeters,
             Dictionary<string, StationCandidate> stationCandidates,
-            Dictionary<long, TransitLineData> routeMap,
-            HashSet<long> seenRouteIds)
+            Dictionary<long, TransitLineData> routeMap)
         {
             int pos = 0;
             while (pos < data.Length)
@@ -167,7 +165,7 @@ namespace IndoorCO2MapAppV2.Spatial
                     int len = (int)ReadVarint(data.AsSpan(), ref pos);
                     DecodeLayerMessage(data.AsSpan(pos, len).ToArray(),
                         userLat, userLon, tx, ty, rangeMeters,
-                        stationCandidates, routeMap, seenRouteIds);
+                        stationCandidates, routeMap);
                     pos += len;
                 }
                 else SkipField(data, ref pos, w);
@@ -178,8 +176,7 @@ namespace IndoorCO2MapAppV2.Spatial
             byte[] data, double userLat, double userLon,
             long tx, long ty, int rangeMeters,
             Dictionary<string, StationCandidate> stationCandidates,
-            Dictionary<long, TransitLineData> routeMap,
-            HashSet<long> seenRouteIds)
+            Dictionary<long, TransitLineData> routeMap)
         {
             int pos = 0;
             uint extent = 4096;
@@ -267,10 +264,12 @@ namespace IndoorCO2MapAppV2.Spatial
                 }
                 else // routes
                 {
-                    if (seenRouteIds.Contains(osmId)) continue;
-                    seenRouteIds.Add(osmId);
+                    // Already accepted from a closer tile-clip — skip
+                    if (routeMap.ContainsKey(osmId)) continue;
 
-                    // Compute shortest distance from user to any segment of this route tile-clip
+                    // Compute shortest distance from user to any segment of this route tile-clip.
+                    // Do NOT mark as "seen" before the distance check: if this tile-clip is too far
+                    // away the route should still be evaluated from other (closer) tiles.
                     double dist = MinDistanceToRoute(userLat, userLon, vertices, tx, ty, extent, rangeMeters);
                     if (dist > rangeMeters) continue;
 
