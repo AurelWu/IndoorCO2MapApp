@@ -17,6 +17,7 @@ namespace IndoorCO2MapAppV2.Pages
         private View? TickerContainer;
         private Label? TickerLabel;
         private CancellationTokenSource? _tickerCts;
+        private CancellationTokenSource? _smallBarCts;
 
         public AppPage()
         {
@@ -106,7 +107,7 @@ namespace IndoorCO2MapAppV2.Pages
             _tickerCts?.Cancel();
             _tickerCts = null;
             if (TickerLabel != null)
-                Microsoft.Maui.Controls.ViewExtensions.CancelAnimations(TickerLabel);
+                Microsoft.Maui.Controls.ViewExtensions.CancelAnimations(TickerLabel); // suppress ambiguity
         }
 
         private async Task RunTickerAsync(CancellationToken ct)
@@ -149,13 +150,49 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void UpdateBars()
         {
-            if (LargeBar == null || SmallBar == null)
-                return;
+            if (LargeBar == null || SmallBar == null) return;
 
             bool allReady = StatusViewModel.Instance.AllReady;
-
             LargeBar.IsVisible = !allReady;
-            SmallBar.IsVisible = allReady;
+
+            if (allReady)
+            {
+                _smallBarCts?.Cancel();
+                _smallBarCts = new CancellationTokenSource();
+
+                SmallBar.Opacity = 1;
+                SmallBar.TranslationY = 0;
+                SmallBar.IsVisible = true;
+
+                _ = DismissSmallBarAsync(_smallBarCts.Token);
+            }
+            else
+            {
+                _smallBarCts?.Cancel();
+                _smallBarCts = null;
+                Microsoft.Maui.Controls.ViewExtensions.CancelAnimations(SmallBar);
+                SmallBar.IsVisible = false;
+            }
+        }
+
+        private async Task DismissSmallBarAsync(CancellationToken ct)
+        {
+            try
+            {
+                await Task.Delay(3000, ct);
+                if (ct.IsCancellationRequested || SmallBar == null) return;
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    var fadeTask = SmallBar.FadeToAsync(0, 400, Easing.CubicIn);
+                    var slideTask = SmallBar.TranslateToAsync(0, -20, 400);
+                    await Task.WhenAll(fadeTask, slideTask);
+                    if (!ct.IsCancellationRequested)
+                        SmallBar.IsVisible = false;
+                    SmallBar.Opacity = 1;
+                    SmallBar.TranslationY = 0;
+                });
+            }
+            catch (TaskCanceledException) { }
         }
 
         // --- Navigation helper ---
