@@ -38,8 +38,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         internal static readonly Dictionary<Guid, CO2MonitorType> MonitorTypeByAdvertisementServiceUuid = new()
         {
-
-            { Guid.Parse("29EA02DF-0C82-9357-414D-2B6BA4941CB8"), CO2MonitorType.Airvalent }
+            // UUID as produced by To128BitGuids() from the Airvalent's raw advertisement bytes
+            // (B8-1C-94-A4-6B-2B-4D-41-93-57-0C-82-29-EA-02-DF parsed via new Guid(byte[]))
+            { Guid.Parse("A4941CB8-2B6B-414D-9357-0C8229EA02DF"), CO2MonitorType.Airvalent }
         };
 
         internal static readonly Dictionary<Guid, CO2MonitorType> MonitorTypeByServiceUuid = new()

@@ -50,7 +50,7 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel = new MainPageViewModel();
             BindingContext = _mainPageViewModel;
 
-            CO2MonitorPicker.ItemsSource = _mainPageViewModel.Sensor.Devices.Select(d => d.Name).ToList();
+            CO2MonitorPicker.ItemsSource = _mainPageViewModel.Sensor.Devices.Select(d => d.DisplayName).ToList();
             CO2MonitorPicker.SelectedIndexChanged += DevicePicker_SelectedIndexChanged;
 
             sortAlphabetical = UserSettings.Instance.SortBuildingsAlphabetical;
@@ -345,7 +345,7 @@ namespace IndoorCO2MapAppV2.Pages
                 .Where(d => string.IsNullOrEmpty(sf) ||
                             d.Name.Contains(sf, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            CO2MonitorPicker.ItemsSource = _filteredDevices.Select(d => d.Name).ToList();
+            CO2MonitorPicker.ItemsSource = _filteredDevices.Select(d => d.DisplayName).ToList();
 
             if (_filteredDevices.Count > 0)
             {

@@ -1,4 +1,6 @@
-﻿using Plugin.BLE.Abstractions.Contracts;
+﻿using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Enumerations;
+using Plugin.BLE.Abstractions.Contracts;
 using System.Text;
 
 namespace IndoorCO2MapAppV2.Bluetooth
@@ -7,6 +9,23 @@ namespace IndoorCO2MapAppV2.Bluetooth
     {
         public string Name => Device.Name ?? "Unknown";
         public string Id => Device.Id.ToString();
+
+        /// <summary>Set by BLEDeviceManager after detection; used for display only.</summary>
+        public CO2MonitorType? DetectedType { get; set; }
+
+        /// <summary>Human-readable label: prepends a friendly type name when the device name is cryptic.</summary>
+        public string DisplayName
+        {
+            get
+            {
+                string raw = Device.Name ?? "Unknown";
+                if (DetectedType is CO2MonitorType t &&
+                    MonitorTypes.SearchStringByMonitorType.TryGetValue(t, out var label) &&
+                    !raw.Contains(label, StringComparison.OrdinalIgnoreCase))
+                    return $"{label} ({raw})";
+                return raw;
+            }
+        }
         public int Rssi => Device.Rssi;
 
 

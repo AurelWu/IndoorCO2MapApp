@@ -294,6 +294,9 @@ namespace IndoorCO2MapAppV2.Recording
                 MonitorType = recording.CO2MonitorType,
                 MonitorDeviceId = deviceId,
                 CO2Values = recording.MeasurementData,
+                DoorWindowState = recording.DoorWindowState,
+                VentilationState = recording.VentilationState,
+                CustomNote = recording.CustomNotes,
                 IsTransitRecording = recording.AdditionalDataByParameter.ContainsKey("routeID"),
                 AdditionalDataByParameter = new Dictionary<string, string>(recording.AdditionalDataByParameter)
             };

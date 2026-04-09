@@ -72,15 +72,6 @@ namespace IndoorCO2MapAppV2.Bluetooth
             {
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(e.Device.Name)) return;
-
-                    var advertisedServices = e.Device.AdvertisementRecords?
-                        .Where(r =>
-                            r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
-                            r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
-                        .SelectMany(r => r.Data.To128BitGuids())
-                        .ToList();
-
                     var detectedType = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(
                         e.Device,
                         _adapter
@@ -93,7 +84,7 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
                         return;
 
-                    var deviceModel = new BluetoothDeviceModel(e.Device);
+                    var deviceModel = new BluetoothDeviceModel(e.Device) { DetectedType = detectedType };
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {

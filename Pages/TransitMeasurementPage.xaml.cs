@@ -33,6 +33,15 @@ namespace IndoorCO2MapAppV2.Pages
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
+
+                var activeRec = RecordingManager.Instance.ActiveRecording;
+                if (activeRec != null)
+                {
+                    NoteEditor.Text = activeRec.CustomNotes;
+                    _windowsState = activeRec.DoorWindowState;
+                    _ventilationState = activeRec.VentilationState;
+                }
+
                 await UpdateChartAsync();
             });
         }
@@ -139,7 +148,13 @@ namespace IndoorCO2MapAppV2.Pages
                 _ventilationState = state;
         }
 
-        private void OnCustomNotesChanged(object sender, TextChangedEventArgs e) { }
+        private void OnCustomNotesChanged(object sender, TextChangedEventArgs e)
+        {
+            RecordingManager.Instance.UpdateRecoverySnapshot(
+                _windowsState,
+                _ventilationState,
+                NoteEditor.Text ?? "");
+        }
 
         private void OnSearchEndpointClicked(object sender, EventArgs e)
             => SearchEndpointAsync().SafeFireAndForget("TransitMeasurementPage|OnSearchEndpointClicked");

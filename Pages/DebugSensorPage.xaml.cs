@@ -26,7 +26,7 @@ namespace IndoorCO2MapAppV2.Pages
             //BluetoothDevicesList.ItemsSource = _viewModel.Devices;
 
             // Bind device list to Picker
-            DevicePicker.ItemsSource = _viewModel.Devices.Select(d => d.Name).ToList();
+            DevicePicker.ItemsSource = _viewModel.Devices.Select(d => d.DisplayName).ToList();
 
 
             // Populate monitor type picker
@@ -77,7 +77,7 @@ namespace IndoorCO2MapAppV2.Pages
         {
             await _viewModel.StartScanAsync(_viewModel.SelectedMonitorType);
 
-            var deviceNames = _viewModel.Devices.Select(d => d.Name).ToList();
+            var deviceNames = _viewModel.Devices.Select(d => d.DisplayName).ToList();
             DevicePicker.ItemsSource = deviceNames;
 
             if (deviceNames.Count > 0)
@@ -124,7 +124,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 while (!token.IsCancellationRequested)
                 {
-                    int amount = System.Random.Shared.Next(10, 61); // 10–60 inclusive
+                    int amount = System.Random.Shared.Next(10, 61); // 10ï¿½60 inclusive
 
                     //Logger.WriteLogToFile($"Retrieving last {amount} history entries");
 
