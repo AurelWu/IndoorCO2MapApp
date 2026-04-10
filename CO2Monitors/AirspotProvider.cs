@@ -37,18 +37,14 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     private const int ResponseCooldownMs = 300;
     private const int CO2_SENTINEL = 0xFFFF;
 
-    // Assumed interval between sensor history entries in minutes.
-    // TODO: read from sensor once the command is known.
-    private const int AssumedEntryIntervalMinutes = 1;
-
     // Number of entries per flash page (fixed by sensor firmware).
     private const int EntriesPerPage = 16;
 
-    // Minutes of history covered by a single full page.
-    private const int MinutesPerPage = EntriesPerPage * AssumedEntryIntervalMinutes; // = 16
-
-    // Minimum gap between consecutive entries to filter out button presses.
-    private const int MinEntryGapSeconds = 60;
+    // Entry interval in seconds — read from device on connect, default 60.
+    // Device byte[6] in FF AA 08 44 response: 0x00=60s, 0x01=180s, 0x03=5s
+    private int _entryIntervalSeconds = 60;
+    private int EntryIntervalMinutes => Math.Max(1, _entryIntervalSeconds / 60);
+    private int SecondsPerPage => EntriesPerPage * _entryIntervalSeconds;
 
     // ================= BLE =================
 
@@ -87,6 +83,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     // ================= REQUEST STATE =================
 
     private volatile TaskCompletionSource<ushort>? _currentPageTcs;
+    private volatile TaskCompletionSource<byte>? _settingsTcs;
 
     // ================= INITIALIZATION =================
 
@@ -149,6 +146,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
             _historyReadInProgress = false;
             _currentPageTcs = null;
+            _settingsTcs = null;
             _pendingPageRequests.Clear();
 
             _notify.ValueUpdated += OnNotify;
@@ -284,6 +282,17 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
             return;
         }
 
+        // ── Settings response: FF AA 08 44 ───────────────────────────────
+        if (data.Length >= 7 &&
+            data[0] == 0xFF && data[1] == 0xAA &&
+            data[2] == 0x08 && data[3] == 0x44)
+        {
+            byte powerModeByte = data[6];
+            Logger.WriteToLog($"PacketRouterLoop|settings response, powerMode byte=0x{powerModeByte:X2}", LogMode.Verbose);
+            _settingsTcs?.TrySetResult(powerModeByte);
+            return;
+        }
+
         Logger.WriteToLog($"PacketRouterLoop|unhandled: {BitConverter.ToString(data)}", LogMode.Verbose);
     }
 
@@ -334,6 +343,7 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     // ================= COMMANDS =================
 
     private static readonly byte[] CMD_CURRENT_PAGE = { 0xFF, 0xAA, 0x0B, 0x01, 0x00 };
+    private static readonly byte[] CMD_SETTINGS_READ = { 0xFF, 0xAA, 0x08, 0x01, 0x01 };
 
     private static byte[] CMD_SET_TIME()
     {
@@ -503,11 +513,10 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
                 Logger.WriteToLog($"CollectHistoryAsync|start page = {_startPage}", LogMode.Verbose);
 
                 // Backfill: calculate how many pages back we need to cover
-                // the requested minutes. Each page holds ~16 entries at 1
-                // min/entry = ~16 minutes. We add 1 extra page as buffer to
-                // make sure we have enough even if the current page is partly
-                // filled.
-                int pagesNeeded = (int)Math.Ceiling((double)minutes / MinutesPerPage) + 1;
+                // the requested minutes. Page duration depends on entry interval.
+                // We add 1 extra page as buffer for a partly-filled current page.
+                int minutesPerPage = Math.Max(1, SecondsPerPage / 60);
+                int pagesNeeded = (int)Math.Ceiling((double)minutes / minutesPerPage) + 1;
                 int oldestPage = Math.Max(1, _startPage.Value - pagesNeeded);
 
                 Logger.WriteToLog($"CollectHistoryAsync|backfill: minutes={minutes}, pagesNeeded={pagesNeeded}, reading pages {oldestPage}..{_startPage.Value}", LogMode.Verbose);
@@ -572,7 +581,6 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         lock (_entriesLock)
         {
             int added = 0;
-            int skipped = 0;
 
             for (int i = 0; i < page.Timestamps.Count && i < page.CO2Values.Count; i++)
             {
@@ -585,25 +593,11 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
                 if (_allEntries.ContainsKey(ts))
                     continue;
 
-                // Filter button-press entries: gap to previous entry < 60s
-                if (_allEntries.Count > 0)
-                {
-                    uint lastTs = _allEntries.Keys.Last();
-                    int gap = (int)(ts - lastTs);
-
-                    if (gap < MinEntryGapSeconds)
-                    {
-                        Logger.WriteToLog($"MergePageEntries|skipping button-press entry ts={ts} co2={co2} (gap={gap}s)", LogMode.Verbose);
-                        skipped++;
-                        continue;
-                    }
-                }
-
                 _allEntries[ts] = co2;
                 added++;
             }
 
-            Logger.WriteToLog($"MergePageEntries|page {page.PageID}: +{added} added, {skipped} skipped, total={_allEntries.Count}", LogMode.Verbose);
+            Logger.WriteToLog($"MergePageEntries|page {page.PageID}: +{added} added, total={_allEntries.Count}", LogMode.Verbose);
         }
     }
 
@@ -614,15 +608,20 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
             if (_allEntries.Count == 0)
                 return Array.Empty<ushort>();
 
-            var values = _allEntries.Values
-                .Select(v => (ushort)Math.Clamp(v, 0, ushort.MaxValue))
+            // Bucket all raw entries into 1-minute windows and average each bucket.
+            // At 5-sec interval: 12 readings → 1 averaged value per minute.
+            // At 1-min / 3-min interval: 1 reading per bucket, passed through unchanged.
+            var buckets = _allEntries
+                .GroupBy(kv => kv.Key / 60)
+                .OrderBy(g => g.Key)
+                .Select(g => (ushort)Math.Clamp((int)g.Average(kv => kv.Value), 0, ushort.MaxValue))
                 .ToArray();
 
-            if (minutes > 0 && values.Length > minutes)
-                values = values.TakeLast(minutes).ToArray();
+            if (minutes > 0 && buckets.Length > minutes)
+                buckets = buckets.TakeLast(minutes).ToArray();
 
-            Logger.WriteToLog($"BuildResult|{values.Length} values (requested={minutes}, stored={_allEntries.Count})", LogMode.Verbose);
-            return values;
+            Logger.WriteToLog($"BuildResult|{buckets.Length} minute-buckets (requested={minutes}, raw={_allEntries.Count})", LogMode.Verbose);
+            return buckets;
         }
     }
 
@@ -634,8 +633,39 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
         return Task.FromResult(CurrentCO2Value);
     }
 
-    protected override Task<int> DoReadUpdateIntervalAsync()
-        => Task.FromResult(-99);
+    protected override async Task<int> DoReadUpdateIntervalAsync()
+    {
+        if (!IsGattValid())
+            return _entryIntervalSeconds;
+
+        var tcs = new TaskCompletionSource<byte>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _settingsTcs = tcs;
+        try
+        {
+            await SendAsync(CMD_SETTINGS_READ, "CMD_SETTINGS_READ");
+            var completed = await Task.WhenAny(tcs.Task, Task.Delay(RequestTimeoutMs));
+            if (completed != tcs.Task)
+            {
+                Logger.WriteToLog("DoReadUpdateIntervalAsync|timeout", LogMode.Verbose);
+                return _entryIntervalSeconds;
+            }
+
+            byte powerModeByte = await tcs.Task;
+            _entryIntervalSeconds = powerModeByte switch
+            {
+                0x00 => 60,
+                0x01 => 180,
+                0x03 => 5,
+                _ => 60
+            };
+            Logger.WriteToLog($"DoReadUpdateIntervalAsync|powerMode=0x{powerModeByte:X2} → {_entryIntervalSeconds}s", LogMode.Verbose);
+            return _entryIntervalSeconds;
+        }
+        finally
+        {
+            Interlocked.CompareExchange(ref _settingsTcs, null, tcs);
+        }
+    }
 
     protected override async Task<ushort[]?> DoReadHistoryAsync(ushort minutes, int interval)
         => await CollectHistoryAsync(minutes);
@@ -679,6 +709,8 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
         _currentPageTcs?.TrySetCanceled();
         _currentPageTcs = null;
+        _settingsTcs?.TrySetCanceled();
+        _settingsTcs = null;
 
         if (_notify != null)
         {
