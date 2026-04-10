@@ -172,6 +172,9 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
             _isActive = true;
             _packetRouterTask = Task.Run(PacketRouterLoop);
 
+            // Sync device clock on every connect (official app does this immediately after subscribe)
+            _ = SendAsync(CMD_SET_TIME(), "CMD_SET_TIME");
+
             // No CMD_LIVE — sensor pushes live CO2 automatically on connect.
 
             if (isReconnect)
@@ -272,6 +275,15 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
             return;
         }
 
+        // ── Time-set ACK: FF AA 04 01 ─────────────────────────────────────
+        if (data.Length >= 5 &&
+            data[0] == 0xFF && data[1] == 0xAA &&
+            data[2] == 0x04 && data[3] == 0x01)
+        {
+            Logger.WriteToLog($"PacketRouterLoop|CMD_SET_TIME ack: {(data[4] == 0x01 ? "OK" : $"0x{data[4]:X2}")}", LogMode.Verbose);
+            return;
+        }
+
         Logger.WriteToLog($"PacketRouterLoop|unhandled: {BitConverter.ToString(data)}", LogMode.Verbose);
     }
 
@@ -322,6 +334,17 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
     // ================= COMMANDS =================
 
     private static readonly byte[] CMD_CURRENT_PAGE = { 0xFF, 0xAA, 0x0B, 0x01, 0x00 };
+
+    private static byte[] CMD_SET_TIME()
+    {
+        var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local);
+        uint ts = (uint)(long)(DateTime.Now - epoch).TotalSeconds;
+        return new byte[]
+        {
+            0xFF, 0xAA, 0x04, 0x04,
+            (byte)(ts >> 24), (byte)(ts >> 16), (byte)(ts >> 8), (byte)(ts & 0xFF)
+        };
+    }
 
     private static byte[] CMD_READ_PAGE(ushort page) => new[]
     {

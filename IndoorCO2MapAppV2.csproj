@@ -45,6 +45,10 @@
 		<DebugType>embedded</DebugType>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<AndroidNativeLibraryPageAlignmentPolicy>PageAligned</AndroidNativeLibraryPageAlignmentPolicy>
+	</PropertyGroup>
 	
 
 	<ItemGroup>
@@ -52,7 +56,7 @@
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1d8eff" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1d8eff" BaseSize="300,300" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -74,6 +78,8 @@
 		<PackageReference Include="Plugin.BLE" Version="3.2.0" />
 		<PackageReference Include="Polly" Version="8.6.4" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.8"
+		    Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
 		<PackageReference Include="ZstdSharp.Port" Version="0.8.1" />
 		<PackageReference Include="Mapsui.Maui" Version="4.1.7"
 		    Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'" />
