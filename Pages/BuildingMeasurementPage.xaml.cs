@@ -126,6 +126,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
+                if (TrimSlider == null || lineChartView == null) return;
                 if (data.Count >= 2)
                 {
                     bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
@@ -280,11 +281,8 @@ namespace IndoorCO2MapAppV2.Pages
         private void UpdateSubmitButtonState()
         {
             var rec = RecordingManager.Instance.ActiveRecording;
-            if (rec == null || rec.MeasurementData == null || TrimSlider == null)
-            {
-                SubmitButton.IsEnabled = false;
+            if (rec == null || rec.MeasurementData == null || TrimSlider == null || SubmitButton == null)
                 return;
-            }
 
             int trimStart = (int)TrimSlider.LowerValue;
             int trimEnd = (int)TrimSlider.UpperValue;

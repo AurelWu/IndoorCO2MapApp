@@ -8,6 +8,13 @@ using System.Text.Json;
 
 namespace IndoorCO2MapAppV2.PersistentData
 {
+    public class TransitRouteFavourite
+    {
+        public long RouteId { get; set; }
+        public double Lat { get; set; }  // GPS rounded to 2 decimals (~1 km bucket)
+        public double Lon { get; set; }
+    }
+
     public sealed class UserSettings : AutoSaveSettings
     {
         private const string FileName = "usersettings.json";
@@ -95,6 +102,13 @@ namespace IndoorCO2MapAppV2.PersistentData
         {
             get => _favouriteLocationKeys;
             set => SetProperty(ref _favouriteLocationKeys, value);
+        }
+
+        private List<TransitRouteFavourite> _favouriteTransitRoutes = new();
+        public List<TransitRouteFavourite> FavouriteTransitRoutes
+        {
+            get => _favouriteTransitRoutes;
+            set => SetProperty(ref _favouriteTransitRoutes, value);
         }
 
         private int _cacheRangeOverrideMeters = -1;

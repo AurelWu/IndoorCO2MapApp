@@ -7,6 +7,7 @@ using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
+using System.Linq;
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -83,6 +84,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
+                if (TrimSlider == null || lineChartView == null) return;
                 if (data.Count >= 2)
                 {
                     bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
@@ -105,11 +107,8 @@ namespace IndoorCO2MapAppV2.Pages
         private void UpdateSubmitButtonState()
         {
             var rec = RecordingManager.Instance.ActiveRecording;
-            if (rec == null || rec.MeasurementData == null || TrimSlider == null)
-            {
-                SubmitButton.IsEnabled = false;
+            if (rec == null || rec.MeasurementData == null || TrimSlider == null || SubmitButton == null)
                 return;
-            }
 
             int trimStart = (int)TrimSlider.LowerValue;
             int trimEnd = (int)TrimSlider.UpperValue;
@@ -156,6 +155,41 @@ namespace IndoorCO2MapAppV2.Pages
                 NoteEditor.Text ?? "");
         }
 
+        private void OnEndpointPickerSelectionChanged(object sender, EventArgs e)
+        {
+            var loc = EndpointPicker.SelectedItem as LocationData;
+            if (loc == null)
+            {
+                EndpointStarLabel.TextColor = Color.FromArgb("#BDBDBD");
+                return;
+            }
+            bool isFav = UserSettings.Instance.FavouriteLocationKeys.Contains(loc.FavouriteKey);
+            EndpointStarLabel.TextColor = isFav ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+        }
+
+        private void OnEndpointStarTapped(object sender, EventArgs e)
+        {
+            var loc = EndpointPicker.SelectedItem as LocationData;
+            if (loc == null) return;
+            var key = loc.FavouriteKey;
+            var keys = new List<string>(UserSettings.Instance.FavouriteLocationKeys);
+            if (!keys.Remove(key)) keys.Add(key);
+            UserSettings.Instance.FavouriteLocationKeys = keys;
+            bool isFav = keys.Contains(key);
+            EndpointStarLabel.TextColor = isFav ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+
+            // Re-sort endpoint list with favourites first
+            if (_endpointStations.Count == 0) return;
+            var sorted = _endpointStations
+                .Where(s => UserSettings.Instance.FavouriteLocationKeys.Contains(s.FavouriteKey))
+                .Concat(_endpointStations.Where(s => !UserSettings.Instance.FavouriteLocationKeys.Contains(s.FavouriteKey)))
+                .ToList();
+            EndpointPicker.ItemsSource = sorted;
+            var stillSelected = sorted.FirstOrDefault(s => s.FavouriteKey == key);
+            if (stillSelected != null)
+                EndpointPicker.SelectedItem = stillSelected;
+        }
+
         private void OnSearchEndpointClicked(object sender, EventArgs e)
             => SearchEndpointAsync().SafeFireAndForget("TransitMeasurementPage|OnSearchEndpointClicked");
 
@@ -190,8 +224,13 @@ namespace IndoorCO2MapAppV2.Pages
 
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    EndpointPicker.ItemsSource = _endpointStations;
-                    if (_endpointStations.Count > 0)
+                    var favKeys = UserSettings.Instance.FavouriteLocationKeys;
+                    var sorted = _endpointStations
+                        .Where(s => favKeys.Contains(s.FavouriteKey))
+                        .Concat(_endpointStations.Where(s => !favKeys.Contains(s.FavouriteKey)))
+                        .ToList();
+                    EndpointPicker.ItemsSource = sorted;
+                    if (sorted.Count > 0)
                         EndpointPicker.SelectedIndex = 0;
                     if (_endpointStations.Count == 0)
                     {

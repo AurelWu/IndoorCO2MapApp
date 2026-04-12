@@ -2,14 +2,20 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Spatial;
+using IndoorCO2MapAppV2.UIUtility;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
     public partial class TransitSearchViewModel : ObservableObject
     {
         private readonly LocationStore _locationStore = LocationStore.Instance;
+
+        private double _searchLat;
+        private double _searchLon;
 
         public List<string> ModeFilterOptions { get; } = ["All", "Bus", "Tram", "Train", "LightRail", "Subway"];
 
@@ -70,6 +76,53 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public bool CanStartRecording => SelectedStation != null && SelectedRoute != null;
 
+        public bool IsStationFavourited =>
+            SelectedStation != null &&
+            UserSettings.Instance.FavouriteLocationKeys.Contains(SelectedStation.FavouriteKey);
+
+        public Color StationStarColor => IsStationFavourited ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+
+        public bool IsRouteFavourited
+        {
+            get
+            {
+                if (SelectedRoute == null) return false;
+                double rLat = Math.Round(_searchLat, 2);
+                double rLon = Math.Round(_searchLon, 2);
+                return UserSettings.Instance.FavouriteTransitRoutes
+                    .Any(f => f.RouteId == SelectedRoute.ID && f.Lat == rLat && f.Lon == rLon);
+            }
+        }
+
+        public Color RouteStarColor => IsRouteFavourited ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+
+        public ICommand ToggleStationFavouriteCommand => new Command(() =>
+        {
+            if (SelectedStation == null) return;
+            var key = SelectedStation.FavouriteKey;
+            var keys = new List<string>(UserSettings.Instance.FavouriteLocationKeys);
+            if (!keys.Remove(key)) keys.Add(key);
+            UserSettings.Instance.FavouriteLocationKeys = keys;
+            OnPropertyChanged(nameof(IsStationFavourited));
+            OnPropertyChanged(nameof(StationStarColor));
+            RefreshStations();
+        });
+
+        public ICommand ToggleRouteFavouriteCommand => new Command(() =>
+        {
+            if (SelectedRoute == null) return;
+            double rLat = Math.Round(_searchLat, 2);
+            double rLon = Math.Round(_searchLon, 2);
+            var favs = new List<TransitRouteFavourite>(UserSettings.Instance.FavouriteTransitRoutes);
+            var existing = favs.FirstOrDefault(f => f.RouteId == SelectedRoute.ID && f.Lat == rLat && f.Lon == rLon);
+            if (existing != null) favs.Remove(existing);
+            else favs.Add(new TransitRouteFavourite { RouteId = SelectedRoute.ID, Lat = rLat, Lon = rLon });
+            UserSettings.Instance.FavouriteTransitRoutes = favs;
+            OnPropertyChanged(nameof(IsRouteFavourited));
+            OnPropertyChanged(nameof(RouteStarColor));
+            RefreshRoutes(preserveSelection: true);
+        });
+
         public IRelayCommand<string> ModeFilterChangedCommand { get; }
 
         public TransitSearchViewModel()
@@ -78,7 +131,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 if (mode == null) return;
                 ModeFilter = mode;
-                RefreshRoutes(preserveSelection: true);
+                RefreshRoutes(preserveSelection: false);
             });
         }
 
@@ -87,8 +140,16 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         partial void OnRouteFilterTextChanged(string value) => RefreshRoutes(preserveSelection: true);
 
+        partial void OnSelectedStationChanged(LocationData? value)
+        {
+            OnPropertyChanged(nameof(IsStationFavourited));
+            OnPropertyChanged(nameof(StationStarColor));
+        }
+
         partial void OnSelectedRouteChanged(TransitLineData? value)
         {
+            OnPropertyChanged(nameof(IsRouteFavourited));
+            OnPropertyChanged(nameof(RouteStarColor));
             SelectedRouteGeometry = null;
             if (value == null || !ShowRoutePreview) return;
             IsRoutePreviewExpanded = true;
@@ -110,6 +171,11 @@ namespace IndoorCO2MapAppV2.ViewModels
             try
             {
                 var (stations, routes) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, searchRange, ct);
+
+                _searchLat = lat;
+                _searchLon = lon;
+                TransitRouteDisplayConverter.CurrentSearchLat = lat;
+                TransitRouteDisplayConverter.CurrentSearchLon = lon;
 
                 _locationStore.SetTransportStartLocations(stations);
                 _locationStore.SetTransitLines(routes);
@@ -137,11 +203,16 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public void RefreshStations()
         {
-            var data = _locationStore.TransportStartLocationData
-                .OrderBy(s => s.Distance);
+            var favKeys = UserSettings.Instance.FavouriteLocationKeys;
+            var list = _locationStore.TransportStartLocationData
+                .OrderBy(s => s.Distance)
+                .ToList();
+
+            var sorted = list.Where(s => favKeys.Contains(s.FavouriteKey))
+                             .Concat(list.Where(s => !favKeys.Contains(s.FavouriteKey)));
 
             Stations.Clear();
-            foreach (var s in data)
+            foreach (var s in sorted)
                 Stations.Add(s);
 
             SelectedStation = Stations.FirstOrDefault();
@@ -172,8 +243,19 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             data = data.OrderBy(r => r.Name);
 
+            double rLat = Math.Round(_searchLat, 2);
+            double rLon = Math.Round(_searchLon, 2);
+            var favIds = UserSettings.Instance.FavouriteTransitRoutes
+                .Where(f => f.Lat == rLat && f.Lon == rLon)
+                .Select(f => f.RouteId)
+                .ToHashSet();
+
+            var list = data.ToList();
+            var sorted = list.Where(r => favIds.Contains(r.ID))
+                             .Concat(list.Where(r => !favIds.Contains(r.ID)));
+
             FilteredRoutes.Clear();
-            foreach (var r in data)
+            foreach (var r in sorted)
                 FilteredRoutes.Add(r);
 
             SelectedRoute = (previous != null && FilteredRoutes.Contains(previous))

@@ -14,6 +14,7 @@
            <ui:ExpandButtonTextConverter x:Key="ExpandButtonTextConverter"/>
            <ui:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
            <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
+           <ui:TransitRouteDisplayConverter x:Key="TransitRouteDisplayConverter" />
            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
                       TrueText="Fetching Data..."
                       FalseText="Search Buildings"/>
@@ -246,13 +247,27 @@
                         </HorizontalStackLayout>
 
                         <!-- Station picker -->
-                        <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                            <Picker ItemsSource="{Binding Transit.Stations}"
-                                    SelectedItem="{Binding Transit.SelectedStation}"
-                                    ItemDisplayBinding="{Binding Name}" />
-                        </Border>
+                        <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" HorizontalOptions="Fill">
+                            <Border Grid.Column="0"
+                                    Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                    StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                <Picker ItemsSource="{Binding Transit.Stations}"
+                                        SelectedItem="{Binding Transit.SelectedStation}"
+                                        ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}" />
+                            </Border>
+                            <Label Grid.Column="1"
+                                   Text="★"
+                                   TextColor="{Binding Transit.StationStarColor}"
+                                   FontSize="30"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="End"
+                                   Margin="8,0,0,0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Transit.ToggleStationFavouriteCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
 
                         <!-- Route mode filter -->
                         <c:LabeledSegmentedControl Label=""
@@ -263,14 +278,28 @@
                             SelectionChangedCommand="{Binding Transit.ModeFilterChangedCommand}" />
 
                         <!-- Route picker -->
-                        <Border Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                            <Picker ItemsSource="{Binding Transit.FilteredRoutes}"
-                                    SelectedItem="{Binding Transit.SelectedRoute}"
-                                    ItemDisplayBinding="{Binding ShortenedName}"
-                                    Title="Select route..." />
-                        </Border>
+                        <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" HorizontalOptions="Fill">
+                            <Border Grid.Column="0"
+                                    Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                    StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                <Picker ItemsSource="{Binding Transit.FilteredRoutes}"
+                                        SelectedItem="{Binding Transit.SelectedRoute}"
+                                        ItemDisplayBinding="{Binding Converter={StaticResource TransitRouteDisplayConverter}}"
+                                        Title="Select route..." />
+                            </Border>
+                            <Label Grid.Column="1"
+                                   Text="★"
+                                   TextColor="{Binding Transit.RouteStarColor}"
+                                   FontSize="30"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="End"
+                                   Margin="8,0,0,0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Transit.ToggleRouteFavouriteCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
 
                         <!-- Route text filter -->
                         <Entry Placeholder="Search routes by name..."

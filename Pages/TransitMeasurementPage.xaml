@@ -5,8 +5,15 @@
                xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
                xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
                xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
+               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
                x:Class="IndoorCO2MapAppV2.Pages.TransitMeasurementPage"
                Title="Transit Measurement">
+
+    <local:AppPage.Resources>
+        <ResourceDictionary>
+            <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
+        </ResourceDictionary>
+    </local:AppPage.Resources>
 
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
@@ -49,14 +56,30 @@
                        IsVisible="False"
                        FontSize="13" TextColor="Gray"
                        HorizontalOptions="Center" />
-                <Border x:Name="EndpointPickerBorder"
-                        Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
-                        StrokeThickness="{OnPlatform iOS=2, Android=0}">
-                    <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
-                    <Picker x:Name="EndpointPicker"
-                            ItemDisplayBinding="{Binding Name}"
-                            Title="Select destination stop..." />
-                </Border>
+                <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" HorizontalOptions="Fill">
+                    <Border Grid.Column="0"
+                            x:Name="EndpointPickerBorder"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                        <Picker x:Name="EndpointPicker"
+                                ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}"
+                                SelectedIndexChanged="OnEndpointPickerSelectionChanged"
+                                Title="Select destination stop..." />
+                    </Border>
+                    <Label x:Name="EndpointStarLabel"
+                           Grid.Column="1"
+                           Text="★"
+                           TextColor="#BDBDBD"
+                           FontSize="30"
+                           VerticalOptions="Center"
+                           HorizontalOptions="End"
+                           Margin="8,0,0,0">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnEndpointStarTapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
             </VerticalStackLayout>
         </Border>
 
