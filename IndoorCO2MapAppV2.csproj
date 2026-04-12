@@ -23,7 +23,7 @@
 		<ApplicationTitle>IndoorCO2MapAppV2</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.indoorco2mapappv2</ApplicationId>
+		<ApplicationId>com.aurelwuensch.indoorco2map</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -50,10 +50,19 @@
 		<AndroidNativeLibraryPageAlignmentPolicy>PageAligned</AndroidNativeLibraryPageAlignmentPolicy>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net10.0-ios'">
-	  <ProvisioningType>automatic</ProvisioningType>
-	  <CodesignKey>Apple Development</CodesignKey>
-	  <CodesignProvision>VS: com.aurelwuensch.indoorco2datacollector Development</CodesignProvision>
+	<!-- iOS Debug: development signing via automatic provisioning -->
+	<PropertyGroup Condition="'$(Configuration)'=='Debug' AND '$(TargetFramework)'=='net10.0-ios'">
+		<ProvisioningType>automatic</ProvisioningType>
+		<CodesignKey>Apple Development</CodesignKey>
+	</PropertyGroup>
+
+	<!-- iOS Release: distribution signing for Ad Hoc / TestFlight -->
+	<PropertyGroup Condition="'$(Configuration)'=='Release' AND '$(TargetFramework)'=='net10.0-ios'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<ProvisioningType>automatic</ProvisioningType>
+		<CodesignKey>Apple Distribution</CodesignKey>
+		<BuildIpa>true</BuildIpa>
+		<ArchiveOnBuild>false</ArchiveOnBuild>
 	</PropertyGroup>
 	
 

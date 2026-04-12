@@ -43,7 +43,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>IndoorCO2DataRecorder</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aurelwuensch.indoorco2datacollector</string>
+	<string>com.aurelwuensch.indoorco2map</string>
 	<key>CFBundleShortVersionString</key>
 	<string>200.0</string>
 	<key>CFBundleVersion</key>
