@@ -28,13 +28,13 @@
 
             <Label Text="Latitude:" Grid.Row="0" Grid.Column="0" VerticalOptions="Center" />
             <Entry x:Name="LatitudeEntry"
-                   Text="51.3397"
+                   Text="51.3406"
                    Keyboard="Numeric"
                    Grid.Row="0" Grid.Column="1" />
 
             <Label Text="Longitude:" Grid.Row="1" Grid.Column="0" VerticalOptions="Center" />
             <Entry x:Name="LongitudeEntry"
-                   Text="12.3731"
+                   Text="12.3747"
                    Keyboard="Numeric"
                    Grid.Row="1" Grid.Column="1" />
 

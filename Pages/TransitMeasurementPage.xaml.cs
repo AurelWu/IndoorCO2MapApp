@@ -202,7 +202,7 @@ namespace IndoorCO2MapAppV2.Pages
             try
             {
 #if WINDOWS
-                double lat = 51.332506, lon = 12.373544;
+                double lat = 51.3406, lon = 12.3747;
 #else
                 var locationService = LocationServicePlatformProvider.CreateOrUse();
                 var loc = await locationService.GetCurrentLocationAsync();

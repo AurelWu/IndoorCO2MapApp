@@ -5,7 +5,11 @@
       "Bash(unzip -l /c/Users/aurel/.nuget/packages/microsoft.maui.controls/10.0.10/microsoft.maui.controls.10.0.10.nupkg)",
       "Bash(xargs strings:*)",
       "Bash(find . -name \"*.cs\" -exec grep -l \"class.*Handler.*Android\" {} \\\\;)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(find /d/Claude/IndoorCo2MapApp/IndoorCO2MapApp -type f \\\\\\( -name \"buildingWhitelist.json\" \\\\\\) -exec head -5 {} \\\\;)",
+      "Bash(grep -E \"\\\\.exe$|\\\\.dll$|\\\\.apk$|\\\\.ipa$|\\\\.app/|bin/|obj/\")",
+      "Bash(find /d/Claude/IndoorCo2MapApp/IndoorCO2MapApp/Platforms -type f \\\\\\( -name \"*.gradle\" -o -name \"AndroidManifest.xml\" \\\\\\) -exec cat {} \\\\;)",
+      "Bash(ls -la /d/Claude/IndoorCo2MapApp/IndoorCO2MapApp/*.user*)"
     ]
   }
 }

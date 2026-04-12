@@ -106,8 +106,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
 #if WINDOWS
             // Fake coordinates for desktop debugging
-            Latitude = 51.308059;
-            Longitude = 12.378279;
+            Latitude = 51.3406;
+            Longitude = 12.3747;
             _lastGpsFixTime = DateTime.UtcNow;
             Status = $"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}";
             Logger.WriteToLog(FormattableString.Invariant($"GPS (mocked on Windows): {Latitude:F6}, {Longitude:F6}"));
