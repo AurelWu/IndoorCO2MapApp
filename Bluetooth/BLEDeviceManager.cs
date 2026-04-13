@@ -125,8 +125,16 @@ namespace IndoorCO2MapAppV2.Bluetooth
             try
             {
                 if (!_adapter.ConnectedDevices.Contains(device))
-                    await _adapter.ConnectToDeviceAsync(device);
+                {
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+                    await _adapter.ConnectToDeviceAsync(device, cancellationToken: cts.Token);
+                }
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.WriteToLog("ConnectDeviceAsync timed out after 12s");
+                return false;
             }
             catch (Exception ex)
             {

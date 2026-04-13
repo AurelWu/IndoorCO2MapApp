@@ -81,6 +81,8 @@ namespace IndoorCO2MapAppV2.Pages
 
             var map = new Mapsui.Map();
             map.Navigator.RotationLock = true;
+            map.Navigator.ZoomLock = true;
+            map.Navigator.PanLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
             // Parse route color (fallback purple)

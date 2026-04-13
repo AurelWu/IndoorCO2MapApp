@@ -64,6 +64,10 @@
 		<BuildIpa>true</BuildIpa>
 		<ArchiveOnBuild>false</ArchiveOnBuild>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net10.0-ios'">
+	  <CodesignKey>Apple Development: Created via API (XXAZ8TB4Q7)</CodesignKey>
+	  <CodesignProvision>VS: com.aurelwuensch.indoorco2map Development</CodesignProvision>
+	</PropertyGroup>
 	
 
 	<ItemGroup>

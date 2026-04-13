@@ -69,6 +69,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             await _opLock.WaitAsync();
             try
             {
+                // Re-check inside the lock: a concurrent call that got here first may have
+                // already reconnected successfully (e.g. after a timeout drained the queue).
+                if (SelectedDevice == device && ActiveCO2MonitorProvider != null)
+                    return;
+
                 if (ActiveCO2MonitorProvider != null)
                 {
                     await ActiveCO2MonitorProvider.DisposeAsync();
