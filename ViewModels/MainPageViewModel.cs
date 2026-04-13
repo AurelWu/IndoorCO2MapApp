@@ -99,7 +99,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                 Sensor.CurrentCO2 <= 0)
                 return;
 
-            var monitorType = CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
+            var monitorType = Sensor.SelectedDevice.DetectedType
+                ?? CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
 
             await RecordingManager.Instance.StartRecordingAsync(
                 BuildingSearch.SelectedBuilding.Type,
@@ -107,7 +108,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                 BuildingSearch.SelectedBuilding.Latitude,
                 BuildingSearch.SelectedBuilding.Longitude,
                 BuildingSearch.SelectedBuilding.Name,
-                monitorType.ToString() ?? "",
+                monitorType?.ToString() ?? "",
                 Sensor.SelectedDevice.Id,
                 Settings.EnablePreRecording
             );
@@ -120,7 +121,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             var route = Transit.SelectedRoute;
             if (station == null || route == null || Sensor.SelectedDevice == null) return;
 
-            var monitorType = CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
+            var monitorType = Sensor.SelectedDevice.DetectedType
+                ?? CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
 
             await RecordingManager.Instance.StartRecordingAsync(
                 route.NWRType,

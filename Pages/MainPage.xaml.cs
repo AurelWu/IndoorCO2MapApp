@@ -81,8 +81,6 @@ namespace IndoorCO2MapAppV2.Pages
 
             var map = new Mapsui.Map();
             map.Navigator.RotationLock = true;
-            map.Navigator.ZoomLock = true;
-            map.Navigator.PanLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
             // Parse route color (fallback purple)
@@ -146,7 +144,7 @@ namespace IndoorCO2MapAppV2.Pages
             double padY = (y1 - y0) * 0.05;
             map.Home = n => n.ZoomToBox(new MRect(x0 - padX, y0 - padY, x1 + padX, y1 + padY), MBoxFit.Fit);
 
-            _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map };
+            _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map, IsEnabled = false };
             RoutePreviewContainer.Content = _routePreviewMap;
 #if ANDROID
             _routePreviewMap.HandlerChanged += (s, e) => SetupAndroidMapTouchInterception();

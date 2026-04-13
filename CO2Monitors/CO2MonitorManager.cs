@@ -85,7 +85,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 SelectedDevice = device;
 
-                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: connecting to {device.Device.Name}...");
+                Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: connecting to {device.DisplayName}...");
                 var connected = await _ble.ConnectDeviceAsync(device.Device);
                 Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: connected={connected}");
                 if (!connected)
