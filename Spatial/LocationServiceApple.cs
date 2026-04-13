@@ -21,25 +21,16 @@ namespace IndoorCO2MapAppV2.Spatial
             };
         }
 
-        public Task<bool> HasLocationPermissionAsync()
+        public async Task<bool> HasLocationPermissionAsync()
         {
-            // Use the instance property (required for iOS 14+)
-            var status = locationManager.AuthorizationStatus;
-
-            bool granted =
-                status == CLAuthorizationStatus.AuthorizedAlways ||
-                status == CLAuthorizationStatus.AuthorizedWhenInUse;
-
-            return Task.FromResult(granted);
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            return status == PermissionStatus.Granted;
         }
 
         public async Task<bool> RequestLocationPermissionAsync()
         {
-            if (!await HasLocationPermissionAsync())
-            {
-                locationManager.RequestWhenInUseAuthorization();
-            }
-            return await HasLocationPermissionAsync();
+            var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            return status == PermissionStatus.Granted;
         }
 
         public Task<bool> IsGpsEnabledAsync()

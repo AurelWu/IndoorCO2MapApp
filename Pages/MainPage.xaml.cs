@@ -225,6 +225,10 @@ namespace IndoorCO2MapAppV2.Pages
                     await btHelper.RequestPermissionsAsync();
 
                 await StatusViewModel.Instance.RefreshNowAsync();
+
+                // Immediately attempt GPS now that permission has been granted/confirmed,
+                // rather than waiting for the first loop iteration (up to 15 seconds).
+                try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
             }
 
             _gpsCts?.Cancel();

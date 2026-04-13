@@ -151,7 +151,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             OnPropertyChanged(nameof(IsRouteFavourited));
             OnPropertyChanged(nameof(RouteStarColor));
             SelectedRouteGeometry = null;
-            if (value == null || !ShowRoutePreview) return;
+            if (value == null || !ShowRoutePreview || UserSettings.Instance.UseLiveLocationService) return;
             IsRoutePreviewExpanded = true;
             LoadRouteGeometryAsync(value.ID).SafeFireAndForget("TransitSearchViewModel|LoadRouteGeometry");
         }
@@ -170,7 +170,19 @@ namespace IndoorCO2MapAppV2.ViewModels
             Status = "Searching transit…";
             try
             {
-                var (stations, routes) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, searchRange, ct);
+                List<LocationData> stations;
+                List<TransitLineData> routes;
+
+                if (UserSettings.Instance.UseLiveLocationService)
+                {
+                    (stations, routes) = await SearchTransitOverpassAsync(lat, lon, searchRange, ct);
+                }
+                else
+                {
+                    var result = await PMTilesTransitService.Instance.SearchAsync(lat, lon, searchRange, ct);
+                    stations = result.stations;
+                    routes = result.routes;
+                }
 
                 _searchLat = lat;
                 _searchLon = lon;
@@ -199,6 +211,19 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 IsSearching = false;
             }
+        }
+
+        private async Task<(List<LocationData> stations, List<TransitLineData> routes)> SearchTransitOverpassAsync(
+            double lat, double lon, int searchRange, CancellationToken ct)
+        {
+            string query = OverpassQueryBuilder.CreateTransportOverpassQuery(lat, lon, searchRange, startLocation: true);
+            string? json = await OverpassDataFetcher.Instance.FetchOverpassDataAsync(query, ct);
+            if (json == null)
+                return ([], []);
+
+            var stations = OverpassDataParser.ParseTransitStopsFromOverpassResponse(json, lat, lon);
+            var routes = OverpassDataParser.ParseTransitLinesFromOverpassResponse(json, lat, lon);
+            return (stations, routes);
         }
 
         public void RefreshStations()
