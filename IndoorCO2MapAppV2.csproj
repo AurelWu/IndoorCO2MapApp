@@ -56,16 +56,17 @@
 		<CodesignKey>Apple Development</CodesignKey>
 	</PropertyGroup>
 
-	<!-- iOS Release: distribution signing for Ad Hoc / TestFlight -->
+	<!-- iOS Release: distribution signing for App Store -->
 	<PropertyGroup Condition="'$(Configuration)'=='Release' AND '$(TargetFramework)'=='net10.0-ios'">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<ProvisioningType>automatic</ProvisioningType>
+		<ProvisioningType>manual</ProvisioningType>
 		<CodesignKey>Apple Distribution</CodesignKey>
+		<CodesignProvision>Indoorco2map2026Provisioning</CodesignProvision>
 		<BuildIpa>true</BuildIpa>
 		<ArchiveOnBuild>false</ArchiveOnBuild>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)'=='net10.0-ios'">
-	  <CodesignKey>Apple Development: Created via API (XXAZ8TB4Q7)</CodesignKey>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug' AND '$(TargetFramework)'=='net10.0-ios'">
+	  <CodesignKey>Apple Development</CodesignKey>
 	  <CodesignProvision>VS: com.aurelwuensch.indoorco2map Development</CodesignProvision>
 	</PropertyGroup>
 	
