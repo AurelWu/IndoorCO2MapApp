@@ -28,7 +28,7 @@
 
                     <!-- GPS enabled -->
                     <Border Grid.Row="0" Grid.Column="0"
-                            Stroke="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                            Stroke="{Binding GpsStatusColor}"
                             StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
@@ -39,15 +39,15 @@
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="gps_icon_v2.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                             <Label Text="GPS Status" FontSize="11" VerticalOptions="Center"/>
-                            <Label Text="{Binding IsGpsOn, Converter={StaticResource BoolToSymbolConverter}}"
-                                   TextColor="{Binding IsGpsOn, Converter={StaticResource BooleanToColorConverter}}"
+                            <Label Text="{Binding GpsStatusSymbol}"
+                                   TextColor="{Binding GpsStatusColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                     </Border>
 
                     <!-- Location permission -->
                     <Border Grid.Row="0" Grid.Column="1"
-                            Stroke="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            Stroke="{Binding GpsPermissionColor}"
                             StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
@@ -58,15 +58,15 @@
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="gps_icon_permission.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                             <Label Text="GPS Permissions" FontSize="11" VerticalOptions="Center"/>
-                            <Label Text="{Binding GpsPermissionGranted, Converter={StaticResource BoolToSymbolConverter}}"
-                                   TextColor="{Binding GpsPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            <Label Text="{Binding GpsPermissionSymbol}"
+                                   TextColor="{Binding GpsPermissionColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                     </Border>
 
                     <!-- Bluetooth enabled -->
                     <Border Grid.Row="1" Grid.Column="0"
-                            Stroke="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                            Stroke="{Binding BtStatusColor}"
                             StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
@@ -77,15 +77,15 @@
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="bluetoothstatus.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                             <Label Text="BT Status" FontSize="11" VerticalOptions="Center"/>
-                            <Label Text="{Binding IsBluetoothOn, Converter={StaticResource BoolToSymbolConverter}}"
-                                   TextColor="{Binding IsBluetoothOn, Converter={StaticResource BooleanToColorConverter}}"
+                            <Label Text="{Binding BtStatusSymbol}"
+                                   TextColor="{Binding BtStatusColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                     </Border>
 
                     <!-- Bluetooth permissions -->
                     <Border Grid.Row="1" Grid.Column="1"
-                            Stroke="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            Stroke="{Binding BtPermissionColor}"
                             StrokeThickness="2"
                             BackgroundColor="Transparent"
                             Padding="6,5">
@@ -96,8 +96,8 @@
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="bluetoothscan.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                             <Label Text="BT Permissions" FontSize="11" VerticalOptions="Center"/>
-                            <Label Text="{Binding BluetoothPermissionGranted, Converter={StaticResource BoolToSymbolConverter}}"
-                                   TextColor="{Binding BluetoothPermissionGranted, Converter={StaticResource BooleanToColorConverter}}"
+                            <Label Text="{Binding BtPermissionSymbol}"
+                                   TextColor="{Binding BtPermissionColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                     </Border>

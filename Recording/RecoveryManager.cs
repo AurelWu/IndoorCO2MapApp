@@ -1,7 +1,6 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ViewModels;
 using IndoorCO2MapAppV2.Enumerations;
-using Microsoft.Extensions.Logging;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using System.Text.Json;
@@ -40,9 +39,17 @@ namespace IndoorCO2MapAppV2.Recording
 
         public RecordingRecoverySnapshot? LoadSnapshot()
         {
-            var json = Preferences.Get("RecordingState", "");
-            if (string.IsNullOrWhiteSpace(json)) return null;
-            return JsonSerializer.Deserialize<RecordingRecoverySnapshot>(json);
+            try
+            {
+                var json = Preferences.Get("RecordingState", "");
+                if (string.IsNullOrWhiteSpace(json)) return null;
+                return JsonSerializer.Deserialize<RecordingRecoverySnapshot>(json);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog($"RecoveryManager|LoadSnapshot failed: {ex.Message}");
+                return null;
+            }
         }
 
         public void ClearSnapshot() => Preferences.Remove("RecordingState");
@@ -125,6 +132,7 @@ namespace IndoorCO2MapAppV2.Recording
                 await _adapter.StartScanningForDevicesAsync(cancellationToken: cts.Token);
             }
             catch (OperationCanceledException) { }
+            catch (Exception ex) { Logger.WriteToLog($"RecoveryManager|StartScanning failed: {ex.Message}"); }
             finally
             {
                 _adapter.DeviceDiscovered -= Handler;

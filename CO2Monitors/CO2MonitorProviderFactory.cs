@@ -33,21 +33,19 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         }
 
         /// <summary>
-        /// Detects CO2 monitor type using name, advertisement UUIDs, or GATT services (after connection)
+        /// Detects CO2 monitor type using device name and advertisement UUIDs (scan-time only).
+        /// No GATT operations are performed — safe to call during BLE scanning.
         /// </summary>
-        /// <param name="device">The connected or scanned BLE device</param>
-        /// <param name="bleAdapter">Plugin.BLE adapter, needed only if checking GATT services</param>
-        /// <returns>The detected CO2 monitor type, or null if unknown</returns>
-        public static async Task<CO2MonitorType?> DetectFromNameOrAdvertisementAsync(
-    IDevice device,
-    IAdapter? bleAdapter = null)
+        public static Task<CO2MonitorType?> DetectFromNameOrAdvertisementAsync(
+            IDevice device,
+            IAdapter? bleAdapter = null)
         {
-            // 1️⃣ Name-based detection
+            // 1. Name-based detection
             var byName = DetectFromName(device.Name);
             if (byName != null)
-                return byName;
+                return Task.FromResult<CO2MonitorType?>(byName);
 
-            // 2️⃣ Advertisement service UUIDs (scan-time)
+            // 2. Advertisement service UUIDs (scan-time)
             var advertisedServices = device.AdvertisementRecords?
                 .Where(r => r.Type == AdvertisementRecordType.UuidsComplete128Bit ||
                             r.Type == AdvertisementRecordType.UuidsIncomplete128Bit)
@@ -59,36 +57,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 foreach (var service in advertisedServices)
                 {
                     if (MonitorTypes.MonitorTypeByAdvertisementServiceUuid.TryGetValue(service, out var type))
-                        return type;
+                        return Task.FromResult<CO2MonitorType?>(type);
                 }
             }
 
-            if (device.State != DeviceState.Connected)
-            {
-                Logger.WriteToLog($"Device not connected: {device.Name}");
-                return null;
-            }
-
-            if (bleAdapter != null)
-            {
-                try
-                {
-
-                    var gattServices = await device.GetServicesAsync();
-                    foreach (var service in gattServices)
-                    {
-                        if (MonitorTypes.MonitorTypeByServiceUuid.TryGetValue(service.Id, out var type))
-                            return type;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteToLog("Exception during CO2monitorProviderFactory when trying to get Services of Device for identification | Device Name: " + device.Name ?? "unkown devicee");
-                }
-            }
-
-            return null;
+            return Task.FromResult<CO2MonitorType?>(null);
         }
     }
 }

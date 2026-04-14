@@ -63,7 +63,15 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             _notifyCharacteristic.ValueUpdated -= OnInkbirdCO2haracteristicValueChanged;
             _notifyCharacteristic.ValueUpdated += OnInkbirdCO2haracteristicValueChanged;
-            await _notifyCharacteristic.StartUpdatesAsync();
+            try
+            {
+                await _notifyCharacteristic.StartUpdatesAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("InkbirdProvider|InitializeAsync: StartUpdatesAsync failed: " + ex.Message);
+                return false;
+            }
             _setupDone = true;
             return true;
         }

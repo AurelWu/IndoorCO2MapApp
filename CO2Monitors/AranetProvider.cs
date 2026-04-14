@@ -99,10 +99,16 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         }
 
         /// <summary>
+        /// True when the sensor returned GATT error 2 (READ_NOT_PERMITTED),
+        /// which means Smart Home Integration is disabled in the Aranet app.
+        /// </summary>
+        public bool IsSmartHomeDisabled { get; private set; }
+
+        /// <summary>
         /// Read current CO2 from live characteristic.
         /// </summary>
         protected override async Task<int> DoReadCurrentCO2Async()
-        {                            
+        {
 
             if (_liveCharacteristic == null || !_liveCharacteristic.CanRead)
                 return 0;
@@ -111,6 +117,16 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 var result = await _liveCharacteristic.ReadAsync(cts.Token);
+
+                // GATT status 2 = READ_NOT_PERMITTED → Smart Home Integration is disabled
+                if (result.resultCode == 2)
+                {
+                    IsSmartHomeDisabled = true;
+                    Logger.WriteToLog("AranetProvider|DoReadCurrentCO2Async: GATT READ_NOT_PERMITTED (2) — Smart Home Integration disabled");
+                    return 0;
+                }
+
+                IsSmartHomeDisabled = false;
                 var data = result.data;
 
                 return data.Length >= 2

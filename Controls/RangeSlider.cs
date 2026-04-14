@@ -51,7 +51,7 @@ public partial class RangeSlider : ContentView
     private bool _isDragging;
 
     public RangeSlider()
-    {        
+    {
         _layout.Clip = null; // Disable clipping to prevent flicker
 
         UpdateThumbSize();
@@ -70,7 +70,15 @@ public partial class RangeSlider : ContentView
 
         Content = _layout;
 
-        Loaded += (s, e) => UpdateLayoutPositions();
+        // AppThemeBinding resolves after the constructor on iOS — re-apply colors once loaded
+        // and whenever the system theme changes so the slider isn't stuck black.
+        Loaded += (s, e) =>
+        {
+            UpdateTrackColors();
+            UpdateLayoutPositions();
+        };
+        if (Application.Current != null)
+            Application.Current.RequestedThemeChanged += (s, e) => UpdateTrackColors();
 
         // Gesture recognizers
         var lowerPan = new PanGestureRecognizer();

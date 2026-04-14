@@ -33,6 +33,9 @@ namespace IndoorCO2MapAppV2.ViewModels
                         break;
                     case nameof(CO2MonitorManager.CurrentCO2):
                         CurrentCO2 = _monitorManager.CurrentCO2;
+                        IsSmartHomeWarningVisible =
+                            (_monitorManager.ActiveCO2MonitorProvider as IndoorCO2MapAppV2.CO2Monitors.AranetProvider)
+                            ?.IsSmartHomeDisabled ?? false;
                         break;
                     case nameof(CO2MonitorManager.UpdateInterval):
                         MeasurementInterval = _monitorManager.UpdateInterval;
@@ -98,9 +101,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             await _monitorManager.StartScanAsync(filter, clearBeforeScan);
         }
 
+        [ObservableProperty] private bool isSmartHomeWarningVisible;
+
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
             _monitorManager.ZeroOutCO2Values();
+            IsSmartHomeWarningVisible = false;
             if (device == null) return;
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();
