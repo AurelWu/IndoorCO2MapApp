@@ -91,6 +91,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (!connected)
                     return;
 
+                // Give the Android GATT stack time to settle after connection —
+                // without this, GetServiceAsync fails immediately on the first attempt.
+                await Task.Delay(500);
+
                 // Use type already set during scan — avoids any post-connection GATT check
                 var type = device.DetectedType
                     ?? CO2MonitorProviderFactory.DetectFromName(device.Device.Name)

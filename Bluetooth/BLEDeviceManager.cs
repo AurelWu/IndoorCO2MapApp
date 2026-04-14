@@ -72,6 +72,8 @@ namespace IndoorCO2MapAppV2.Bluetooth
             {
                 try
                 {
+                    Logger.WriteToLog($"BLEDeviceManager|Scan: saw '{e.Device.Name}' ({e.Device.Id})", LogMode.Verbose);
+
                     var detectedType = await CO2MonitorProviderFactory.DetectFromNameOrAdvertisementAsync(
                         e.Device,
                         _adapter
@@ -82,17 +84,23 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     if (cts.IsCancellationRequested) return;
 
                     if (!detectedType.HasValue || (filter & detectedType.Value) == 0)
+                    {
+                        Logger.WriteToLog($"BLEDeviceManager|Scan: '{e.Device.Name}' rejected (detectedType={detectedType?.ToString() ?? "null"}, filter={filter})", LogMode.Verbose);
                         return;
+                    }
 
                     var deviceModel = new BluetoothDeviceModel(e.Device) { DetectedType = detectedType };
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        if (!Devices.Contains(deviceModel))
-                        {
-                            Devices.Add(deviceModel);
-                            DeviceDiscovered?.Invoke(this, deviceModel);
-                        }
+                        // Deduplicate by device ID — Plugin.BLE may produce different IDevice
+                        // instances for the same physical device across repeated advertisement events.
+                        if (Devices.Any(d => d.Device.Id == e.Device.Id))
+                            return;
+
+                        Logger.WriteToLog($"BLEDeviceManager|Scan: adding '{e.Device.Name}' as {detectedType}");
+                        Devices.Add(deviceModel);
+                        DeviceDiscovered?.Invoke(this, deviceModel);
                     });
                 }
                 catch (Exception ex)
