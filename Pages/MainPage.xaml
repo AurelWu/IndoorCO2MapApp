@@ -24,6 +24,26 @@
 
     <Grid>
 
+    <!-- Recovery overlay (shown while auto-recovery is in progress) -->
+    <Border x:Name="RecoveryOverlay"
+            BackgroundColor="#512BD4"
+            IsVisible="False"
+            VerticalOptions="Start"
+            HorizontalOptions="Fill"
+            Margin="20,60,20,0"
+            Padding="20,18"
+            ZIndex="10">
+        <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+        <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+            <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+            <Label Text="Resuming recording…"
+                   TextColor="White"
+                   FontSize="15"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+    </Border>
+
     <!-- Success banner (overlays content, slides in from top) -->
     <Border x:Name="SuccessBanner"
             BackgroundColor="#4CAF50"
@@ -91,6 +111,18 @@
                                    FontSize="13" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
+
+                    <!-- Smart Home Integration warning (Aranet4 only) -->
+                    <HorizontalStackLayout IsVisible="{Binding Sensor.IsSmartHomeWarningVisible}"
+                                           Spacing="5">
+                        <HorizontalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSmartHomeInfoTapped"/>
+                        </HorizontalStackLayout.GestureRecognizers>
+                        <Label Text="⚠ Smart Home Integration not enabled"
+                               TextColor="#E65100" FontSize="13" VerticalOptions="Center"/>
+                        <Label Text="ⓘ" TextColor="#512BD4" FontSize="15"
+                               FontAttributes="Bold" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
 
                 </VerticalStackLayout>
             </Border>

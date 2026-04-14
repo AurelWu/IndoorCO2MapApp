@@ -1,8 +1,10 @@
-﻿using IndoorCO2MapAppV2.Bluetooth;
+﻿using CommunityToolkit.Maui.Views;
+using IndoorCO2MapAppV2.Bluetooth;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Popups;
 using IndoorCO2MapAppV2.Recording;
 using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
@@ -11,6 +13,8 @@ using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
 using System.Globalization;
 using System.Threading.Tasks;
+using CommunityToolkit.Maui.Extensions;
+
 #if !WINDOWS
 using Mapsui;
 using Mapsui.Layers;
@@ -194,7 +198,21 @@ namespace IndoorCO2MapAppV2.Pages
             pageActive = true;
             // Sync the route-preview setting so it updates when user navigates back from Settings
             _mainPageViewModel.Transit.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
-            bool recovered = await TryRecoverRecordingAsync();
+            bool recovered = false;
+            try
+            {
+                RecoveryOverlay.IsVisible = true;
+                recovered = await TryRecoverRecordingAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog($"TryRecoverRecordingAsync failed: {ex.Message}");
+                ManualResumeButton.IsVisible = true;
+            }
+            finally
+            {
+                RecoveryOverlay.IsVisible = false;
+            }
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();
             _ = _mainPageViewModel.RefreshHasRecordingsAsync();
@@ -325,6 +343,13 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnRefreshSensorListClicked(object sender, EventArgs e)
         {
             RefreshSensorListAsync().SafeFireAndForget("OnRefreshSensorListClicked|RefreshSensorListAsync");
+        }
+
+        private void OnSmartHomeInfoTapped(object sender, EventArgs e)
+        {
+#if !WINDOWS
+            this.ShowPopupAsync(new SmarthomeInfoPopUp()).SafeFireAndForget("OnSmartHomeInfoTapped");
+#endif
         }
 
         //TODO: add filter from settings (not just type but also explicit string)

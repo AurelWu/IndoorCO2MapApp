@@ -91,10 +91,9 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (!connected)
                     return;
 
-                var type = await CO2MonitorProviderFactory
-                    .DetectFromNameOrAdvertisementAsync(
-                        device.Device,
-                        BLEDeviceManager.Instance._adapter)
+                // Use type already set during scan — avoids any post-connection GATT check
+                var type = device.DetectedType
+                    ?? CO2MonitorProviderFactory.DetectFromName(device.Device.Name)
                     ?? SelectedMonitorType;
 
                 Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: provider type={type}", LogMode.Verbose);
@@ -104,7 +103,18 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 // InitializeAsync is called ONCE here when connecting.
                 // Refresh methods below must NOT call it again.
-                bool ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+                bool ok;
+                try
+                {
+                    ok = await ActiveCO2MonitorProvider.InitializeAsync(device.Device);
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: InitializeAsync threw: {ex.Message}");
+                    await ActiveCO2MonitorProvider.DisposeAsync();
+                    ActiveCO2MonitorProvider = null;
+                    return;
+                }
                 Logger.WriteToLog($"CO2MonitorManager|SelectDeviceAsync: initialized={ok}");
                 if (!ok)
                 {

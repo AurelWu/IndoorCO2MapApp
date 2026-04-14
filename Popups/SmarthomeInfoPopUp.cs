@@ -16,8 +16,7 @@ namespace IndoorCO2MapAppV2.Popups
         {            
             var titleLabel = new Label
             {
-                //Text = LocalisationResourceManager.Instance.GetString(nameof(AppStrings.SmarthomeGuideHeader)),
-                Text = "PlaceHolder",
+                Text = "Enabling Smart Home Integration",
                 TextColor = Colors.Black,
                 FontSize = 16,
                 FontAttributes = FontAttributes.Bold,
@@ -26,8 +25,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description1 = new Label
             {
-                //Text = LocalisationResourceManager.Instance.GetString(nameof(AppStrings.SmartHomeGuideText1)),
-                Text = "PlaceHolder",
+                Text = "To read the data from your Aranet4, Smart Home Integration needs to be enabled.\n\n1) Open the official Aranet Home App (install from App Store if not installed)",
                 TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
@@ -44,7 +42,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description2 = new Label
             {
-                //Text = LocalisationResourceManager.Instance.GetString(nameof(AppStrings.SmartHomeGuideText2)),
+                Text = "2) Press the Gears Icon in the top right of the sensor",
                 TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
@@ -60,7 +58,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description3 = new Label
             {
-                //Text = LocalisationResourceManager.Instance.GetString(nameof(AppStrings.SmartHomeGuideText3)),
+                Text = "3) Move the Smart Home Integration Slider to the right",
                 TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
@@ -77,7 +75,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var closeButton = new Button
             {
-                //Text = LocalisationResourceManager.Instance.GetString(nameof(AppStrings.QuickGuidePopupCloseButton)),
+                Text = "Close",
                 Command = new Command(() => this.CloseAsync().SafeFireAndForget())
             };
 

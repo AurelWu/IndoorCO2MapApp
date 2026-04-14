@@ -41,7 +41,13 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
         {
             try
             {
-                await BLEDeviceManager.Instance._adapter.ConnectToDeviceAsync(ActiveDevice);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+                await BLEDeviceManager.Instance._adapter.ConnectToDeviceAsync(ActiveDevice, cancellationToken: cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.WriteToLog("EnsureConnectionIsValidAsync: ConnectToDeviceAsync timed out after 12s");
+                return false;
             }
             catch
             {

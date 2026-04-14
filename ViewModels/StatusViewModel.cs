@@ -17,6 +17,14 @@ namespace IndoorCO2MapAppV2.ViewModels
         private static StatusViewModel? _instance;
         public static StatusViewModel Instance => _instance ??= new StatusViewModel();
 
+        // --- Initializing flag (true until first status check completes) ---
+        private bool _isInitializing = true;
+        public bool IsInitializing
+        {
+            get => _isInitializing;
+            private set => SetProperty(ref _isInitializing, value);
+        }
+
         // --- Bluetooth ---
         private bool _isBluetoothOn;
         public bool IsBluetoothOn
@@ -49,6 +57,24 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         // --- is GPS and BT Ready ---
         public bool AllReady => IsGpsOn && GpsPermissionGranted && IsBluetoothOn && BluetoothPermissionGranted;
+
+        // --- Chip colors/symbols (grey while initializing) ---
+        private static readonly Color ColorReady   = Color.FromArgb("#4CAF50");
+        private static readonly Color ColorNotReady = Color.FromArgb("#F44336");
+        private static readonly Color ColorChecking = Color.FromArgb("#9E9E9E");
+
+        private Color ChipColor(bool value) => IsInitializing ? ColorChecking : (value ? ColorReady : ColorNotReady);
+        private string ChipSymbol(bool value) => IsInitializing ? "…" : (value ? "✓" : "✗");
+
+        public Color GpsStatusColor         => ChipColor(IsGpsOn);
+        public Color GpsPermissionColor     => ChipColor(GpsPermissionGranted);
+        public Color BtStatusColor          => ChipColor(IsBluetoothOn);
+        public Color BtPermissionColor      => ChipColor(BluetoothPermissionGranted);
+
+        public string GpsStatusSymbol       => ChipSymbol(IsGpsOn);
+        public string GpsPermissionSymbol   => ChipSymbol(GpsPermissionGranted);
+        public string BtStatusSymbol        => ChipSymbol(IsBluetoothOn);
+        public string BtPermissionSymbol    => ChipSymbol(BluetoothPermissionGranted);
 
         // --- App status ticker ---
         private static readonly HttpClient _statusHttpClient = new();
@@ -111,9 +137,18 @@ namespace IndoorCO2MapAppV2.ViewModels
             backingStore = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-            // Notify AllReady if any component changed
+            // Notify AllReady and chip display properties whenever any component changes
             if (propertyName != nameof(AllReady))
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AllReady)));
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GpsStatusColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GpsPermissionColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BtStatusColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BtPermissionColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GpsStatusSymbol)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GpsPermissionSymbol)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BtStatusSymbol)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BtPermissionSymbol)));
 
             return true;
         }
@@ -163,6 +198,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                 BluetoothPermissionGranted = btPerm;
                 IsGpsOn                    = gpsOn;
                 GpsPermissionGranted       = gpsPerm;
+                IsInitializing             = false;
             });
         }
     }
