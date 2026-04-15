@@ -1,6 +1,8 @@
 ﻿using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ViewModels;
 using IndoorCO2MapAppV2.Enumerations;
+using Plugin.BLE;
+using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using System.Text.Json;
@@ -69,6 +71,10 @@ namespace IndoorCO2MapAppV2.Recording
             var deviceIdString = snapshot.MonitorDeviceId;
             if (string.IsNullOrWhiteSpace(deviceIdString)) return false;
 
+            // On iOS the CBCentralManager starts as Unknown and needs time to reach PoweredOn.
+            // Poll up to 8 seconds before giving up — scan attempts before BT is ready find nothing.
+            await WaitForBluetoothReadyAsync(TimeSpan.FromSeconds(8));
+
             for (int attempt = 1; attempt <= MaxAttempts; attempt++)
             {
                 Logger.WriteToLog($"Recovery attempt {attempt} for device {deviceIdString}");
@@ -86,6 +92,34 @@ namespace IndoorCO2MapAppV2.Recording
             }
 
             return false;
+        }
+
+        // ------------------------------------------------------------------------------
+        // BLUETOOTH READINESS
+        // ------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Polls until the BLE adapter reports PoweredOn, or the timeout elapses.
+        /// On iOS the CBCentralManager starts as Unknown and takes 1-2s to settle.
+        /// </summary>
+        private static async Task WaitForBluetoothReadyAsync(TimeSpan timeout)
+        {
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                var state = CrossBluetoothLE.Current.State;
+                Logger.WriteToLog($"RecoveryManager|WaitForBT: state={state}");
+                if (state == BluetoothState.On)
+                    return;
+                // If it's definitively off/unavailable, stop waiting early
+                if (state == BluetoothState.Off || state == BluetoothState.Unavailable)
+                {
+                    Logger.WriteToLog("RecoveryManager|WaitForBT: BT is off/unavailable, not waiting further");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            Logger.WriteToLog("RecoveryManager|WaitForBT: timed out waiting for BT");
         }
 
         // ------------------------------------------------------------------------------

@@ -55,14 +55,17 @@ namespace IndoorCO2MapAppV2.Bluetooth
             if (_adapter.IsScanning)
                 await _adapter.StopScanningForDevicesAsync();
 
-            //check permissions            
+            //check permissions
 
             var bluetoothHelper = BluetoothPlatformProvider.CreateOrUse();
-            var btOn = bluetoothHelper.CheckIfBTEnabled();
             var btAllowed = bluetoothHelper.CheckPermissions();
-
-            if (!btOn) return;
             if (!btAllowed) return;
+
+            // On iOS, CBCentralManager starts as Unknown and takes ~1-2s to settle to PoweredOn.
+            // Poll up to 5s so the first scan at cold start is not silently skipped.
+            await WaitForBluetoothReadyAsync(TimeSpan.FromSeconds(5));
+
+            if (!bluetoothHelper.CheckIfBTEnabled()) return;
 
             IsScanning = true;
 
@@ -126,6 +129,25 @@ namespace IndoorCO2MapAppV2.Bluetooth
                 _adapter.DeviceDiscovered -= Handler;
                 IsScanning = false;
             }
+        }
+
+        private static async Task WaitForBluetoothReadyAsync(TimeSpan timeout)
+        {
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                var state = CrossBluetoothLE.Current.State;
+                Logger.WriteToLog($"BLEDeviceManager|WaitForBT: state={state}", LogMode.Verbose);
+                if (state == BluetoothState.On)
+                    return;
+                if (state == BluetoothState.Off || state == BluetoothState.Unavailable)
+                {
+                    Logger.WriteToLog("BLEDeviceManager|WaitForBT: BT is off/unavailable, stopping early");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            Logger.WriteToLog("BLEDeviceManager|WaitForBT: timed out");
         }
 
         internal async Task<bool> ConnectDeviceAsync(IDevice device)
