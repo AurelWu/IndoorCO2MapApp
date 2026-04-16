@@ -327,10 +327,19 @@ namespace IndoorCO2MapAppV2.Pages
 
                 if (UserSettings.Instance.EnableHistory)
                 {
+                    // Build description: "Line 42 (Central Station => North Terminal)" or just "Line 42 (Central Station)"
+                    string routePart = rec.LocationName.Contains(" (")
+                        ? rec.LocationName.Substring(0, rec.LocationName.LastIndexOf(" ("))
+                        : rec.LocationName;
+                    string startName = rec.AdditionalDataByParameter.TryGetValue("startName", out var sn) ? sn : "";
+                    string locationName = endpoint != null
+                        ? $"{routePart} ({startName} => {endpoint.Name})"
+                        : rec.LocationName;
+
                     var persistentRecording = new PersistentRecording
                     {
                         DateTime = rec.RecordingStart,
-                        LocationName = rec.LocationName,
+                        LocationName = locationName,
                         NWRId = rec.NwrId,
                         NWRType = rec.NwrType,
                         Latitude = rec.Latitude,
@@ -341,6 +350,9 @@ namespace IndoorCO2MapAppV2.Pages
                         VentilationState = _ventilationState,
                         CustomNotes = customNote,
                         SensorType = rec.CO2MonitorType,
+                        DestinationLatitude  = endpoint?.Latitude,
+                        DestinationLongitude = endpoint?.Longitude,
+                        DestinationName      = endpoint?.Name ?? "",
                     };
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
                 }

@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto, *">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Padding="10,10,10,4" ColumnSpacing="10">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="10,10,10,4" ColumnSpacing="10">
             <Button Grid.Column="0"
                     Text="← History"
                     Clicked="OnNavigateClicked"
@@ -19,6 +19,21 @@
                    Text="Measurement Map"
                    FontSize="18" FontAttributes="Bold"
                    VerticalOptions="Center" />
+            <Border Grid.Column="2"
+                    StrokeShape="RoundRectangle 8"
+                    BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
+                    Stroke="Transparent" Padding="3">
+                <HorizontalStackLayout Spacing="2">
+                    <Button x:Name="BuildingsToggleBtn" Text="Buildings"
+                            Clicked="OnBuildingsToggleClicked"
+                            FontSize="12" Padding="10,4"
+                            HeightRequest="32" CornerRadius="6" />
+                    <Button x:Name="TransitToggleBtn" Text="Transit"
+                            Clicked="OnTransitToggleClicked"
+                            FontSize="12" Padding="10,4"
+                            HeightRequest="32" CornerRadius="6" />
+                </HorizontalStackLayout>
+            </Border>
         </Grid>
 
         <!-- Map area -->

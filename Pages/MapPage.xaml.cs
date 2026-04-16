@@ -4,6 +4,7 @@ using IndoorCO2MapAppV2.ViewModels;
 #if !WINDOWS
 using Mapsui;
 using Mapsui.Layers;
+using Mapsui.Nts;
 using Mapsui.Projections;
 using Mapsui.Tiling;
 #endif
@@ -16,6 +17,8 @@ namespace IndoorCO2MapAppV2.Pages
         private Mapsui.UI.Maui.MapControl? _mapControl;
         private MemoryLayer? _labelLayer;
 #endif
+        private List<PersistentRecording> _allRecordings = new();
+        private bool _showTransit = false;
 
         public MapPage()
         {
@@ -25,16 +28,57 @@ namespace IndoorCO2MapAppV2.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            UpdateToggleVisuals();
 #if WINDOWS
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
             NoMapLabel.IsVisible = true;
 #else
-            var recordings = await App.HistoryDatabase.GetAllRecordingsAsync();
-            BuildMap(recordings);
+            _allRecordings = await App.HistoryDatabase.GetAllRecordingsAsync();
+            BuildMap(FilteredRecordings());
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
 #endif
+        }
+
+        private List<PersistentRecording> FilteredRecordings() =>
+            _showTransit
+                ? _allRecordings.Where(r => r.NWRId.HasValue).ToList()
+                : _allRecordings.Where(r => !r.NWRId.HasValue).ToList();
+
+        private void OnBuildingsToggleClicked(object sender, EventArgs e)
+        {
+            if (_showTransit == false) return;
+            _showTransit = false;
+            UpdateToggleVisuals();
+#if !WINDOWS
+            BuildMap(FilteredRecordings());
+#endif
+        }
+
+        private void OnTransitToggleClicked(object sender, EventArgs e)
+        {
+            if (_showTransit == true) return;
+            _showTransit = true;
+            UpdateToggleVisuals();
+#if !WINDOWS
+            BuildMap(FilteredRecordings());
+#endif
+        }
+
+        private void UpdateToggleVisuals()
+        {
+            var activeColor   = Application.Current?.RequestedTheme == AppTheme.Dark
+                ? Color.FromArgb("#555555") : Colors.White;
+            var inactiveColor = Colors.Transparent;
+            var activeText    = Application.Current?.RequestedTheme == AppTheme.Dark
+                ? Colors.White : Colors.Black;
+            var inactiveText  = Color.FromArgb("#888888");
+
+            BuildingsToggleBtn.BackgroundColor = _showTransit ? inactiveColor : activeColor;
+            BuildingsToggleBtn.TextColor       = _showTransit ? inactiveText  : activeText;
+            TransitToggleBtn.BackgroundColor   = _showTransit ? activeColor   : inactiveColor;
+            TransitToggleBtn.TextColor         = _showTransit ? activeText    : inactiveText;
         }
 
         protected override bool OnBackButtonPressed()
@@ -61,7 +105,8 @@ namespace IndoorCO2MapAppV2.Pages
                     var items = g.Select(r => new CO2RecordingItem(r))
                                  .OrderByDescending(r => r.DateTime).ToList();
                     return (group: new LocationGroupItem(g.First().LocationName, items),
-                            lat: avgLat, lon: avgLon) as (LocationGroupItem group, double lat, double lon)?;
+                            lat: avgLat, lon: avgLon,
+                            recs: withCoords) as (LocationGroupItem group, double lat, double lon, List<PersistentRecording> recs)?;
                 })
                 .Where(x => x != null)
                 .Select(x => x!.Value)
@@ -73,10 +118,11 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (groups.Count > 0)
             {
+                var lineFeatures  = new List<IFeature>();
                 var pinFeatures   = new List<IFeature>();
                 var labelFeatures = new List<IFeature>();
 
-                foreach (var (group, lat, lon) in groups)
+                foreach (var (group, lat, lon, recs) in groups)
                 {
                     var (x, y) = SphericalMercator.FromLonLat(lon, lat);
 
@@ -98,6 +144,42 @@ namespace IndoorCO2MapAppV2.Pages
                     pin["group"] = group;
                     pinFeatures.Add(pin);
 
+                    // Transit: draw destination pin + straight line if destination was recorded
+                    var destRec = recs
+                        .Where(r => r.DestinationLatitude.HasValue && r.DestinationLongitude.HasValue
+                                    && (r.DestinationLatitude != 0 || r.DestinationLongitude != 0))
+                        .OrderByDescending(r => r.DateTime)
+                        .FirstOrDefault();
+
+                    if (destRec != null)
+                    {
+                        var (dx, dy) = SphericalMercator.FromLonLat(
+                            destRec.DestinationLongitude!.Value, destRec.DestinationLatitude!.Value);
+
+                        var lineFeature = new GeometryFeature(
+                            new NetTopologySuite.Geometries.GeometryFactory().CreateLineString(new[]
+                            {
+                                new NetTopologySuite.Geometries.Coordinate(x, y),
+                                new NetTopologySuite.Geometries.Coordinate(dx, dy)
+                            }));
+                        lineFeature.Styles.Add(new Mapsui.Styles.VectorStyle
+                        {
+                            Line = new Mapsui.Styles.Pen(fillColor, 2)
+                        });
+                        lineFeatures.Add(lineFeature);
+
+                        // Destination pin: inverted style (white fill, color outline)
+                        var destPin = new PointFeature(new MPoint(dx, dy));
+                        destPin.Styles.Add(new Mapsui.Styles.SymbolStyle
+                        {
+                            SymbolType  = Mapsui.Styles.SymbolType.Ellipse,
+                            Fill        = new Mapsui.Styles.Brush(Mapsui.Styles.Color.White),
+                            Outline     = new Mapsui.Styles.Pen(fillColor, 2),
+                            SymbolScale = 0.5
+                        });
+                        pinFeatures.Add(destPin);
+                    }
+
                     // Label (separate layer so visibility can be toggled)
                     var lbl = new PointFeature(new MPoint(x, y));
                     lbl.Styles.Add(new Mapsui.Styles.LabelStyle
@@ -112,6 +194,7 @@ namespace IndoorCO2MapAppV2.Pages
                     labelFeatures.Add(lbl);
                 }
 
+                map.Layers.Add(new MemoryLayer { Name = "Lines", Features = lineFeatures, Style = null });
                 map.Layers.Add(new MemoryLayer { Name = "Pins", Features = pinFeatures, Style = null, IsMapInfoLayer = true });
                 _labelLayer = new MemoryLayer  { Name = "Labels", Features = labelFeatures, Style = null };
                 map.Layers.Add(_labelLayer);

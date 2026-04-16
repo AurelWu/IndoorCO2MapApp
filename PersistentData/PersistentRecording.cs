@@ -29,5 +29,10 @@ namespace IndoorCO2MapAppV2.PersistentData
         public TriState VentilationState { get; set; }
         public string CustomNotes { get; set; } = "";
         public string SensorType { get; set; } = "";
+
+        // Transit destination — null for building recordings and old transit records
+        public double? DestinationLatitude { get; set; }
+        public double? DestinationLongitude { get; set; }
+        public string DestinationName { get; set; } = "";
     }
 }
