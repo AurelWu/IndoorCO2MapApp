@@ -336,6 +336,13 @@ namespace IndoorCO2MapAppV2.Pages
                         ? $"{routePart} ({startName} => {endpoint.Name})"
                         : rec.LocationName;
 
+                    int trimMin = (int)TrimSlider.LowerValue;
+                    int trimMax = (int)TrimSlider.UpperValue;
+                    var trimmed = rec.MeasurementData
+                        .Skip(trimMin)
+                        .Take(trimMax - trimMin + 1)
+                        .ToList();
+
                     var persistentRecording = new PersistentRecording
                     {
                         DateTime = rec.RecordingStart,
@@ -344,8 +351,8 @@ namespace IndoorCO2MapAppV2.Pages
                         NWRType = rec.NwrType,
                         Latitude = rec.Latitude,
                         Longitude = rec.Longitude,
-                        AvgCO2 = rec.MeasurementData.Average(x => x.Ppm),
-                        Values = string.Join(";", rec.MeasurementData.Select(x => x.Ppm)),
+                        AvgCO2 = trimmed.Average(x => x.Ppm),
+                        Values = string.Join(";", trimmed.Select(x => x.Ppm)),
                         DoorWindowState = _windowsState,
                         VentilationState = _ventilationState,
                         CustomNotes = customNote,
