@@ -17,6 +17,7 @@ namespace IndoorCO2MapAppV2.Recording
         private string _notes = "";
         private TriState _openWindowsDoors = TriState.Unknown;
         private TriState _ventilationSystem = TriState.Unknown;
+        private string _submissionId = "";
 
         public APISubmissionBuilder(BuildingRecording recording, int trimMin, int trimMax)
         {
@@ -30,7 +31,7 @@ namespace IndoorCO2MapAppV2.Recording
         {
             var submission = new BuildingSubmissionData(
                 sensorType: _rec.CO2MonitorType,
-                sensorID: "unknown", // => should be random                    
+                sensorID: _submissionId,
                 nwrType: _rec.NwrType,
                 nwrID: _rec.NwrId,
                 nwrName: _rec.LocationName,
@@ -84,6 +85,12 @@ namespace IndoorCO2MapAppV2.Recording
         public APISubmissionBuilder WithNotes(string notes)
         {
             _notes = notes;
+            return this;
+        }
+
+        public APISubmissionBuilder WithSubmissionId(string id)
+        {
+            _submissionId = id;
             return this;
         }
 

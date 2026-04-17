@@ -314,12 +314,14 @@ namespace IndoorCO2MapAppV2.Pages
                 if (rec == null) return;
 
                 var endpoint = EndpointPicker.SelectedItem as LocationData;
+                string submissionId = Converter.GenerateSubmissionId();
                 var submission = TransitSubmissionData.FromRecording(
                     rec,
                     trimMin: (int)TrimSlider.LowerValue,
                     trimMax: (int)TrimSlider.UpperValue,
                     notes: customNote,
-                    endpoint: endpoint);
+                    endpoint: endpoint,
+                    submissionId: submissionId);
 
                 Logger.WriteToLog("TransitMeasurementPage|SubmitRecordingAsync: " + submission.ToJson(), minimumLogMode: IndoorCO2MapAppV2.Enumerations.LogMode.Verbose);
 
@@ -360,6 +362,7 @@ namespace IndoorCO2MapAppV2.Pages
                         DestinationLatitude  = endpoint?.Latitude,
                         DestinationLongitude = endpoint?.Longitude,
                         DestinationName      = endpoint?.Name ?? "",
+                        SubmissionId         = submissionId,
                     };
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
                 }

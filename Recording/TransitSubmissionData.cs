@@ -108,7 +108,7 @@ namespace IndoorCO2MapAppV2.Recording
         /// </summary>
         public static TransitSubmissionData FromRecording(
             BuildingRecording rec, int trimMin, int trimMax, string notes,
-            LocationData? endpoint = null)
+            LocationData? endpoint = null, string submissionId = "")
         {
             var d = rec.AdditionalDataByParameter;
 
@@ -130,7 +130,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             return new TransitSubmissionData(
                 sensorType:   rec.CO2MonitorType,
-                sensorId:     Random.Shared.Next(0, 999999).ToString(),
+                sensorId:     submissionId,
                 startTime:    rec.RecordingStart,
                 startNWRType: startNWRType ?? "node",
                 startID:      startID,

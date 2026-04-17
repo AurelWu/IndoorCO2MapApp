@@ -2,6 +2,8 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using IndoorCO2MapAppV2.CO2Monitors;
 
 namespace IndoorCO2MapAppV2.Recording
@@ -59,7 +61,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             JObject json = new JObject
             {
-                ["d"] = "TestRunNewApp_" + SensorType + "_" + Random.Shared.Next(0, 100000),
+                ["d"] = "TestRunNewApp_" + SensorType + "_" + SensorID,
                 ["p"] = NwrType,
                 ["i"] = NwrID,
                 ["n"] = NwrName,
@@ -84,6 +86,13 @@ namespace IndoorCO2MapAppV2.Recording
         public static string ArrayToString(string[] array, string separator)
         {
             return string.Join(separator, array);
+        }
+
+        public static string GenerateSubmissionId(int length = 24)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var bytes = RandomNumberGenerator.GetBytes(length);
+            return new string(bytes.Select(b => chars[b % chars.Length]).ToArray());
         }
     }
 }

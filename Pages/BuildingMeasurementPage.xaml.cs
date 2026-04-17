@@ -210,6 +210,8 @@ namespace IndoorCO2MapAppV2.Pages
                 var rec = RecordingManager.Instance.ActiveRecording;
                 if (rec == null) return;
 
+                string submissionId = Converter.GenerateSubmissionId();
+
                 var builder = new APISubmissionBuilder(
                     rec,
                     trimMin: (int)TrimSlider.LowerValue,
@@ -220,6 +222,7 @@ namespace IndoorCO2MapAppV2.Pages
                     .WithOpenWindowsDoors(_doorsWindowsState)
                     .WithVentilationSystem(_ventilationState)
                     .WithNotes(customNote)
+                    .WithSubmissionId(submissionId)
                     .Build();
 
                 await Co2ApiGatewayClient.SubmitAsync(
@@ -250,6 +253,7 @@ namespace IndoorCO2MapAppV2.Pages
                         VentilationState = _ventilationState,
                         CustomNotes = customNote,
                         SensorType = rec.CO2MonitorType,
+                        SubmissionId = submissionId,
                     };
 
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);
