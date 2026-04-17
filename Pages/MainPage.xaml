@@ -445,13 +445,15 @@
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com"
                     Style="{StaticResource TonalButtonStyle}"
-                    HorizontalOptions="Fill"/>
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding Settings.ShowWebsiteButton}"/>
 
             <Button Text="🔗  Data Protection Info and Imprint"
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com/impressum.html"
                     Style="{StaticResource TonalButtonStyle}"
-                    HorizontalOptions="Fill"/>
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding Settings.ShowImprintButton}"/>
 
         </VerticalStackLayout>
     </ScrollView>

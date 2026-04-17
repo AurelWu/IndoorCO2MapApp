@@ -132,6 +132,20 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showRoutePreview, value);
         }
 
+        private bool _showWebsiteButton = true;
+        public bool ShowWebsiteButton
+        {
+            get => _showWebsiteButton;
+            set => SetProperty(ref _showWebsiteButton, value);
+        }
+
+        private bool _showImprintButton = true;
+        public bool ShowImprintButton
+        {
+            get => _showImprintButton;
+            set => SetProperty(ref _showImprintButton, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

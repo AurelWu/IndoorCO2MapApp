@@ -35,6 +35,8 @@
                 <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
                 <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
                 <c:LabeledSegmentedControl Label="Default Sort Mode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
+                <c:LabeledSwitch Text="Show 'Open Map in Browser' Button" IsToggled="{Binding ShowWebsiteButton}" />
+                <c:LabeledSwitch Text="Show 'Data Protection Info and Imprint' Button" IsToggled="{Binding ShowImprintButton}" />
             </VerticalStackLayout>
         </Border>
 
