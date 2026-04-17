@@ -18,6 +18,8 @@
             <Grid x:Name="RootGrid" RowDefinitions="Auto,Auto,*"
                 BindingContext="{x:Static vm:StatusViewModel.Instance}">
 
+                <VerticalStackLayout Spacing="0">
+
                 <!-- LARGE BAR — compact chip row -->
                 <Grid x:Name="LargeBar"
                       ColumnDefinitions="*,*"
@@ -117,6 +119,8 @@
                                VerticalOptions="Center" />
                     </Border>
                 </Grid>
+
+                </VerticalStackLayout>
 
                 <!-- STATUS TICKER -->
                 <Grid Grid.Row="1"
