@@ -498,6 +498,11 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        private void OnOpenUrlClicked(object sender, EventArgs e)
+        {
+            if (sender is Button btn && btn.CommandParameter is string url)
+                Launcher.OpenAsync(new Uri(url)).SafeFireAndForget("OnOpenUrlClicked");
+        }
 
     }
 }

@@ -39,7 +39,7 @@
                         Command="{Binding ImportCommand}"
                         Style="{StaticResource TonalButtonStyle}" />
 
-                <Button Text="🗺 Map"
+                <Button Text="Map"
                         Clicked="OnNavigateClicked"
                         CommandParameter="///map"
                         Style="{StaticResource TonalButtonStyle}" />
@@ -94,7 +94,8 @@
                                         <Label Text="{Binding LocationNameWithChevron}"
                                                FontSize="14"
                                                FontAttributes="Bold"
-                                               LineBreakMode="TailTruncation" />
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="2" />
                                         <Label Text="{Binding OsmId}"
                                                FontSize="11"
                                                IsVisible="{Binding HasOsmId}"
@@ -173,7 +174,8 @@
                                 <Label Text="{Binding LocationNameWithChevron}"
                                        FontSize="16"
                                        FontAttributes="Bold"
-                                       LineBreakMode="TailTruncation" />
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2" />
                                 <Label Text="{Binding OsmId}"
                                        FontSize="11"
                                        IsVisible="{Binding HasOsmId}"

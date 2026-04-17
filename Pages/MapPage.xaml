@@ -15,10 +15,6 @@
                     Clicked="OnNavigateClicked"
                     CommandParameter="///history"
                     Style="{StaticResource TonalButtonStyle}" />
-            <Label Grid.Column="1"
-                   Text="Measurement Map"
-                   FontSize="18" FontAttributes="Bold"
-                   VerticalOptions="Center" />
             <Border Grid.Column="2"
                     StrokeShape="RoundRectangle 8"
                     BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"

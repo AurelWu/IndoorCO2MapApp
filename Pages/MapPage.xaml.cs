@@ -69,10 +69,10 @@ namespace IndoorCO2MapAppV2.Pages
         private void UpdateToggleVisuals()
         {
             var activeColor   = Application.Current?.RequestedTheme == AppTheme.Dark
-                ? Color.FromArgb("#555555") : Colors.White;
+                ? Color.FromArgb("#ac99ea") : Color.FromArgb("#512BD4");
             var inactiveColor = Colors.Transparent;
             var activeText    = Application.Current?.RequestedTheme == AppTheme.Dark
-                ? Colors.White : Colors.Black;
+                ? Color.FromArgb("#190649") : Colors.White;
             var inactiveText  = Color.FromArgb("#888888");
 
             BuildingsToggleBtn.BackgroundColor = _showTransit ? inactiveColor : activeColor;
