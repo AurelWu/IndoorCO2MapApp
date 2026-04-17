@@ -97,14 +97,18 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     await _airValentHistoryPointer.WriteAsync(msg);
                 }
 
-                // 3️ Read history chunks
+                // 3️ Read history chunks — stop once we have enough minutes or exhaust available chunks
                 var historyBytesList = new List<byte>();
-                for (int i = 0; i < (chunkCount > 0 ? 2 : 1); i++)
+                int availableChunks = chunkCount > 0 ? chunkCount : 1;
+                int minutesAccumulated = 0;
+
+                for (int i = 0; i < availableChunks && minutesAccumulated < amountOfMinutes; i++)
                 {
                     var reply = await _airValentHistory.ReadAsync();
                     var bytes = reply.data.ToList();
                     if (bytes.Count > 8) bytes.RemoveRange(0, 8); // skip header
                     historyBytesList.AddRange(bytes);
+                    minutesAccumulated += bytes.Count / 8; // 8 bytes per minute record
                 }
 
                 // 4️ Convert to CO2 values

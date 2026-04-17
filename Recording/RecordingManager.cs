@@ -143,8 +143,7 @@ namespace IndoorCO2MapAppV2.Recording
             if (minutes < 1)
                 return;
 
-            //we read max 120 minutes for now
-            await _monitor.RefreshHistoryAsync((ushort)Math.Min(minutes, 120));
+            await _monitor.RefreshHistoryAsync((ushort)Math.Min(minutes, 480));
 
             // Re-check after the await — recording could have been stopped
             if (ActiveRecording == null)

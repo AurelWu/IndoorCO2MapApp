@@ -238,43 +238,49 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 Debug.WriteLine($"TotalDataPoints: {totalDataPoints}, StartIndex: {startIndex}, PointsToRead: {pointsToRead}");
 
-                // 3. Build request packet with startIndex (adjust CreateCO2HistoryRequestPacket to take start index)
-                byte[] packet = CreateCO2HistoryRequestPacket((ushort)startIndex);
-
                 if (_writerCharacteristic.WriteType != Plugin.BLE.Abstractions.CharacteristicWriteType.Default)
                     _writerCharacteristic.WriteType = Plugin.BLE.Abstractions.CharacteristicWriteType.Default;
 
-                // 4. Send request
-                try
+                // Paginated read — Aranet returns one BLE-MTU page per request;
+                // keep requesting from the advancing index until all points are fetched.
+                var allValues = new List<ushort>();
+                int currentIndex = startIndex;
+                int remaining = pointsToRead;
+
+                while (remaining > 0)
                 {
-                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-                    await _writerCharacteristic.WriteAsync(packet, cts.Token);
+                    byte[] packet = CreateCO2HistoryRequestPacket((ushort)currentIndex);
+
+                    try
+                    {
+                        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                        await _writerCharacteristic.WriteAsync(packet, cts.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"WriteAsync failed: {ex.Message}");
+                        break;
+                    }
+
+                    await Task.Delay(35);
+
+                    using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    var pageResult = await _historyV2Characteristic.ReadAsync(readCts.Token);
+                    var data = pageResult.data;
+
+                    if (data.Length < 10) break;
+
+                    byte count = data[9];
+                    if (count == 0) break;
+
+                    for (int i = 0; i < count; i++)
+                        allValues.Add(BitConverter.ToUInt16(data, 10 + i * 2));
+
+                    currentIndex += count;
+                    remaining   -= count;
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"WriteAsync failed: {ex.Message}");
-                    return null;
-                }
 
-                // 5. Give device a short moment to prepare response
-                await Task.Delay(35);
-
-                // 6. Read the response
-                using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                var result = await _historyV2Characteristic.ReadAsync(readCts.Token);
-                var data = result.data;
-
-                if (data.Length < 10)
-                    return [];
-
-                byte count = data[9];
-                ushort[] values = new ushort[count];
-
-                for (int i = 0; i < count; i++)
-                    values[i] = BitConverter.ToUInt16(data, 10 + i * 2); 
-
-
-                return values;
+                return allValues.Count > 0 ? allValues.ToArray() : [];
             }
             catch (Exception ex)
             {
