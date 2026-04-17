@@ -18,6 +18,12 @@ namespace IndoorCO2MapAppV2.UIUtility
         [GeneratedRegex(@"`(.+?)`")]
         private static partial Regex CodeRegex();
 
+        [GeneratedRegex(@"!\[([^\]]*)\]\(([^)]+)\)")]
+        private static partial Regex ImageRegex();
+
+        [GeneratedRegex(@"\[([^\]]+)\]\(([^)]+)\)")]
+        private static partial Regex LinkRegex();
+
         public static string ToHtml(string markdown)
         {
             var lines = markdown.ReplaceLineEndings("\n").Split('\n');
@@ -75,6 +81,8 @@ namespace IndoorCO2MapAppV2.UIUtility
 
         private static string Inline(string text)
         {
+            text = ImageRegex().Replace(text, "<img src=\"$2\" alt=\"$1\" style=\"max-width:100%;height:auto;\">");
+            text = LinkRegex().Replace(text, "<a href=\"$2\">$1</a>");
             text = BoldRegex().Replace(text, "<strong>$1</strong>");
             text = ItalicRegex().Replace(text, "<em>$1</em>");
             text = CodeRegex().Replace(text, "<code>$1</code>");
@@ -111,9 +119,12 @@ namespace IndoorCO2MapAppV2.UIUtility
                 }
                 strong { font-weight: 600; }
                 hr { border: none; border-top: 1px solid #ccc; margin: 16px 0; }
+                a { color: #512BD4; }
+                img { display: block; margin: 8px 0; border-radius: 6px; }
                 @media (prefers-color-scheme: dark) {
                   body  { color: #e8e8e8; background: transparent; }
                   code  { background: #2a2a2a; }
+                  a     { color: #ac99ea; }
                 }
               </style>
             </head>
