@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Net.Http;
+using System.Text;
 using System.Windows.Input;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
@@ -10,6 +12,9 @@ namespace IndoorCO2MapAppV2.ViewModels
 {
     public class HistoryViewModel : INotifyPropertyChanged
     {
+        private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
+        private const string DeleteEndpoint = "https://nlg29ka74k.execute-api.eu-central-1.amazonaws.com/DeleteLastSubmission";
+
         private List<CO2RecordingItem> _allItems = new();
         private string _filterText = "";
         private bool _isGrouped;
@@ -60,6 +65,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         public ICommand ToggleGroupExpandCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ImportCommand { get; }
+        public ICommand DeleteCommand { get; }
 
         public HistoryViewModel()
         {
@@ -105,6 +111,30 @@ namespace IndoorCO2MapAppV2.ViewModels
                 }
             });
 
+            DeleteCommand = new Command<CO2RecordingItem>(async item =>
+            {
+                bool hasOnlineId = !string.IsNullOrEmpty(item.SubmissionId);
+                string msg = hasOnlineId
+                    ? "Do you want to remove this entry from the online database and local history?"
+                    : "Remove this entry from local history? (No submission ID — online entry cannot be removed.)";
+
+                bool confirm = await App.Current.MainPage.DisplayAlertAsync("Delete Entry", msg, "Delete", "Cancel");
+                if (!confirm) return;
+
+                if (hasOnlineId)
+                {
+                    try
+                    {
+                        var content = new StringContent(item.SubmissionId, Encoding.UTF8, "text/plain");
+                        await _http.PostAsync(DeleteEndpoint, content);
+                    }
+                    catch { }
+                }
+
+                await App.HistoryDatabase.DeleteRecordingAsync(item.Id);
+                _allItems.RemoveAll(i => i.Id == item.Id);
+                ApplyFilter();
+            });
         }
 
         public async Task ReloadRecordingsAsync()
@@ -225,6 +255,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             VentilationState = r.VentilationState;
             CustomNotes = r.CustomNotes;
             SensorType = r.SensorType;
+            SubmissionId = r.SubmissionId;
 
             PpmList = Values.Split(';', StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => ushort.TryParse(s, out var v) ? v : (ushort)0)

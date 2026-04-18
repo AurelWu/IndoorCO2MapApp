@@ -208,7 +208,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private async Task SearchBuildingsPMTilesAsync(double lat, double lon)
         {
-            Status = "Searching buildings (PMTiles)...";
+            Status = "Searching buildings...";
             try
             {
                 var results = await PMTilesLocationService.Instance.SearchAsync(lat, lon, Range);

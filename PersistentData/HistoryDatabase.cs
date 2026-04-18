@@ -29,6 +29,9 @@ namespace IndoorCO2MapAppV2.PersistentData
         public Task<int> SaveRecordingAsync(PersistentRecording recording) =>
             _database.InsertAsync(recording);
 
+        public Task<int> DeleteRecordingAsync(int id) =>
+            _database.DeleteAsync<PersistentRecording>(id);
+
         public void Dispose()
         {
             // Dispose the underlying connection
