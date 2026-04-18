@@ -116,7 +116,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             // On slow devices (e.g. Android 12) the GATT stack may not be fully settled
             // after the initial read, leaving CurrentCO2 = 0. Retry until we get a value
             // or the user selects a different device.
-            for (int i = 0; i < 5 && CurrentCO2 == 0 && SelectedDevice == device; i++)
+            for (int i = 0; i < 5 && CurrentCO2 == 0 && !IsSmartHomeWarningVisible && SelectedDevice == device; i++)
             {
                 Logger.WriteToLog($"SensorViewModel|SelectDeviceAsync retry {i + 1}/5: CO2 still 0, waiting 3s...");
                 await Task.Delay(3000);
@@ -132,6 +132,9 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             Logger.WriteToLog("SensorViewModel |RefreshLiveCO2Async called", LogMode.Verbose);
             await _monitorManager.RefreshLiveCO2Async();
+            IsSmartHomeWarningVisible =
+                (_monitorManager.ActiveCO2MonitorProvider as IndoorCO2MapAppV2.CO2Monitors.AranetProvider)
+                ?.IsSmartHomeDisabled ?? false;
         }
 
         public async Task RefreshUpdateIntervalAsync()

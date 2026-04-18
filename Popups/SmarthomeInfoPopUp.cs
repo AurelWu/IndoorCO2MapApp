@@ -13,20 +13,14 @@ namespace IndoorCO2MapAppV2.Popups
     partial class SmarthomeInfoPopUp : Popup
     {
         public SmarthomeInfoPopUp()
-        {            
-            var titleLabel = new Label
-            {
-                Text = "Enabling Smart Home Integration",
-                TextColor = Colors.Black,
-                FontSize = 16,
-                FontAttributes = FontAttributes.Bold,
-                HorizontalOptions = LayoutOptions.Center
-            };
+        {
+            var display = DeviceDisplay.MainDisplayInfo;
+            double screenW = display.Width / display.Density;
+            double screenH = display.Height / display.Density;
 
             var description1 = new Label
             {
                 Text = "To read the data from your Aranet4, Smart Home Integration needs to be enabled.\n\n1) Open the official Aranet Home App (install from App Store if not installed)",
-                TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -36,14 +30,12 @@ namespace IndoorCO2MapAppV2.Popups
                 Source = "aranetlogo.png",
                 HeightRequest = 64,
                 WidthRequest = 64,
-                //Aspect = Aspect.AspectFit,
                 HorizontalOptions = LayoutOptions.Center
             };
 
             var description2 = new Label
             {
                 Text = "2) Press the Gears Icon in the top right of the sensor",
-                TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -59,7 +51,6 @@ namespace IndoorCO2MapAppV2.Popups
             var description3 = new Label
             {
                 Text = "3) Move the Smart Home Integration Slider to the right",
-                TextColor = Colors.Black,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -72,39 +63,33 @@ namespace IndoorCO2MapAppV2.Popups
                 HorizontalOptions = LayoutOptions.Center
             };
 
-
             var closeButton = new Button
             {
                 Text = "Close",
                 Command = new Command(() => this.CloseAsync().SafeFireAndForget())
             };
 
-
-            var popupContent = new VerticalStackLayout
+            var stack = new VerticalStackLayout
             {
-                Padding = 20,
-                Spacing = 10,
+                Padding = new Thickness(12, 8),
+                Spacing = 8,
                 BackgroundColor = Color.FromArgb("#F0F8FF"),
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                Children =
-        {
-            titleLabel,
-            description1,
-            image1,
-            description2,
-            image2,
-            description3,
-            image3,
-            closeButton
-        }
+                HorizontalOptions = LayoutOptions.Fill,
+                Children = { description1, image1, description2, image2, description3, image3, closeButton }
+            };
+
+            var scrollView = new ScrollView
+            {
+                Content = stack,
+                WidthRequest = screenW - 40,
+                HeightRequest = screenH * 0.8
             };
 
             var tapGestureRecognizer = new TapGestureRecognizer();
-            tapGestureRecognizer.Tapped += (s, e) => this.CloseAsync().SafeFireAndForget(); // Close on tap anywhere
-            popupContent.GestureRecognizers.Add(tapGestureRecognizer);
+            tapGestureRecognizer.Tapped += (s, e) => this.CloseAsync().SafeFireAndForget();
+            stack.GestureRecognizers.Add(tapGestureRecognizer);
 
-            Content = popupContent;
+            Content = scrollView;
         }
     }
 }
