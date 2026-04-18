@@ -149,9 +149,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 var result = await _liveCharacteristic.ReadAsync(cts.Token);
-                var data = result.data;
 
-                // Only read if data has enough bytes
+                if (result.resultCode == 2)
+                    return 0;
+
+                var data = result.data;
                 return data.Length >= 11
                     ? (data[10] << 8) | data[9]
                     : 0;
