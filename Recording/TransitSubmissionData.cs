@@ -76,7 +76,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             var json = new JObject
             {
-                ["d"] = $"NewApp_{_sensorType}_{_sensorId}",
+                ["d"] = $"{(DeviceInfo.Platform == DevicePlatform.Android ? "A" : "i")}{AppInfo.BuildString}_{_sensorType}_{_sensorId}",
                 ["b"] = _startTime,
                 ["st"] = _startNWRType,
                 ["si"] = _startID,

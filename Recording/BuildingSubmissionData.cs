@@ -61,7 +61,7 @@ namespace IndoorCO2MapAppV2.Recording
 
             JObject json = new JObject
             {
-                ["d"] = "TestRunNewApp_" + SensorType + "_" + SensorID,
+                ["d"] = (DeviceInfo.Platform == DevicePlatform.Android ? "A" : "i") + AppInfo.BuildString + "_" + SensorType + "_" + SensorID,
                 ["p"] = NwrType,
                 ["i"] = NwrID,
                 ["n"] = NwrName,
