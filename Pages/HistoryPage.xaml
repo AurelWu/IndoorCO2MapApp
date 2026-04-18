@@ -130,16 +130,22 @@
                                         Readings="{Binding PpmReadings}"
                                         HeightRequest="120"
                                         IsVisible="{Binding HasReadings}" />
-                                    <Button Text="🗑"
-                                            FontSize="14"
-                                            Command="{Binding BindingContext.DeleteCommand, Source={x:Reference RecordingsCollection}}"
-                                            CommandParameter="{Binding .}"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
-                                            BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
-                                            HorizontalOptions="Start"
-                                            HeightRequest="36"
-                                            Padding="12,0" />
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Button Text="🗑"
+                                                FontSize="14"
+                                                Command="{Binding BindingContext.DeleteCommand, Source={x:Reference RecordingsCollection}}"
+                                                CommandParameter="{Binding .}"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                                                BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                                                IsEnabled="{Binding IsDeleting, Converter={StaticResource InvertBooleanConverter}}"
+                                                HeightRequest="36"
+                                                Padding="12,0" />
+                                        <ActivityIndicator IsRunning="{Binding IsDeleting}"
+                                                           IsVisible="{Binding IsDeleting}"
+                                                           WidthRequest="20" HeightRequest="20"
+                                                           VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
                                 </StackLayout>
 
                             </StackLayout>
@@ -269,16 +275,22 @@
                                                    VerticalOptions="Center"
                                                    TextColor="{Binding AvgCO2Color}"
                                                    Margin="8,0" />
-                                            <Button Grid.Column="2"
-                                                    Text="🗑"
-                                                    FontSize="12"
-                                                    Command="{Binding BindingContext.DeleteCommand, Source={x:Reference GroupedCollection}}"
-                                                    CommandParameter="{Binding .}"
-                                                    Style="{StaticResource SecondaryButtonStyle}"
-                                                    TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
-                                                    BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
-                                                    HeightRequest="30"
-                                                    Padding="8,0" />
+                                            <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                                <Button Text="🗑"
+                                                        FontSize="12"
+                                                        Command="{Binding BindingContext.DeleteCommand, Source={x:Reference GroupedCollection}}"
+                                                        CommandParameter="{Binding .}"
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                                                        BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
+                                                        IsEnabled="{Binding IsDeleting, Converter={StaticResource InvertBooleanConverter}}"
+                                                        HeightRequest="30"
+                                                        Padding="8,0" />
+                                                <ActivityIndicator IsRunning="{Binding IsDeleting}"
+                                                                   IsVisible="{Binding IsDeleting}"
+                                                                   WidthRequest="16" HeightRequest="16"
+                                                                   VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
                                         </Grid>
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>

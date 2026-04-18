@@ -121,19 +121,27 @@ namespace IndoorCO2MapAppV2.ViewModels
                 bool confirm = await App.Current.MainPage.DisplayAlertAsync("Delete Entry", msg, "Delete", "Cancel");
                 if (!confirm) return;
 
-                if (hasOnlineId)
+                item.IsDeleting = true;
+                try
                 {
-                    try
+                    if (hasOnlineId)
                     {
-                        var content = new StringContent(item.SubmissionId, Encoding.UTF8, "text/plain");
-                        await _http.PostAsync(DeleteEndpoint, content);
+                        try
+                        {
+                            var content = new StringContent(item.SubmissionId, Encoding.UTF8, "text/plain");
+                            await _http.PostAsync(DeleteEndpoint, content);
+                        }
+                        catch { }
                     }
-                    catch { }
-                }
 
-                await App.HistoryDatabase.DeleteRecordingAsync(item.Id);
-                _allItems.RemoveAll(i => i.Id == item.Id);
-                ApplyFilter();
+                    await App.HistoryDatabase.DeleteRecordingAsync(item.Id);
+                    _allItems.RemoveAll(i => i.Id == item.Id);
+                    ApplyFilter();
+                }
+                finally
+                {
+                    item.IsDeleting = false;
+                }
             });
         }
 
@@ -207,6 +215,17 @@ namespace IndoorCO2MapAppV2.ViewModels
                 _isExpanded = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LocationNameWithChevron)));
+            }
+        }
+
+        private bool _isDeleting;
+        public bool IsDeleting
+        {
+            get => _isDeleting;
+            set
+            {
+                _isDeleting = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDeleting)));
             }
         }
 
