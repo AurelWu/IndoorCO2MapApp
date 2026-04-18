@@ -146,6 +146,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showImprintButton, value);
         }
 
+        private string _language = "en";
+        public string Language
+        {
+            get => _language;
+            set => SetProperty(ref _language, value);
+        }
+
 
 
         public static void Init(UserSettings settings) =>

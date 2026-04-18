@@ -4,6 +4,7 @@
               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
               xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
+              xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
               x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
               Title="History">
 
@@ -46,16 +47,16 @@
             </HorizontalStackLayout>
 
             <!-- Search / filter -->
-            <SearchBar Placeholder="Filter by location..."
+            <SearchBar Placeholder="{x:Static t:Localisation.HistoryFilterPlaceholder}"
                        Text="{Binding FilterText}"
                        HorizontalOptions="Fill" />
 
             <!-- Sort + Group toggles — wrap to next line on narrow screens -->
             <FlexLayout Wrap="Wrap" Direction="Row" AlignItems="Center">
-                <controls:LabeledSwitch Text="Group by location"
+                <controls:LabeledSwitch Text="{x:Static t:Localisation.HistoryGroupByLocation}"
                                         IsToggled="{Binding IsGrouped}"
                                         Margin="0,0,24,4" />
-                <controls:LabeledSwitch Text="Sort A–Z"
+                <controls:LabeledSwitch Text="{x:Static t:Localisation.HistorySortAZ}"
                                         IsToggled="{Binding SortAlphabetical}"
                                         Margin="0,0,0,4" />
             </FlexLayout>
@@ -107,7 +108,7 @@
                                                FontAttributes="Bold"
                                                TextColor="{Binding AvgCO2Color}"
                                                HorizontalOptions="End" />
-                                        <Label Text="ppm avg"
+                                        <Label Text="{x:Static t:Localisation.HistoryPpmAvg}"
                                                FontSize="10"
                                                Style="{StaticResource MicroLabelStyle}"
                                                HorizontalOptions="End" />
@@ -196,7 +197,7 @@
                                        FontSize="11"
                                        IsVisible="{Binding HasOsmId}"
                                        Style="{StaticResource MicroLabelStyle}" />
-                                <Label Text="{Binding TotalCount, StringFormat='{0} recordings'}"
+                                <Label Text="{Binding RecordingsCountText}"
                                        FontSize="12"
                                        Style="{StaticResource CaptionLabelStyle}" />
                             </VerticalStackLayout>
@@ -209,7 +210,7 @@
                                        FontAttributes="Bold"
                                        TextColor="{Binding AvgCO2Color}"
                                        HorizontalOptions="End" />
-                                <Label Text="ppm avg"
+                                <Label Text="{x:Static t:Localisation.HistoryPpmAvg}"
                                        FontSize="10"
                                        Style="{StaticResource MicroLabelStyle}"
                                        HorizontalOptions="End" />

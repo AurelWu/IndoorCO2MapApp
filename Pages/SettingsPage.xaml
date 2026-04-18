@@ -17,6 +17,19 @@
         <Button Text="Building Recording Debug" Clicked="OnNavigateClicked" CommandParameter="///buildingRecordingDebug" HorizontalOptions="Fill"/>
         -->
 
+        <!-- ===== Language ===== -->
+        <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Language" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSegmentedControl Label="App Language"
+                    Items="{Binding LanguageOptions}"
+                    SelectedItem="{Binding SelectedLanguage}" />
+                <Label Text="{Binding LanguageRestartHint}"
+                       FontSize="12"
+                       Style="{StaticResource CaptionLabelStyle}" />
+            </VerticalStackLayout>
+        </Border>
+
         <!-- ===== Sensor ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">

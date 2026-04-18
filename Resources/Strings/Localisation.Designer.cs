@@ -338,5 +338,98 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
                 return ResourceManager.GetString("UpdateInterval", resourceCulture);
             }
         }
+
+        internal static string SettingsLanguageRestartHint {
+            get {
+                return ResourceManager.GetString("SettingsLanguageRestartHint", resourceCulture);
+            }
+        }
+
+        internal static string MainMenuModeBuilding {
+            get { return ResourceManager.GetString("MainMenuModeBuilding", resourceCulture); }
+        }
+
+        internal static string MainMenuModeTransit {
+            get { return ResourceManager.GetString("MainMenuModeTransit", resourceCulture); }
+        }
+
+        internal static string MainMenuButtonStartTransitRecording {
+            get { return ResourceManager.GetString("MainMenuButtonStartTransitRecording", resourceCulture); }
+        }
+
+        internal static string MainMenuBlockedNoBuilding {
+            get { return ResourceManager.GetString("MainMenuBlockedNoBuilding", resourceCulture); }
+        }
+
+        internal static string MainMenuBlockedNoSensor {
+            get { return ResourceManager.GetString("MainMenuBlockedNoSensor", resourceCulture); }
+        }
+
+        internal static string MainMenuBlockedWaitingCO2 {
+            get { return ResourceManager.GetString("MainMenuBlockedWaitingCO2", resourceCulture); }
+        }
+
+        internal static string MainMenuBlockedNoStation {
+            get { return ResourceManager.GetString("MainMenuBlockedNoStation", resourceCulture); }
+        }
+
+        internal static string MainMenuBlockedNoRoute {
+            get { return ResourceManager.GetString("MainMenuBlockedNoRoute", resourceCulture); }
+        }
+        internal static string RadioYes { get { return ResourceManager.GetString("RadioYes", resourceCulture); } }
+        internal static string RadioNo { get { return ResourceManager.GetString("RadioNo", resourceCulture); } }
+        internal static string RadioNoData { get { return ResourceManager.GetString("RadioNoData", resourceCulture); } }
+        internal static string TransitDestinationLabel { get { return ResourceManager.GetString("TransitDestinationLabel", resourceCulture); } }
+        internal static string TransitSearchNearbyStops { get { return ResourceManager.GetString("TransitSearchNearbyStops", resourceCulture); } }
+        internal static string TransitSelectDestination { get { return ResourceManager.GetString("TransitSelectDestination", resourceCulture); } }
+        internal static string TransitRouteStationPlaceholder { get { return ResourceManager.GetString("TransitRouteStationPlaceholder", resourceCulture); } }
+        internal static string MainMenuResumingRecording { get { return ResourceManager.GetString("MainMenuResumingRecording", resourceCulture); } }
+        internal static string MainMenuSubmissionSuccessful { get { return ResourceManager.GetString("MainMenuSubmissionSuccessful", resourceCulture); } }
+        internal static string MainMenuResumeRecording { get { return ResourceManager.GetString("MainMenuResumeRecording", resourceCulture); } }
+        internal static string MainMenuRoutePreview { get { return ResourceManager.GetString("MainMenuRoutePreview", resourceCulture); } }
+        internal static string MainMenuNewsButton { get { return ResourceManager.GetString("MainMenuNewsButton", resourceCulture); } }
+        internal static string MainMenuStatisticsButton { get { return ResourceManager.GetString("MainMenuStatisticsButton", resourceCulture); } }
+        internal static string MainMenuOpenMapInBrowser { get { return ResourceManager.GetString("MainMenuOpenMapInBrowser", resourceCulture); } }
+        internal static string MainMenuDataProtectionImprint { get { return ResourceManager.GetString("MainMenuDataProtectionImprint", resourceCulture); } }
+        internal static string TransitSearchRoutesByName { get { return ResourceManager.GetString("TransitSearchRoutesByName", resourceCulture); } }
+        internal static string HistoryFilterPlaceholder { get { return ResourceManager.GetString("HistoryFilterPlaceholder", resourceCulture); } }
+        internal static string HistoryGroupByLocation { get { return ResourceManager.GetString("HistoryGroupByLocation", resourceCulture); } }
+        internal static string HistorySortAZ { get { return ResourceManager.GetString("HistorySortAZ", resourceCulture); } }
+        internal static string HistoryRecordingsCount { get { return ResourceManager.GetString("HistoryRecordingsCount", resourceCulture); } }
+        internal static string HistoryPpmAvg { get { return ResourceManager.GetString("HistoryPpmAvg", resourceCulture); } }
+        internal static string HistoryDeleteTitle { get { return ResourceManager.GetString("HistoryDeleteTitle", resourceCulture); } }
+        internal static string HistoryDeleteConfirmOnline { get { return ResourceManager.GetString("HistoryDeleteConfirmOnline", resourceCulture); } }
+        internal static string HistoryDeleteConfirmLocal { get { return ResourceManager.GetString("HistoryDeleteConfirmLocal", resourceCulture); } }
+        internal static string HistoryDeleteButton { get { return ResourceManager.GetString("HistoryDeleteButton", resourceCulture); } }
+        internal static string HistoryCancelButton { get { return ResourceManager.GetString("HistoryCancelButton", resourceCulture); } }
+        internal static string TimeAgoJustNow { get { return ResourceManager.GetString("TimeAgoJustNow", resourceCulture); } }
+        internal static string TimeAgoToday { get { return ResourceManager.GetString("TimeAgoToday", resourceCulture); } }
+        internal static string TimeAgoYesterday { get { return ResourceManager.GetString("TimeAgoYesterday", resourceCulture); } }
+        internal static string TimeAgoDaysAgo { get { return ResourceManager.GetString("TimeAgoDaysAgo", resourceCulture); } }
+        internal static string TimeAgoOneWeekAgo { get { return ResourceManager.GetString("TimeAgoOneWeekAgo", resourceCulture); } }
+        internal static string TimeAgoWeeksAgo { get { return ResourceManager.GetString("TimeAgoWeeksAgo", resourceCulture); } }
+        internal static string TimeAgoOneMonthAgo { get { return ResourceManager.GetString("TimeAgoOneMonthAgo", resourceCulture); } }
+        internal static string TimeAgoMonthsAgo { get { return ResourceManager.GetString("TimeAgoMonthsAgo", resourceCulture); } }
+        internal static string TimeAgoOneYearAgo { get { return ResourceManager.GetString("TimeAgoOneYearAgo", resourceCulture); } }
+        internal static string TimeAgoYearsAgo { get { return ResourceManager.GetString("TimeAgoYearsAgo", resourceCulture); } }
+        internal static string ContextWindowsOpen { get { return ResourceManager.GetString("ContextWindowsOpen", resourceCulture); } }
+        internal static string ContextWindowsClosed { get { return ResourceManager.GetString("ContextWindowsClosed", resourceCulture); } }
+        internal static string ContextVentilated { get { return ResourceManager.GetString("ContextVentilated", resourceCulture); } }
+        internal static string ContextNotVentilated { get { return ResourceManager.GetString("ContextNotVentilated", resourceCulture); } }
+        internal static string HistoryStatsLine { get { return ResourceManager.GetString("HistoryStatsLine", resourceCulture); } }
+        internal static string HistoryNoData { get { return ResourceManager.GetString("HistoryNoData", resourceCulture); } }
+        internal static string TransitSearchButton { get { return ResourceManager.GetString("TransitSearchButton", resourceCulture); } }
+        internal static string TransitSearchingButton { get { return ResourceManager.GetString("TransitSearchingButton", resourceCulture); } }
+        internal static string TransitModeAll { get { return ResourceManager.GetString("TransitModeAll", resourceCulture); } }
+        internal static string TransitModeBus { get { return ResourceManager.GetString("TransitModeBus", resourceCulture); } }
+        internal static string TransitModeTram { get { return ResourceManager.GetString("TransitModeTram", resourceCulture); } }
+        internal static string TransitModeTrain { get { return ResourceManager.GetString("TransitModeTrain", resourceCulture); } }
+        internal static string TransitModeLightRail { get { return ResourceManager.GetString("TransitModeLightRail", resourceCulture); } }
+        internal static string TransitModeSubway { get { return ResourceManager.GetString("TransitModeSubway", resourceCulture); } }
+        internal static string SensorWaitingForData { get { return ResourceManager.GetString("SensorWaitingForData", resourceCulture); } }
+        internal static string SmartHomeStep1 { get { return ResourceManager.GetString("SmartHomeStep1", resourceCulture); } }
+        internal static string SmartHomeStep2 { get { return ResourceManager.GetString("SmartHomeStep2", resourceCulture); } }
+        internal static string SmartHomeStep3 { get { return ResourceManager.GetString("SmartHomeStep3", resourceCulture); } }
+        internal static string SmartHomeClose { get { return ResourceManager.GetString("SmartHomeClose", resourceCulture); } }
     }
 }

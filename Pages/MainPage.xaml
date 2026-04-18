@@ -36,7 +36,7 @@
         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
         <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
             <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-            <Label Text="Resuming recording…"
+            <Label Text="{x:Static t:Localisation.MainMenuResumingRecording}"
                    TextColor="White"
                    FontSize="15"
                    FontAttributes="Bold"
@@ -54,7 +54,7 @@
             Padding="20,28"
             ZIndex="10">
         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
-        <Label Text="✓  Submission Successful"
+        <Label Text="{x:Static t:Localisation.MainMenuSubmissionSuccessful}"
                TextColor="White"
                FontSize="15"
                FontAttributes="Bold"
@@ -135,7 +135,7 @@
                     <!-- Mode toggle -->
                     <c:LabeledSegmentedControl Label=""
                         Items="{Binding RecordingModeOptions}"
-                        SelectedItem="Building"
+                        SelectedItem="{x:Static t:Localisation.MainMenuModeBuilding}"
                         FillWidth="True"
                         SelectionChangedCommand="{Binding RecordingModeChangedCommand}" />
 
@@ -334,7 +334,7 @@
                         </Grid>
 
                         <!-- Route text filter -->
-                        <Entry Placeholder="Search routes by name..."
+                        <Entry Placeholder="{x:Static t:Localisation.TransitSearchRoutesByName}"
                                Text="{Binding Transit.RouteFilterText}" />
 
                         <!-- Route preview map (hidden entirely when disabled in settings) -->
@@ -345,7 +345,7 @@
                             <!-- Collapse header + map — only shown once geometry is loaded -->
                             <VerticalStackLayout IsVisible="{Binding Transit.HasRouteGeometry}" Spacing="4">
                                 <Grid ColumnDefinitions="*, Auto">
-                                    <Label Text="Route Preview" VerticalOptions="Center" FontSize="13"
+                                    <Label Text="{x:Static t:Localisation.MainMenuRoutePreview}" VerticalOptions="Center" FontSize="13"
                                            TextColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource SecondaryDarkText}}" />
                                     <Button Grid.Column="1"
                                             Text="{Binding Transit.RoutePreviewExpanderText}"
@@ -390,7 +390,7 @@
 
                     <!-- Transit recording -->
                     <VerticalStackLayout IsVisible="{Binding IsTransitMode}" Spacing="10">
-                        <Button Text="Start Transit Recording"
+                        <Button Text="{x:Static t:Localisation.MainMenuButtonStartTransitRecording}"
                                 Command="{Binding StartTransitRecordingCommand}"
                                 IsEnabled="{Binding CanStartTransitRecording}"
                                 HorizontalOptions="Fill" />
@@ -404,7 +404,7 @@
 
                     <Button
                         x:Name="ManualResumeButton"
-                        Text="Resume Recording"
+                        Text="{x:Static t:Localisation.MainMenuResumeRecording}"
                         IsVisible="False"
                         Clicked="OnManualResumeClicked" />
 
@@ -420,13 +420,13 @@
                     HorizontalOptions="Fill"/>
 
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                <Button Text="News"
+                <Button Text="{x:Static t:Localisation.MainMenuNewsButton}"
                         Clicked="OnNavigateClicked"
                         CommandParameter="///news"
                         Style="{StaticResource TonalButtonStyle}"
                         HorizontalOptions="Fill"
                         Grid.Column="0"/>
-                <Button Text="Statistics"
+                <Button Text="{x:Static t:Localisation.MainMenuStatisticsButton}"
                         Clicked="OnNavigateClicked"
                         CommandParameter="///statistics"
                         Style="{StaticResource TonalButtonStyle}"
@@ -441,14 +441,14 @@
                     HorizontalOptions="Fill"
                     IsVisible="{Binding HasRecordings}"/>
 
-            <Button Text="🔗  Open Map in Browser"
+            <Button Text="{x:Static t:Localisation.MainMenuOpenMapInBrowser}"
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com"
                     Style="{StaticResource TonalButtonStyle}"
                     HorizontalOptions="Fill"
                     IsVisible="{Binding Settings.ShowWebsiteButton}"/>
 
-            <Button Text="🔗  Data Protection Info and Imprint"
+            <Button Text="{x:Static t:Localisation.MainMenuDataProtectionImprint}"
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com/impressum.html"
                     Style="{StaticResource TonalButtonStyle}"

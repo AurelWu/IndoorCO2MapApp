@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using CommunityToolkit.Maui.Views;
 using IndoorCO2MapAppV2.ExtensionMethods;
+using IndoorCO2MapAppV2.Resources.Strings;
 
 
 namespace IndoorCO2MapAppV2.Popups
@@ -20,7 +21,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description1 = new Label
             {
-                Text = "To read the data from your Aranet4, Smart Home Integration needs to be enabled.\n\n1) Open the official Aranet Home App (install from App Store if not installed)",
+                Text = Localisation.SmartHomeStep1,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -35,7 +36,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description2 = new Label
             {
-                Text = "2) Press the Gears Icon in the top right of the sensor",
+                Text = Localisation.SmartHomeStep2,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -50,7 +51,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var description3 = new Label
             {
-                Text = "3) Move the Smart Home Integration Slider to the right",
+                Text = Localisation.SmartHomeStep3,
                 FontSize = 12,
                 HorizontalOptions = LayoutOptions.Center
             };
@@ -65,7 +66,7 @@ namespace IndoorCO2MapAppV2.Popups
 
             var closeButton = new Button
             {
-                Text = "Close",
+                Text = Localisation.SmartHomeClose,
                 Command = new Command(() => this.CloseAsync().SafeFireAndForget())
             };
 

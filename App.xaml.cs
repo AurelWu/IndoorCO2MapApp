@@ -15,6 +15,9 @@ namespace IndoorCO2MapAppV2
 
         public App()
         {
+            IndoorCO2MapAppV2.Resources.Strings.Localisation.Culture =
+                new System.Globalization.CultureInfo(UserSettings.Instance.Language);
+
             InitializeComponent();
             _ = ViewModels.StatusViewModel.FetchAppStatusAsync();
             ViewModels.StatusViewModel.StartPeriodicRefresh();

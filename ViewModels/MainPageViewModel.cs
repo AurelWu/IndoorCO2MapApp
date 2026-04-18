@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Pages;
 using IndoorCO2MapAppV2.Recording;
+using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using System.ComponentModel;
 
@@ -22,7 +23,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public OverpassFetchState FetchState { get; }
 
-        public List<string> RecordingModeOptions { get; } = ["Building", "Transit"];
+        public List<string> RecordingModeOptions { get; } =
+            [Localisation.MainMenuModeBuilding, Localisation.MainMenuModeTransit];
 
         [ObservableProperty] private bool hasRecordings;
         [ObservableProperty] private bool isTransitMode;
@@ -41,7 +43,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             StartTransitRecordingCommand = new AsyncRelayCommand(StartTransitRecordingAsync);
             RecordingModeChangedCommand = new RelayCommand<string>(mode =>
             {
-                IsTransitMode = mode == "Transit";
+                IsTransitMode = mode == RecordingModeOptions[1];
                 OnPropertyChanged(nameof(IsBuildingMode));
                 OnPropertyChanged(nameof(CanStartTransitRecording));
                 OnPropertyChanged(nameof(IsTransitRecordingBlocked));
@@ -162,9 +164,9 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             get
             {
-                if (BuildingSearch.SelectedBuilding == null) return "No building selected";
-                if (Sensor.SelectedDevice == null)           return "No sensor connected";
-                if (Sensor.CurrentCO2 == 0)                  return "Waiting for CO2 reading (0 ppm)";
+                if (BuildingSearch.SelectedBuilding == null) return Localisation.MainMenuBlockedNoBuilding;
+                if (Sensor.SelectedDevice == null)           return Localisation.MainMenuBlockedNoSensor;
+                if (Sensor.CurrentCO2 == 0)                  return Localisation.MainMenuBlockedWaitingCO2;
                 return string.Empty;
             }
         }
@@ -181,10 +183,10 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             get
             {
-                if (Transit.SelectedStation == null) return "No station selected";
-                if (Transit.SelectedRoute == null)   return "No route selected";
-                if (Sensor.SelectedDevice == null)   return "No sensor connected";
-                if (Sensor.CurrentCO2 == 0)          return "Waiting for CO2 reading (0 ppm)";
+                if (Transit.SelectedStation == null) return Localisation.MainMenuBlockedNoStation;
+                if (Transit.SelectedRoute == null)   return Localisation.MainMenuBlockedNoRoute;
+                if (Sensor.SelectedDevice == null)   return Localisation.MainMenuBlockedNoSensor;
+                if (Sensor.CurrentCO2 == 0)          return Localisation.MainMenuBlockedWaitingCO2;
                 return string.Empty;
             }
         }

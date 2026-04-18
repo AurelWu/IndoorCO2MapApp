@@ -160,6 +160,22 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public string AppVersion =>
             $"Version {AppInfo.VersionString} ({AppInfo.BuildString})";
+
+        public IReadOnlyList<string> LanguageOptions => ["EN", "DE", "FR", "PT"];
+
+        public string LanguageRestartHint => Localisation.SettingsLanguageRestartHint;
+
+        public string SelectedLanguage
+        {
+            get => UserSettings.Instance.Language.ToUpperInvariant();
+            set
+            {
+                string code = value.ToLowerInvariant();
+                if (UserSettings.Instance.Language == code) return;
+                UserSettings.Instance.Language = code;
+                OnPropertyChanged();
+            }
+        }
     }
 
 }

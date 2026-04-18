@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Resources.Strings;
 
 namespace IndoorCO2MapAppV2.ViewModels
 {
@@ -22,6 +23,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         // --- Aggregate stats ---
         public int TotalCount { get; }
+        public string RecordingsCountText => string.Format(Localisation.HistoryRecordingsCount, TotalCount);
         public int TotalPages { get; }
         public string AvgCO2Range { get; }
         public double MeanCO2 { get; }

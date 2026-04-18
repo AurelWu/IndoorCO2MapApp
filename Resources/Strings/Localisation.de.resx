@@ -1,64 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -117,4 +58,291 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MonitorSelectionLabel" xml:space="preserve">
+    <value>CO2-Sensor ausw&#228;hlen</value>
+  </data>
+  <data name="ScanningStatusLabel" xml:space="preserve">
+    <value>Suche nach Ger&#228;ten...</value>
+  </data>
+  <data name="SearchRangeLabel" xml:space="preserve">
+    <value>Suchradius: </value>
+  </data>
+  <data name="CurrentCOLevelsLabel" xml:space="preserve">
+    <value>Aktuelles CO2: </value>
+  </data>
+  <data name="CO2LevelsLabel" xml:space="preserve">
+    <value>CO2: </value>
+  </data>
+  <data name="NoSensorFoundStatusLabel" xml:space="preserve">
+    <value>Kein Sensor gefunden</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Ready" xml:space="preserve">
+    <value>Geb&#228;ude suchen</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Searching" xml:space="preserve">
+    <value>Standortdaten werden abgerufen...</value>
+  </data>
+  <data name="Sort_Alphabetical" xml:space="preserve">
+    <value>Alphabetisch</value>
+  </data>
+  <data name="Sort_Distance" xml:space="preserve">
+    <value>Entfernung</value>
+  </data>
+  <data name="RecordingLocationLabel" xml:space="preserve">
+    <value>Ort: </value>
+  </data>
+  <data name="CancelRecordingButton" xml:space="preserve">
+    <value>Aufnahme abbrechen</value>
+  </data>
+  <data name="SubmitRecordingButton" xml:space="preserve">
+    <value>Messung &#252;bermitteln</value>
+  </data>
+  <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
+    <value>5 Datenpunkte f&#252;r &#220;bermittlung n&#246;tig</value>
+  </data>
+  <data name="UpdateInterval" xml:space="preserve">
+    <value>Intervall: </value>
+  </data>
+  <data name="HistoryExportDatabaseTitle" xml:space="preserve">
+    <value>Exportieren</value>
+  </data>
+  <data name="HistoryExportDatabaseSuccess" xml:space="preserve">
+    <value>Export abgeschlossen</value>
+  </data>
+  <data name="HistoryExportDatabaseFailure" xml:space="preserve">
+    <value>Export fehlgeschlagen</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulTitle" xml:space="preserve">
+    <value>Import erfolgreich</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulDescription" xml:space="preserve">
+    <value>Datenbank erfolgreich importiert. Bitte starten Sie die App neu, um die neue Datenbank zu laden.</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureTitle" xml:space="preserve">
+    <value>Import fehlgeschlagen</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureDescription" xml:space="preserve">
+    <value>Datenbank konnte nicht importiert werden. Bitte versuchen Sie es erneut.</value>
+  </data>
+  <data name="RadioButtonLabelOpenDoorsWindows" xml:space="preserve">
+    <value>T&#252;ren / Fenster ge&#246;ffnet</value>
+  </data>
+  <data name="RadioButtonLabelVentilationSystem" xml:space="preserve">
+    <value>Bel&#252;ftungssystem</value>
+  </data>
+  <data name="RecordingCustomNoteLabelText" xml:space="preserve">
+    <value>Notiz</value>
+  </data>
+  <data name="RecordingCustomNotPlaceholderText" xml:space="preserve">
+    <value>Notiz zur Messung hinzuf&#252;gen...</value>
+  </data>
+  <data name="MainMenuButtonStartBuildingRecording" xml:space="preserve">
+    <value>Geb&#228;udemessung starten</value>
+  </data>
+  <data name="MainMenuPrerecordingSwitchText" xml:space="preserve">
+    <value>15 Min. Voraufzeichnung aktivieren</value>
+  </data>
+  <data name="MainMenuSettingsButtonText" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="MainMenuHistoryButtonText" xml:space="preserve">
+    <value>Historie</value>
+  </data>
+  <data name="MainMenuResultFilterPlaceholderText" xml:space="preserve">
+    <value>Nach Name suchen...</value>
+  </data>
+  <data name="SettingsLanguageRestartHint" xml:space="preserve">
+    <value>Erfordert einen App-Neustart.</value>
+  </data>
+  <data name="MainMenuModeBuilding" xml:space="preserve">
+    <value>Geb&#228;ude</value>
+  </data>
+  <data name="MainMenuModeTransit" xml:space="preserve">
+    <value>Transit</value>
+  </data>
+  <data name="MainMenuButtonStartTransitRecording" xml:space="preserve">
+    <value>Transitaufnahme starten</value>
+  </data>
+  <data name="MainMenuBlockedNoBuilding" xml:space="preserve">
+    <value>Kein Geb&#228;ude ausgew&#228;hlt</value>
+  </data>
+  <data name="MainMenuBlockedNoSensor" xml:space="preserve">
+    <value>Kein Sensor verbunden</value>
+  </data>
+  <data name="MainMenuBlockedWaitingCO2" xml:space="preserve">
+    <value>Warte auf CO2-Messung (0 ppm)</value>
+  </data>
+  <data name="MainMenuBlockedNoStation" xml:space="preserve">
+    <value>Kein Bahnhof ausgew&#228;hlt</value>
+  </data>
+  <data name="MainMenuBlockedNoRoute" xml:space="preserve">
+    <value>Keine Linie ausgew&#228;hlt</value>
+  </data>
+  <data name="RadioYes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="RadioNo" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="RadioNoData" xml:space="preserve">
+    <value>Keine Angabe</value>
+  </data>
+  <data name="TransitDestinationLabel" xml:space="preserve">
+    <value>Ziel (Optional)</value>
+  </data>
+  <data name="TransitSearchNearbyStops" xml:space="preserve">
+    <value>Nahegelegene Haltestellen suchen</value>
+  </data>
+  <data name="TransitSelectDestination" xml:space="preserve">
+    <value>Zielhaltestelle ausw&#228;hlen...</value>
+  </data>
+  <data name="TransitRouteStationPlaceholder" xml:space="preserve">
+    <value>[Linie / Haltestelle]</value>
+  </data>
+  <data name="MainMenuResumingRecording" xml:space="preserve">
+    <value>Aufnahme wird fortgesetzt&#8230;</value>
+  </data>
+  <data name="MainMenuSubmissionSuccessful" xml:space="preserve">
+    <value>&#10003;  &#220;bermittlung erfolgreich</value>
+  </data>
+  <data name="MainMenuResumeRecording" xml:space="preserve">
+    <value>Aufnahme fortsetzen</value>
+  </data>
+  <data name="MainMenuRoutePreview" xml:space="preserve">
+    <value>Linienvorschau</value>
+  </data>
+  <data name="MainMenuNewsButton" xml:space="preserve">
+    <value>Neuigkeiten</value>
+  </data>
+  <data name="MainMenuStatisticsButton" xml:space="preserve">
+    <value>Statistiken</value>
+  </data>
+  <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
+    <value>&#128279;  Karte im Browser &#246;ffnen</value>
+  </data>
+  <data name="MainMenuDataProtectionImprint" xml:space="preserve">
+    <value>&#128279;  Datenschutz und Impressum</value>
+  </data>
+  <data name="TransitSearchRoutesByName" xml:space="preserve">
+    <value>Linien nach Name suchen...</value>
+  </data>
+  <data name="HistoryFilterPlaceholder" xml:space="preserve">
+    <value>Nach Ort filtern...</value>
+  </data>
+  <data name="HistoryGroupByLocation" xml:space="preserve">
+    <value>Nach Ort gruppieren</value>
+  </data>
+  <data name="HistorySortAZ" xml:space="preserve">
+    <value>Alphabetisch (A&#8211;Z)</value>
+  </data>
+  <data name="HistoryRecordingsCount" xml:space="preserve">
+    <value>{0} Aufnahmen</value>
+  </data>
+  <data name="HistoryPpmAvg" xml:space="preserve">
+    <value>ppm &#216;</value>
+  </data>
+  <data name="HistoryDeleteTitle" xml:space="preserve">
+    <value>Eintrag l&#246;schen</value>
+  </data>
+  <data name="HistoryDeleteConfirmOnline" xml:space="preserve">
+    <value>M&#246;chten Sie diesen Eintrag aus der Online-Datenbank und dem lokalen Verlauf entfernen?</value>
+  </data>
+  <data name="HistoryDeleteConfirmLocal" xml:space="preserve">
+    <value>Eintrag aus dem lokalen Verlauf entfernen? (Keine &#220;bermittlungs-ID &#8212; Online-Eintrag kann nicht entfernt werden.)</value>
+  </data>
+  <data name="HistoryDeleteButton" xml:space="preserve">
+    <value>L&#246;schen</value>
+  </data>
+  <data name="HistoryCancelButton" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="TimeAgoJustNow" xml:space="preserve">
+    <value>gerade eben</value>
+  </data>
+  <data name="TimeAgoToday" xml:space="preserve">
+    <value>heute</value>
+  </data>
+  <data name="TimeAgoYesterday" xml:space="preserve">
+    <value>gestern</value>
+  </data>
+  <data name="TimeAgoDaysAgo" xml:space="preserve">
+    <value>vor {0} Tagen</value>
+  </data>
+  <data name="TimeAgoOneWeekAgo" xml:space="preserve">
+    <value>vor 1 Woche</value>
+  </data>
+  <data name="TimeAgoWeeksAgo" xml:space="preserve">
+    <value>vor {0} Wochen</value>
+  </data>
+  <data name="TimeAgoOneMonthAgo" xml:space="preserve">
+    <value>vor 1 Monat</value>
+  </data>
+  <data name="TimeAgoMonthsAgo" xml:space="preserve">
+    <value>vor {0} Monaten</value>
+  </data>
+  <data name="TimeAgoOneYearAgo" xml:space="preserve">
+    <value>vor 1 Jahr</value>
+  </data>
+  <data name="TimeAgoYearsAgo" xml:space="preserve">
+    <value>vor {0} Jahren</value>
+  </data>
+  <data name="ContextWindowsOpen" xml:space="preserve">
+    <value>Fenster ge&#246;ffnet</value>
+  </data>
+  <data name="ContextWindowsClosed" xml:space="preserve">
+    <value>Fenster geschlossen</value>
+  </data>
+  <data name="ContextVentilated" xml:space="preserve">
+    <value>Bel&#252;ftet</value>
+  </data>
+  <data name="ContextNotVentilated" xml:space="preserve">
+    <value>Nicht bel&#252;ftet</value>
+  </data>
+  <data name="HistoryStatsLine" xml:space="preserve">
+    <value>Min: {0} &#183; Max: {1} &#183; {2} Messungen</value>
+  </data>
+  <data name="HistoryNoData" xml:space="preserve">
+    <value>Keine Daten</value>
+  </data>
+  <data name="TransitSearchButton" xml:space="preserve">
+    <value>Transit suchen</value>
+  </data>
+  <data name="TransitSearchingButton" xml:space="preserve">
+    <value>Suche l&#228;uft&#8230;</value>
+  </data>
+  <data name="TransitModeAll" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="TransitModeBus" xml:space="preserve">
+    <value>Bus</value>
+  </data>
+  <data name="TransitModeTram" xml:space="preserve">
+    <value>Stra&#223;enbahn</value>
+  </data>
+  <data name="TransitModeTrain" xml:space="preserve">
+    <value>Zug</value>
+  </data>
+  <data name="TransitModeLightRail" xml:space="preserve">
+    <value>Stadtbahn</value>
+  </data>
+  <data name="TransitModeSubway" xml:space="preserve">
+    <value>U-Bahn</value>
+  </data>
+  <data name="SensorWaitingForData" xml:space="preserve">
+    <value>Warte auf Sensordaten&#8230;</value>
+  </data>
+  <data name="SmartHomeStep1" xml:space="preserve">
+    <value>Um die Daten Ihres Aranet4 auszulesen, muss Smart Home Integration aktiviert sein.
+
+1) &#214;ffnen Sie die offizielle Aranet Home App (aus dem App Store installieren, falls nicht vorhanden)</value>
+  </data>
+  <data name="SmartHomeStep2" xml:space="preserve">
+    <value>2) Dr&#252;cken Sie das Zahnrad-Symbol oben rechts am Sensor</value>
+  </data>
+  <data name="SmartHomeStep3" xml:space="preserve">
+    <value>3) Bewegen Sie den Smart Home Integration Schieberegler nach rechts</value>
+  </data>
+  <data name="SmartHomeClose" xml:space="preserve">
+    <value>Schlie&#223;en</value>
+  </data>
 </root>

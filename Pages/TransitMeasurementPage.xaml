@@ -18,7 +18,7 @@
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
 
-    <Label x:Name="MeasuredLocationLabel" Text="[Route / Station]"
+    <Label x:Name="MeasuredLocationLabel" Text="{x:Static t:Localisation.TransitRouteStationPlaceholder}"
            Style="{StaticResource PageTitleStyle}"/>
 
     <Grid RowDefinitions="150, 55">
@@ -44,9 +44,9 @@
         <!-- Destination (optional) -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Destination (Optional)" Style="{StaticResource SectionLabelStyle}" />
+                <Label Text="{x:Static t:Localisation.TransitDestinationLabel}" Style="{StaticResource SectionLabelStyle}" />
                 <Button x:Name="SearchEndpointButton"
-                        Text="Search Nearby Stops"
+                        Text="{x:Static t:Localisation.TransitSearchNearbyStops}"
                         Clicked="OnSearchEndpointClicked"
                         HorizontalOptions="Fill" />
                 <ActivityIndicator x:Name="EndpointSearchIndicator"
@@ -65,7 +65,7 @@
                         <Picker x:Name="EndpointPicker"
                                 ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}"
                                 SelectedIndexChanged="OnEndpointPickerSelectionChanged"
-                                Title="Select destination stop..." />
+                                Title="{x:Static t:Localisation.TransitSelectDestination}" />
                     </Border>
                     <Label x:Name="EndpointStarLabel"
                            Grid.Column="1"
@@ -93,20 +93,20 @@
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
                         x:Name="WindowsUnknownRb"
-                        Content="No data"
+                        Content="{x:Static t:Localisation.RadioNoData}"
                         IsChecked="True"
                         GroupName="TransitWindowsGroup"
                         Value="{x:Static enums:TriState.Unknown}"
                         CheckedChanged="OnWindowsChanged" />
                     <RadioButton
                         x:Name="WindowsYesRb"
-                        Content="Yes"
+                        Content="{x:Static t:Localisation.RadioYes}"
                         GroupName="TransitWindowsGroup"
                         Value="{x:Static enums:TriState.Yes}"
                         CheckedChanged="OnWindowsChanged" />
                     <RadioButton
                         x:Name="WindowsNoRb"
-                        Content="No"
+                        Content="{x:Static t:Localisation.RadioNo}"
                         GroupName="TransitWindowsGroup"
                         Value="{x:Static enums:TriState.No}"
                         CheckedChanged="OnWindowsChanged" />
@@ -119,20 +119,20 @@
                 <HorizontalStackLayout Spacing="5">
                     <RadioButton
                         x:Name="VentilationUnknownRb"
-                        Content="No data"
+                        Content="{x:Static t:Localisation.RadioNoData}"
                         IsChecked="True"
                         GroupName="TransitVentilationGroup"
                         Value="{x:Static enums:TriState.Unknown}"
                         CheckedChanged="OnVentilationChanged" />
                     <RadioButton
                         x:Name="VentilationYesRb"
-                        Content="Yes"
+                        Content="{x:Static t:Localisation.RadioYes}"
                         GroupName="TransitVentilationGroup"
                         Value="{x:Static enums:TriState.Yes}"
                         CheckedChanged="OnVentilationChanged" />
                     <RadioButton
                         x:Name="VentilationNoRb"
-                        Content="No"
+                        Content="{x:Static t:Localisation.RadioNo}"
                         GroupName="TransitVentilationGroup"
                         Value="{x:Static enums:TriState.No}"
                         CheckedChanged="OnVentilationChanged" />

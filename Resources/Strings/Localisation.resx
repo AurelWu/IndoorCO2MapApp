@@ -210,4 +210,198 @@
   <data name="MainMenuResultFilterPlaceholderText" xml:space="preserve">
     <value>Search by name...</value>
   </data>
+  <data name="SettingsLanguageRestartHint" xml:space="preserve">
+    <value>Requires app restart to take effect.</value>
+  </data>
+  <data name="MainMenuModeBuilding" xml:space="preserve">
+    <value>Building</value>
+  </data>
+  <data name="MainMenuModeTransit" xml:space="preserve">
+    <value>Transit</value>
+  </data>
+  <data name="MainMenuButtonStartTransitRecording" xml:space="preserve">
+    <value>Start Transit Recording</value>
+  </data>
+  <data name="MainMenuBlockedNoBuilding" xml:space="preserve">
+    <value>No building selected</value>
+  </data>
+  <data name="MainMenuBlockedNoSensor" xml:space="preserve">
+    <value>No sensor connected</value>
+  </data>
+  <data name="MainMenuBlockedWaitingCO2" xml:space="preserve">
+    <value>Waiting for CO2 reading (0 ppm)</value>
+  </data>
+  <data name="MainMenuBlockedNoStation" xml:space="preserve">
+    <value>No station selected</value>
+  </data>
+  <data name="MainMenuBlockedNoRoute" xml:space="preserve">
+    <value>No route selected</value>
+  </data>
+  <data name="RadioYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="RadioNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="RadioNoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="TransitDestinationLabel" xml:space="preserve">
+    <value>Destination (Optional)</value>
+  </data>
+  <data name="TransitSearchNearbyStops" xml:space="preserve">
+    <value>Search Nearby Stops</value>
+  </data>
+  <data name="TransitSelectDestination" xml:space="preserve">
+    <value>Select destination stop...</value>
+  </data>
+  <data name="TransitRouteStationPlaceholder" xml:space="preserve">
+    <value>[Route / Station]</value>
+  </data>
+  <data name="MainMenuResumingRecording" xml:space="preserve">
+    <value>Resuming recording…</value>
+  </data>
+  <data name="MainMenuSubmissionSuccessful" xml:space="preserve">
+    <value>✓  Submission Successful</value>
+  </data>
+  <data name="MainMenuResumeRecording" xml:space="preserve">
+    <value>Resume Recording</value>
+  </data>
+  <data name="MainMenuRoutePreview" xml:space="preserve">
+    <value>Route Preview</value>
+  </data>
+  <data name="MainMenuNewsButton" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="MainMenuStatisticsButton" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
+    <value>🔗  Open Map in Browser</value>
+  </data>
+  <data name="MainMenuDataProtectionImprint" xml:space="preserve">
+    <value>🔗  Data Protection Info and Imprint</value>
+  </data>
+  <data name="TransitSearchRoutesByName" xml:space="preserve">
+    <value>Search routes by name...</value>
+  </data>
+  <data name="HistoryFilterPlaceholder" xml:space="preserve">
+    <value>Filter by location...</value>
+  </data>
+  <data name="HistoryGroupByLocation" xml:space="preserve">
+    <value>Group by location</value>
+  </data>
+  <data name="HistorySortAZ" xml:space="preserve">
+    <value>Sort A–Z</value>
+  </data>
+  <data name="HistoryRecordingsCount" xml:space="preserve">
+    <value>{0} recordings</value>
+  </data>
+  <data name="HistoryPpmAvg" xml:space="preserve">
+    <value>ppm avg</value>
+  </data>
+  <data name="HistoryDeleteTitle" xml:space="preserve">
+    <value>Delete Entry</value>
+  </data>
+  <data name="HistoryDeleteConfirmOnline" xml:space="preserve">
+    <value>Do you want to remove this entry from the online database and local history?</value>
+  </data>
+  <data name="HistoryDeleteConfirmLocal" xml:space="preserve">
+    <value>Remove this entry from local history? (No submission ID — online entry cannot be removed.)</value>
+  </data>
+  <data name="HistoryDeleteButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="HistoryCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="TimeAgoJustNow" xml:space="preserve">
+    <value>just now</value>
+  </data>
+  <data name="TimeAgoToday" xml:space="preserve">
+    <value>today</value>
+  </data>
+  <data name="TimeAgoYesterday" xml:space="preserve">
+    <value>yesterday</value>
+  </data>
+  <data name="TimeAgoDaysAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="TimeAgoOneWeekAgo" xml:space="preserve">
+    <value>1 week ago</value>
+  </data>
+  <data name="TimeAgoWeeksAgo" xml:space="preserve">
+    <value>{0} weeks ago</value>
+  </data>
+  <data name="TimeAgoOneMonthAgo" xml:space="preserve">
+    <value>1 month ago</value>
+  </data>
+  <data name="TimeAgoMonthsAgo" xml:space="preserve">
+    <value>{0} months ago</value>
+  </data>
+  <data name="TimeAgoOneYearAgo" xml:space="preserve">
+    <value>1 year ago</value>
+  </data>
+  <data name="TimeAgoYearsAgo" xml:space="preserve">
+    <value>{0} years ago</value>
+  </data>
+  <data name="ContextWindowsOpen" xml:space="preserve">
+    <value>Windows open</value>
+  </data>
+  <data name="ContextWindowsClosed" xml:space="preserve">
+    <value>Windows closed</value>
+  </data>
+  <data name="ContextVentilated" xml:space="preserve">
+    <value>Ventilated</value>
+  </data>
+  <data name="ContextNotVentilated" xml:space="preserve">
+    <value>Not ventilated</value>
+  </data>
+  <data name="HistoryStatsLine" xml:space="preserve">
+    <value>Min: {0} · Max: {1} · {2} readings</value>
+  </data>
+  <data name="HistoryNoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="TransitSearchButton" xml:space="preserve">
+    <value>Search Transit</value>
+  </data>
+  <data name="TransitSearchingButton" xml:space="preserve">
+    <value>Searching…</value>
+  </data>
+  <data name="TransitModeAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="TransitModeBus" xml:space="preserve">
+    <value>Bus</value>
+  </data>
+  <data name="TransitModeTram" xml:space="preserve">
+    <value>Tram</value>
+  </data>
+  <data name="TransitModeTrain" xml:space="preserve">
+    <value>Train</value>
+  </data>
+  <data name="TransitModeLightRail" xml:space="preserve">
+    <value>LightRail</value>
+  </data>
+  <data name="TransitModeSubway" xml:space="preserve">
+    <value>Subway</value>
+  </data>
+  <data name="SensorWaitingForData" xml:space="preserve">
+    <value>Waiting for sensor data…</value>
+  </data>
+  <data name="SmartHomeStep1" xml:space="preserve">
+    <value>To read the data from your Aranet4, Smart Home Integration needs to be enabled.
+
+1) Open the official Aranet Home App (install from App Store if not installed)</value>
+  </data>
+  <data name="SmartHomeStep2" xml:space="preserve">
+    <value>2) Press the Gears Icon in the top right of the sensor</value>
+  </data>
+  <data name="SmartHomeStep3" xml:space="preserve">
+    <value>3) Move the Smart Home Integration Slider to the right</value>
+  </data>
+  <data name="SmartHomeClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

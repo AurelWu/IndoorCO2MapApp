@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.UIUtility;
 using System.Collections.ObjectModel;
@@ -17,7 +18,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         private double _searchLat;
         private double _searchLon;
 
-        public List<string> ModeFilterOptions { get; } = ["All", "Bus", "Tram", "Train", "LightRail", "Subway"];
+        public List<string> ModeFilterOptions { get; } = [Localisation.TransitModeAll, Localisation.TransitModeBus, Localisation.TransitModeTram, Localisation.TransitModeTrain, Localisation.TransitModeLightRail, Localisation.TransitModeSubway];
 
         public ObservableCollection<LocationData> Stations { get; } = [];
         public ObservableCollection<TransitLineData> FilteredRoutes { get; } = [];
@@ -34,7 +35,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         private string routeFilterText = "";
 
         [ObservableProperty]
-        private string modeFilter = "All";
+        private string modeFilter = Localisation.TransitModeAll;
 
         [ObservableProperty]
         private string status = "";
@@ -72,7 +73,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         public bool HasRouteGeometry => SelectedRouteGeometry != null;
         public string RoutePreviewExpanderText => IsRoutePreviewExpanded ? "▲" : "▼";
 
-        public string SearchButtonText => IsSearching ? "Searching…" : "Search Transit";
+        public string SearchButtonText => IsSearching ? Localisation.TransitSearchingButton : Localisation.TransitSearchButton;
 
         public bool CanStartRecording => SelectedStation != null && SelectedRoute != null;
 
@@ -247,15 +248,12 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             var previous = preserveSelection ? SelectedRoute : null;
 
-            var osm = ModeFilter switch
-            {
-                "Bus" => "bus",
-                "Tram" => "tram",
-                "Train" => "train",
-                "LightRail" => "light_rail",
-                "Subway" => "subway",
-                _ => null
-            };
+            string? osm = null;
+            if (ModeFilter == Localisation.TransitModeBus)           osm = "bus";
+            else if (ModeFilter == Localisation.TransitModeTram)     osm = "tram";
+            else if (ModeFilter == Localisation.TransitModeTrain)    osm = "train";
+            else if (ModeFilter == Localisation.TransitModeLightRail) osm = "light_rail";
+            else if (ModeFilter == Localisation.TransitModeSubway)   osm = "subway";
 
             IEnumerable<TransitLineData> data = _locationStore.TransitLines;
 

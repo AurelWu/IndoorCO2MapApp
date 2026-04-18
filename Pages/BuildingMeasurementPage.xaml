@@ -47,7 +47,7 @@
                     <HorizontalStackLayout Spacing="5">
                         <RadioButton
                 x:Name="DoorsWindowsUnknownRb"
-                Content="No data"
+                Content="{x:Static t:Localisation.RadioNoData}"
                 IsChecked="True"
                 GroupName="DoorsWindowsGroup"
                 Value="{x:Static enums:TriState.Unknown}"
@@ -55,14 +55,14 @@
 
                         <RadioButton
                 x:Name="DoorsWindowsYesRb"
-                Content="Yes"
+                Content="{x:Static t:Localisation.RadioYes}"
                 GroupName="DoorsWindowsGroup"
                 Value="{x:Static enums:TriState.Yes}"
                 CheckedChanged="OnDoorsWindowsChanged" />
 
                         <RadioButton
                 x:Name="DoorsWindowsNoRb"
-                Content="No"
+                Content="{x:Static t:Localisation.RadioNo}"
                 GroupName="DoorsWindowsGroup"
                 Value="{x:Static enums:TriState.No}"
                 CheckedChanged="OnDoorsWindowsChanged" />
@@ -75,7 +75,7 @@
                     <HorizontalStackLayout Spacing="5">
                         <RadioButton
                 x:Name="VentilationUnknownRb"
-                Content="No data"
+                Content="{x:Static t:Localisation.RadioNoData}"
                 GroupName="VentilationGroup"
                 IsChecked="True"
                 Value="{x:Static enums:TriState.Unknown}"
@@ -83,14 +83,14 @@
 
                         <RadioButton
                 x:Name="VentilationYesRb"
-                Content="Yes"
+                Content="{x:Static t:Localisation.RadioYes}"
                 GroupName="VentilationGroup"
                 Value="{x:Static enums:TriState.Yes}"
                 CheckedChanged="OnVentilationChanged" />
 
                         <RadioButton
                 x:Name="VentilationNoRb"
-                Content="No"
+                Content="{x:Static t:Localisation.RadioNo}"
                 GroupName="VentilationGroup"
                 Value="{x:Static enums:TriState.No}"
                 CheckedChanged="OnVentilationChanged" />

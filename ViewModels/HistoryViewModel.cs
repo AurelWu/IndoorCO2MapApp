@@ -115,10 +115,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 bool hasOnlineId = !string.IsNullOrEmpty(item.SubmissionId);
                 string msg = hasOnlineId
-                    ? "Do you want to remove this entry from the online database and local history?"
-                    : "Remove this entry from local history? (No submission ID — online entry cannot be removed.)";
+                    ? Localisation.HistoryDeleteConfirmOnline
+                    : Localisation.HistoryDeleteConfirmLocal;
 
-                bool confirm = await App.Current.MainPage.DisplayAlertAsync("Delete Entry", msg, "Delete", "Cancel");
+                bool confirm = await App.Current.MainPage.DisplayAlertAsync(
+                    Localisation.HistoryDeleteTitle, msg,
+                    Localisation.HistoryDeleteButton, Localisation.HistoryCancelButton);
                 if (!confirm) return;
 
                 item.IsDeleting = true;
@@ -249,16 +251,16 @@ namespace IndoorCO2MapAppV2.ViewModels
         public static string ToTimeAgo(long unixMs)
         {
             var diff = System.DateTime.Now - DateTimeOffset.FromUnixTimeMilliseconds(unixMs).LocalDateTime;
-            if (diff.TotalHours < 1)  return "just now";
-            if (diff.TotalDays  < 1)  return "today";
-            if (diff.TotalDays  < 2)  return "yesterday";
-            if (diff.TotalDays  < 7)  return $"{(int)diff.TotalDays} days ago";
-            if (diff.TotalDays  < 14) return "1 week ago";
-            if (diff.TotalDays  < 30) return $"{(int)(diff.TotalDays / 7)} weeks ago";
-            if (diff.TotalDays  < 60) return "1 month ago";
-            if (diff.TotalDays  < 365) return $"{(int)(diff.TotalDays / 30)} months ago";
-            if (diff.TotalDays  < 730) return "1 year ago";
-            return $"{(int)(diff.TotalDays / 365)} years ago";
+            if (diff.TotalHours < 1)   return Localisation.TimeAgoJustNow;
+            if (diff.TotalDays  < 1)   return Localisation.TimeAgoToday;
+            if (diff.TotalDays  < 2)   return Localisation.TimeAgoYesterday;
+            if (diff.TotalDays  < 7)   return string.Format(Localisation.TimeAgoDaysAgo, (int)diff.TotalDays);
+            if (diff.TotalDays  < 14)  return Localisation.TimeAgoOneWeekAgo;
+            if (diff.TotalDays  < 30)  return string.Format(Localisation.TimeAgoWeeksAgo, (int)(diff.TotalDays / 7));
+            if (diff.TotalDays  < 60)  return Localisation.TimeAgoOneMonthAgo;
+            if (diff.TotalDays  < 365) return string.Format(Localisation.TimeAgoMonthsAgo, (int)(diff.TotalDays / 30));
+            if (diff.TotalDays  < 730) return Localisation.TimeAgoOneYearAgo;
+            return string.Format(Localisation.TimeAgoYearsAgo, (int)(diff.TotalDays / 365));
         }
 
         public CO2RecordingItem(PersistentRecording r)
@@ -291,14 +293,14 @@ namespace IndoorCO2MapAppV2.ViewModels
                     : Color.FromArgb("#F44336");
 
             StatsLine = DataPoints > 0
-                ? $"Min: {MinCO2} · Max: {MaxCO2} · {DataPoints} readings"
-                : "No data";
+                ? string.Format(Localisation.HistoryStatsLine, MinCO2, MaxCO2, DataPoints)
+                : Localisation.HistoryNoData;
 
             var parts = new List<string>();
-            if (DoorWindowState == TriState.Yes) parts.Add("Windows open");
-            else if (DoorWindowState == TriState.No) parts.Add("Windows closed");
-            if (VentilationState == TriState.Yes) parts.Add("Ventilated");
-            else if (VentilationState == TriState.No) parts.Add("Not ventilated");
+            if (DoorWindowState == TriState.Yes) parts.Add(Localisation.ContextWindowsOpen);
+            else if (DoorWindowState == TriState.No) parts.Add(Localisation.ContextWindowsClosed);
+            if (VentilationState == TriState.Yes) parts.Add(Localisation.ContextVentilated);
+            else if (VentilationState == TriState.No) parts.Add(Localisation.ContextNotVentilated);
             if (!string.IsNullOrWhiteSpace(CustomNotes))
                 parts.Add(CustomNotes.Length > 40 ? CustomNotes[..40] + "…" : CustomNotes);
 
