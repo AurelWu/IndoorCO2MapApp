@@ -146,8 +146,20 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.ShowRoutePreview = value; OnPropertyChanged(); }
         }
 
+        public bool ShowWebsiteButton
+        {
+            get => UserSettings.Instance.ShowWebsiteButton;
+            set { UserSettings.Instance.ShowWebsiteButton = value; OnPropertyChanged(); }
+        }
 
+        public bool ShowImprintButton
+        {
+            get => UserSettings.Instance.ShowImprintButton;
+            set { UserSettings.Instance.ShowImprintButton = value; OnPropertyChanged(); }
+        }
 
+        public string AppVersion =>
+            $"Version {AppInfo.VersionString} ({AppInfo.BuildString})";
     }
 
 }
