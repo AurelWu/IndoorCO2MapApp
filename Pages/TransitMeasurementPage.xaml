@@ -21,14 +21,15 @@
     <Label x:Name="MeasuredLocationLabel" Text="{x:Static t:Localisation.TransitRouteStationPlaceholder}"
            Style="{StaticResource PageTitleStyle}"/>
 
+    <!-- Chart + slider share the grid area. Slider spans both rows so its
+         transparent hit-extensions cover the full chart height. Chart sits
+         on top visually (added last = higher z-order) but is InputTransparent
+         so touches fall through to the slider's extended hit areas. -->
     <Grid RowDefinitions="150, 55">
-        <controls:LineChartView x:Name="lineChartView"
-                                Grid.Row="0"
-                                HeightRequest="150"
-                                WidthRequest="400" />
         <controls:RangeSlider
             x:Name="TrimSlider"
-            Grid.Row="1"
+            Grid.Row="0"
+            Grid.RowSpan="2"
             RangeChanged="OnTrimChanged"
             Minimum="0"
             Maximum="20"
@@ -39,6 +40,11 @@
             TrackColor="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
             HighlightColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
             WidthRequest="375" />
+        <controls:LineChartView x:Name="lineChartView"
+                                Grid.Row="0"
+                                HeightRequest="150"
+                                WidthRequest="400"
+                                InputTransparent="True" />
     </Grid>
 
         <!-- Destination (optional) -->

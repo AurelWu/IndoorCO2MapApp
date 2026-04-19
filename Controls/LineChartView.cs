@@ -50,6 +50,8 @@ namespace IndoorCO2MapAppV2.Controls
             _drawable = new LineChartDrawable();
             Drawable = _drawable;
             UpdateThemeColor();
+            if (Application.Current != null)
+                Application.Current.RequestedThemeChanged += (_, _) => { UpdateThemeColor(); Invalidate(); };
         }
 
         internal void SetData(List<CO2Reading> newData, int trimStart, int trimEnd)
@@ -97,20 +99,9 @@ namespace IndoorCO2MapAppV2.Controls
 
         private void UpdateThemeColor()
         {
-            ResourceDictionary? colorResource = Application.Current?.Resources.MergedDictionaries.FirstOrDefault();
-            if (colorResource != null && colorResource.TryGetValue("ThemeLineColor", out var colorValue) && colorValue is AppThemeColor themeColor)
-            {
-                AppTheme? currentTheme = Application.Current?.RequestedTheme;
-                Color? lineColor = currentTheme == AppTheme.Light ? themeColor.Light : themeColor.Dark;
-                if (lineColor != null)
-                {
-                    _drawable.LineColor = lineColor;
-                }
-            }
-            else
-            {
-                _drawable.LineColor = Colors.Gray;
-            }
+            _drawable.LineColor = Application.Current?.RequestedTheme == AppTheme.Dark
+                ? Colors.White
+                : Colors.Black;
         }
 
         private class LineChartDrawable : IDrawable
@@ -154,25 +145,25 @@ namespace IndoorCO2MapAppV2.Controls
                 if (Data.Length < 2)
                 {
                     // Draw axes skeleton then centered placeholder
-                    canvas.StrokeColor = Colors.Black;
+                    canvas.StrokeColor = LineColor;
                     canvas.StrokeSize = 2;
                     canvas.StrokeDashPattern = [1, 0];
                     canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, height - paddingBottom);
                     canvas.DrawLine(paddingLeft, height - paddingBottom, width - paddingRight, height - paddingBottom);
-                    canvas.FontColor = Colors.Gray;
+                    canvas.FontColor = LineColor;
                     canvas.FontSize = 13;
                     canvas.DrawString("Waiting for data…", paddingLeft, 0, usableWidth, height, HorizontalAlignment.Center, VerticalAlignment.Center);
                     return;
                 }
 
-                canvas.FillColor = Colors.Black;
+                canvas.FillColor = LineColor;
 
                 float xScale = usableWidth / (float)(Data.Length - 1);
                 float maxValue = GetMaxDataValue();
                 float minValue = 300;
                 float yScale = usableHeight / (maxValue - minValue);
 
-                canvas.StrokeColor = Colors.Black;
+                canvas.StrokeColor = LineColor;
                 canvas.StrokeSize = 2;
                 for (int i = 0; i < Data.Length; i++)
                 {
@@ -183,8 +174,8 @@ namespace IndoorCO2MapAppV2.Controls
                         canvas.DrawLine(x, height - paddingBottom, x, height - paddingBottom - 5);
                 }
 
-                canvas.StrokeColor = Colors.Black;
-                canvas.FontColor = Colors.Black;
+                canvas.StrokeColor = LineColor;
+                canvas.FontColor = LineColor;
                 canvas.FontSize = 8;
                 canvas.StrokeSize = 2;
                 for (int i = 400; i <= maxValue; i += 400)
@@ -196,7 +187,7 @@ namespace IndoorCO2MapAppV2.Controls
 
                 if (Data.Length > 0)
                 {
-                    canvas.StrokeColor = Colors.Black;
+                    canvas.StrokeColor = LineColor;
                     canvas.StrokeSize = 2;
                     float prevX = paddingLeft;
                     float prevY = height - paddingBottom - (Data[0] - minValue) * yScale;
@@ -212,8 +203,8 @@ namespace IndoorCO2MapAppV2.Controls
                         else
                         {
                             canvas.StrokeDashPattern = [1, 0];
-                            canvas.StrokeColor = Colors.Black;
-                            canvas.FillColor = Colors.Black;
+                            canvas.StrokeColor = LineColor;
+                            canvas.FillColor = LineColor;
                         }
                         float x = paddingLeft + i * xScale;
                         float y = height - paddingBottom - (Data[i] - minValue) * yScale;
@@ -225,7 +216,7 @@ namespace IndoorCO2MapAppV2.Controls
                         if (i < _trimStart || i > _trimEnd)
                             canvas.FillColor = Color.FromRgb(155, 155, 155);
                         else
-                            canvas.FillColor = Colors.Black;
+                            canvas.FillColor = LineColor;
 
                         if (Data.Length <= 25)
                             canvas.FillCircle(x, y, 5);
@@ -236,7 +227,7 @@ namespace IndoorCO2MapAppV2.Controls
                     }
                 }
 
-                canvas.StrokeColor = Colors.Black;
+                canvas.StrokeColor = LineColor;
                 canvas.StrokeDashPattern = [1, 0];
                 canvas.StrokeSize = 2;
                 canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, height - paddingBottom);

@@ -46,6 +46,9 @@ public partial class RangeSlider : ContentView
     private readonly BoxView _highlight = new() { HeightRequest = 4, CornerRadius = 2 };
     private readonly Border _lowerThumb = new() { Background = Colors.White, Stroke = Colors.Black, StrokeThickness = 1 };
     private readonly Border _upperThumb = new() { Background = Colors.White, Stroke = Colors.Black, StrokeThickness = 1 };
+    // Transparent hit-extension areas above each thumb (covers chart area above slider)
+    private readonly BoxView _lowerHitArea = new() { BackgroundColor = Colors.Transparent };
+    private readonly BoxView _upperHitArea = new() { BackgroundColor = Colors.Transparent };
     private readonly AbsoluteLayout _layout = new();
     private bool _isInitialized;
     private bool _isDragging;
@@ -62,11 +65,15 @@ public partial class RangeSlider : ContentView
         AbsoluteLayout.SetLayoutFlags(_highlight, AbsoluteLayoutFlags.None);
         AbsoluteLayout.SetLayoutFlags(_lowerThumb, AbsoluteLayoutFlags.None);
         AbsoluteLayout.SetLayoutFlags(_upperThumb, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutFlags(_lowerHitArea, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutFlags(_upperHitArea, AbsoluteLayoutFlags.None);
 
         _layout.Children.Add(_track);
         _layout.Children.Add(_highlight);
         _layout.Children.Add(_lowerThumb);
         _layout.Children.Add(_upperThumb);
+        _layout.Children.Add(_lowerHitArea);
+        _layout.Children.Add(_upperHitArea);
 
         Content = _layout;
 
@@ -80,7 +87,7 @@ public partial class RangeSlider : ContentView
         if (Application.Current != null)
             Application.Current.RequestedThemeChanged += (s, e) => UpdateTrackColors();
 
-        // Gesture recognizers
+        // Gesture recognizers on thumb visuals
         var lowerPan = new PanGestureRecognizer();
         lowerPan.PanUpdated += OnLowerPan;
         _lowerThumb.GestureRecognizers.Add(lowerPan);
@@ -88,6 +95,15 @@ public partial class RangeSlider : ContentView
         var upperPan = new PanGestureRecognizer();
         upperPan.PanUpdated += OnUpperPan;
         _upperThumb.GestureRecognizers.Add(upperPan);
+
+        // Extended hit area above each thumb (transparent, same pan handlers)
+        var lowerExtPan = new PanGestureRecognizer();
+        lowerExtPan.PanUpdated += OnLowerPan;
+        _lowerHitArea.GestureRecognizers.Add(lowerExtPan);
+
+        var upperExtPan = new PanGestureRecognizer();
+        upperExtPan.PanUpdated += OnUpperPan;
+        _upperHitArea.GestureRecognizers.Add(upperExtPan);
     }
 
     // Property changed handlers
@@ -233,8 +249,8 @@ public partial class RangeSlider : ContentView
         double trackWidth = _layout.Width - ThumbSize;
         double lowerPos = ValueToPosition(LowerValue, trackWidth);
         double upperPos = ValueToPosition(UpperValue, trackWidth);
-        double centerY = _layout.Height / 2 - ThumbSize / 2;
-        double trackCenterY = _layout.Height / 2 - TrackHeight / 2;
+        double centerY = _layout.Height - ThumbSize;
+        double trackCenterY = _layout.Height - ThumbSize / 2 - TrackHeight / 2;
 
         // Batch UI updates
         MainThread.BeginInvokeOnMainThread(() =>
@@ -242,6 +258,8 @@ public partial class RangeSlider : ContentView
             AbsoluteLayout.SetLayoutBounds(_lowerThumb, new Rect(lowerPos, centerY, ThumbSize, ThumbSize));
             AbsoluteLayout.SetLayoutBounds(_upperThumb, new Rect(upperPos, centerY, ThumbSize, ThumbSize));
             AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lowerPos + ThumbSize / 2, trackCenterY, upperPos - lowerPos, TrackHeight));
+            AbsoluteLayout.SetLayoutBounds(_lowerHitArea, new Rect(lowerPos, 0, ThumbSize, centerY));
+            AbsoluteLayout.SetLayoutBounds(_upperHitArea, new Rect(upperPos, 0, ThumbSize, centerY));
         });
     }
 
@@ -262,12 +280,14 @@ public partial class RangeSlider : ContentView
         double trackWidth = this.Width - ThumbSize;
         double lowerPos = ValueToPosition(LowerValue, trackWidth);
         double upperPos = ValueToPosition(UpperValue, trackWidth);
-        double centerY = this.Height / 2 - ThumbSize / 2;
-        double trackCenterY = this.Height / 2 - TrackHeight / 2;
+        double centerY = this.Height - ThumbSize;
+        double trackCenterY = this.Height - ThumbSize / 2 - TrackHeight / 2;
         AbsoluteLayout.SetLayoutBounds(_track, new Rect(0, trackCenterY, this.Width, TrackHeight));
         AbsoluteLayout.SetLayoutBounds(_highlight, new Rect(lowerPos + ThumbSize / 2, trackCenterY, upperPos - lowerPos, TrackHeight));
         AbsoluteLayout.SetLayoutBounds(_lowerThumb, new Rect(lowerPos, centerY, ThumbSize, ThumbSize));
         AbsoluteLayout.SetLayoutBounds(_upperThumb, new Rect(upperPos, centerY, ThumbSize, ThumbSize));
+        AbsoluteLayout.SetLayoutBounds(_lowerHitArea, new Rect(lowerPos, 0, ThumbSize, centerY));
+        AbsoluteLayout.SetLayoutBounds(_upperHitArea, new Rect(upperPos, 0, ThumbSize, centerY));
     }
 
     public new void ForceLayout()

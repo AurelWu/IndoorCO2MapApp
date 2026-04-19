@@ -122,9 +122,10 @@ namespace IndoorCO2MapAppV2.UIUtility
                 a { color: #512BD4; }
                 img { display: block; margin: 8px 0; border-radius: 6px; }
                 @media (prefers-color-scheme: dark) {
-                  body  { color: #e8e8e8; background: transparent; }
+                  body  { color: #e8e8e8; background: #1a1a1a; }
                   code  { background: #2a2a2a; }
                   a     { color: #ac99ea; }
+                  hr    { border-top-color: #444; }
                 }
               </style>
             </head>
