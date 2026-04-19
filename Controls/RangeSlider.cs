@@ -46,9 +46,10 @@ public partial class RangeSlider : ContentView
     private readonly BoxView _highlight = new() { HeightRequest = 4, CornerRadius = 2 };
     private readonly Border _lowerThumb = new() { Background = Colors.White, Stroke = Colors.Black, StrokeThickness = 1 };
     private readonly Border _upperThumb = new() { Background = Colors.White, Stroke = Colors.Black, StrokeThickness = 1 };
-    // Transparent hit-extension areas above each thumb (covers chart area above slider)
-    private readonly BoxView _lowerHitArea = new() { BackgroundColor = Colors.Transparent };
-    private readonly BoxView _upperHitArea = new() { BackgroundColor = Colors.Transparent };
+    // Transparent hit-extension areas above each thumb (covers chart area above slider).
+    // ContentView is used instead of BoxView: BoxView with null Color renders opaque on iOS.
+    private readonly ContentView _lowerHitArea = new();
+    private readonly ContentView _upperHitArea = new();
     private readonly AbsoluteLayout _layout = new();
     private bool _isInitialized;
     private bool _isDragging;
