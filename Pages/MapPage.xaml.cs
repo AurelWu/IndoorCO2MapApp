@@ -113,9 +113,11 @@ namespace IndoorCO2MapAppV2.Pages
                 .ToList();
 
             var map = new Mapsui.Map();
+            map.Widgets.Clear();
             map.Navigator.RotationLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
+            MemoryLayer? pinLayer = null;
             if (groups.Count > 0)
             {
                 var lineFeatures  = new List<IFeature>();
@@ -195,26 +197,29 @@ namespace IndoorCO2MapAppV2.Pages
                 }
 
                 map.Layers.Add(new MemoryLayer { Name = "Lines", Features = lineFeatures, Style = null });
-                map.Layers.Add(new MemoryLayer { Name = "Pins", Features = pinFeatures, Style = null, IsMapInfoLayer = true });
+                pinLayer = new MemoryLayer { Name = "Pins", Features = pinFeatures, Style = null };
+                map.Layers.Add(pinLayer);
                 _labelLayer = new MemoryLayer  { Name = "Labels", Features = labelFeatures, Style = null };
                 map.Layers.Add(_labelLayer);
 
                 double cx = groups.Average(g => g.lon);
                 double cy = groups.Average(g => g.lat);
                 var (mx, my) = SphericalMercator.FromLonLat(cx, cy);
-                map.Home = n =>
+                map.ViewportInitialized += (_, __) =>
                 {
-                    n.CenterOn(new MPoint(mx, my));
-                    n.ZoomTo(n.Resolutions[14]);
+                    if (map.Navigator.Resolutions.Count > 14)
+                        map.Navigator.CenterOnAndZoomTo(new MPoint(mx, my), map.Navigator.Resolutions[14]);
                 };
             }
 
             _mapControl = new Mapsui.UI.Maui.MapControl { Map = map };
             MapContainer.Content = _mapControl;
 
-            _mapControl.Info += (_, args) =>
+            map.Tapped += (_, args) =>
             {
-                var group = args.MapInfo?.Feature?["group"] as LocationGroupItem;
+                if (pinLayer == null) return;
+                var mapInfo = args.GetMapInfo([pinLayer]);
+                var group = mapInfo?.Feature?["group"] as LocationGroupItem;
                 if (group == null) return;
                 MainThread.BeginInvokeOnMainThread(() => ShowDetailPanel(group));
             };
@@ -239,7 +244,7 @@ namespace IndoorCO2MapAppV2.Pages
 #if !WINDOWS
             if (_labelLayer == null || _mapControl == null) return;
             _labelLayer.Enabled = e.Value;
-            _mapControl.Map.RefreshGraphics();
+            _mapControl.InvalidateCanvas();
 #endif
         }
     }

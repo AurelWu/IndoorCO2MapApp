@@ -100,8 +100,8 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.10" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
 		<PackageReference Include="ZstdSharp.Port" Version="0.8.1" />
-		<PackageReference Include="Mapsui.Maui" Version="4.1.7" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.9" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'" />
+		<PackageReference Include="Mapsui.Maui" Version="5.0.2" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'" />
 	</ItemGroup>
 
 	<ItemGroup>

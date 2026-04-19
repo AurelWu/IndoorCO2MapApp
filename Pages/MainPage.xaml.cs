@@ -84,6 +84,7 @@ namespace IndoorCO2MapAppV2.Pages
             }
 
             var map = new Mapsui.Map();
+            map.Widgets.Clear();
             map.Navigator.RotationLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
@@ -146,7 +147,7 @@ namespace IndoorCO2MapAppV2.Pages
             var (x1, y1) = SphericalMercator.FromLonLat(maxLon, maxLat);
             double padX = (x1 - x0) * 0.05;
             double padY = (y1 - y0) * 0.05;
-            map.Home = n => n.ZoomToBox(new MRect(x0 - padX, y0 - padY, x1 + padX, y1 + padY), MBoxFit.Fit);
+            map.Navigator.ZoomToBox(new MRect(x0 - padX, y0 - padY, x1 + padX, y1 + padY), MBoxFit.Fit);
 
             _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map, IsEnabled = false };
             RoutePreviewContainer.Content = _routePreviewMap;
