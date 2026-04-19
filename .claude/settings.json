@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Claude/IndoorCo2MapApp/**)"
+    ]
+  }
+}
