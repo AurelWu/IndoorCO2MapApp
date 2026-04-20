@@ -43,11 +43,11 @@
 	<key>CFBundleDisplayName</key>
 	<string>IndoorCO2DataRecorder</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aurelwuensch.indoorco2map</string>
+	<string>com.aurelwu.indoorairqualitycollector</string>
 	<key>CFBundleShortVersionString</key>
-	<string>216</string>
+	<string>220</string>
 	<key>CFBundleVersion</key>
-	<string>216</string>
+	<string>220</string>
 	<key>UIStatusBarHidden</key>
 	<true/>
 </dict>
