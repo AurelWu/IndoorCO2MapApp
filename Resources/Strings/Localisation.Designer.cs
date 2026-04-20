@@ -418,6 +418,7 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string ContextNotVentilated { get { return ResourceManager.GetString("ContextNotVentilated", resourceCulture); } }
         internal static string HistoryStatsLine { get { return ResourceManager.GetString("HistoryStatsLine", resourceCulture); } }
         internal static string HistoryNoData { get { return ResourceManager.GetString("HistoryNoData", resourceCulture); } }
+        internal static string HistoryNoRecordingsYet { get { return ResourceManager.GetString("HistoryNoRecordingsYet", resourceCulture); } }
         internal static string TransitSearchButton { get { return ResourceManager.GetString("TransitSearchButton", resourceCulture); } }
         internal static string TransitSearchingButton { get { return ResourceManager.GetString("TransitSearchingButton", resourceCulture); } }
         internal static string TransitModeAll { get { return ResourceManager.GetString("TransitModeAll", resourceCulture); } }

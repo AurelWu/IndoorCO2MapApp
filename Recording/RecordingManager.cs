@@ -326,13 +326,6 @@ namespace IndoorCO2MapAppV2.Recording
                 .GetSystemService(Android.Content.Context.PowerService);
             _wakeLock = pm?.NewWakeLock(Android.OS.WakeLockFlags.Partial, "IndoorCO2:Recording");
             _wakeLock?.Acquire();
-
-            var ctx = Android.App.Application.Context;
-            var intent = new Android.Content.Intent(ctx, typeof(MeasurementForegroundService));
-            if (OperatingSystem.IsAndroidVersionAtLeast(26))
-                ctx.StartForegroundService(intent);
-            else
-                ctx.StartService(intent);
         }
 
         private void ReleaseWakeLockAndStopService()
@@ -340,9 +333,6 @@ namespace IndoorCO2MapAppV2.Recording
             if (_wakeLock?.IsHeld == true)
                 _wakeLock.Release();
             _wakeLock = null;
-
-            var ctx = Android.App.Application.Context;
-            ctx.StopService(new Android.Content.Intent(ctx, typeof(MeasurementForegroundService)));
         }
 #endif
 
