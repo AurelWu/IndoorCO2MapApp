@@ -23,6 +23,8 @@ namespace IndoorCO2MapAppV2.ViewModels
         public ObservableCollection<CO2RecordingItem> Recordings { get; set; } = new();
         public ObservableCollection<LocationGroupItem> GroupedRecordings { get; set; } = new();
 
+        public bool HasNoRecordings => _allItems.Count == 0;
+
         public string FilterText
         {
             get => _filterText;
@@ -177,6 +179,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             if (_isGrouped)
                 RebuildGroups();
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoRecordings)));
         }
 
         private void RebuildGroups()

@@ -438,8 +438,7 @@
                     Clicked="OnNavigateClicked"
                     CommandParameter="///history"
                     Style="{StaticResource TonalButtonStyle}"
-                    HorizontalOptions="Fill"
-                    IsVisible="{Binding HasRecordings}"/>
+                    HorizontalOptions="Fill" />
 
             <Button Text="{x:Static t:Localisation.MainMenuOpenMapInBrowser}"
                     Clicked="OnOpenUrlClicked"

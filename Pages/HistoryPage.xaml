@@ -63,6 +63,15 @@
 
         </VerticalStackLayout>
 
+        <!-- Empty state -->
+        <Label Grid.Row="1"
+               Text="{x:Static t:Localisation.HistoryNoRecordingsYet}"
+               IsVisible="{Binding HasNoRecordings}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontSize="16"
+               Style="{StaticResource CaptionLabelStyle}" />
+
         <!-- ===== FLAT list (default) ===== -->
         <CollectionView Grid.Row="1"
                         x:Name="RecordingsCollection"

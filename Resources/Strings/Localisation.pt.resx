@@ -304,6 +304,9 @@
   <data name="HistoryNoData" xml:space="preserve">
     <value>Sem dados</value>
   </data>
+  <data name="HistoryNoRecordingsYet" xml:space="preserve">
+    <value>Ainda n&#227;o h&#225; grava&#231;&#245;es</value>
+  </data>
   <data name="TransitSearchButton" xml:space="preserve">
     <value>Buscar tr&#226;nsito</value>
   </data>
