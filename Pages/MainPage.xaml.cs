@@ -224,8 +224,11 @@ namespace IndoorCO2MapAppV2.Pages
                 _ = ShowSuccessBannerAsync();
             }
 
-            //only do it at startup once
-            if (!_initialRefreshDone && !recovered)
+            // GAP 3: only do the initial sensor scan when there was no recording to recover.
+            // If recovery was attempted (whether it succeeded or failed), the BLE throttle
+            // may already be close to its limit — skip the scan to avoid competing.
+            // ManualResumeButton.IsVisible == true means recovery was tried but failed.
+            if (!_initialRefreshDone && !recovered && !ManualResumeButton.IsVisible)
             {
                 _initialRefreshDone = true;
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);

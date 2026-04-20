@@ -75,6 +75,11 @@ namespace IndoorCO2MapAppV2.Recording
             // Poll up to 8 seconds before giving up — scan attempts before BT is ready find nothing.
             await WaitForBluetoothReadyAsync(TimeSpan.FromSeconds(8));
 
+            // GAP 2: allow ~2s for Android to tear down GATT handles from the killed process.
+            // Without this, GetSystemConnectedOrPairedDevices() may return a stale "connected"
+            // device whose GATT handles are no longer valid, causing silent read failures.
+            await Task.Delay(2000);
+
             for (int attempt = 1; attempt <= MaxAttempts; attempt++)
             {
                 Logger.WriteToLog($"Recovery attempt {attempt} for device {deviceIdString}");
@@ -83,6 +88,18 @@ namespace IndoorCO2MapAppV2.Recording
                 if (device != null)
                 {
                     await sensorViewModel.SelectDeviceAsync(new Bluetooth.BluetoothDeviceModel(device));
+
+                    // GAP 1: SelectDeviceAsync can fail silently (provider stays null on connect
+                    // timeout or InitializeAsync failure). Don't declare success unless the
+                    // provider is actually live — retry instead.
+                    if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider == null)
+                    {
+                        Logger.WriteToLog($"Recovery attempt {attempt}: provider null after SelectDeviceAsync, retrying");
+                        Preferences.Set("RecordingRecoveryAttempts", attempt);
+                        await Task.Delay(DelayBetweenAttemptsMs);
+                        continue;
+                    }
+
                     await _recordingManager.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, deviceIdString);
                     return true;
                 }
