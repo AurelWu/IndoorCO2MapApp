@@ -28,6 +28,9 @@ namespace IndoorCO2MapAppV2.Recording
         public static RecordingRecoverySnapshot CurrentSnapShot { get; set; } = new RecordingRecoverySnapshot();
 
         bool inkBirdRecoveryDone = false;
+#if ANDROID
+        private Android.OS.PowerManager.WakeLock? _wakeLock;
+#endif
 
         private RecordingManager() { }
 
@@ -81,6 +84,9 @@ namespace IndoorCO2MapAppV2.Recording
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30)); //updates every 30 seconds.
 
             _ = RunLoopAsync(_cts.Token);
+#if ANDROID
+            AcquireWakeLockAndStartService();
+#endif
         }
 
         // ----------------------------------------------------------------------
@@ -101,6 +107,9 @@ namespace IndoorCO2MapAppV2.Recording
             ActiveRecording = null;
             Preferences.Remove("RecordingState");
             CurrentSnapShot = new RecordingRecoverySnapshot();
+#if ANDROID
+            ReleaseWakeLockAndStopService();
+#endif
         }
 
         // ----------------------------------------------------------------------
@@ -275,6 +284,9 @@ namespace IndoorCO2MapAppV2.Recording
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
             _ = RunLoopAsync(_cts.Token);
+#if ANDROID
+            AcquireWakeLockAndStartService();
+#endif
 
             // Optionally: signal UI to navigate to recording page.
         }
@@ -304,6 +316,35 @@ namespace IndoorCO2MapAppV2.Recording
             var json = JsonSerializer.Serialize(snapshot);
             Preferences.Set("RecordingState", json);
         }
+
+#if ANDROID
+        private void AcquireWakeLockAndStartService()
+        {
+            if (_wakeLock?.IsHeld == true)
+                _wakeLock.Release();
+            var pm = (Android.OS.PowerManager?)Android.App.Application.Context
+                .GetSystemService(Android.Content.Context.PowerService);
+            _wakeLock = pm?.NewWakeLock(Android.OS.WakeLockFlags.Partial, "IndoorCO2:Recording");
+            _wakeLock?.Acquire();
+
+            var ctx = Android.App.Application.Context;
+            var intent = new Android.Content.Intent(ctx, typeof(MeasurementForegroundService));
+            if (OperatingSystem.IsAndroidVersionAtLeast(26))
+                ctx.StartForegroundService(intent);
+            else
+                ctx.StartService(intent);
+        }
+
+        private void ReleaseWakeLockAndStopService()
+        {
+            if (_wakeLock?.IsHeld == true)
+                _wakeLock.Release();
+            _wakeLock = null;
+
+            var ctx = Android.App.Application.Context;
+            ctx.StopService(new Android.Content.Intent(ctx, typeof(MeasurementForegroundService)));
+        }
+#endif
 
         public void UpdateRecoverySnapshot(TriState doorWindowstate, TriState ventilationState, string customNote)
         {
