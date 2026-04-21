@@ -254,7 +254,7 @@ namespace IndoorCO2MapAppV2.Pages
             // ManualResumeButton.IsVisible == true means recovery was tried but failed.
             // Also skip if the sensor is already connected (e.g. returning from a recovered recording
             // that was just submitted/aborted) — the live timer handles refresh from here.
-            if (!_initialRefreshDone && !recovered && !ManualResumeButton.IsVisible
+            if (!_initialRefreshDone && !recovered
                 && !_mainPageViewModel.Sensor.IsDeviceConnected)
             {
                 _initialRefreshDone = true;
@@ -302,22 +302,38 @@ namespace IndoorCO2MapAppV2.Pages
             recoveryManager.Initialize(BLEDeviceManager.Instance._adapter, RecordingManager.Instance);
 
             var snapshot = recoveryManager.LoadSnapshot();
-            if (snapshot == null ) return false;
-            
-            bool recovered = await recoveryManager.TryAutoRecoverAsync(_mainPageViewModel.Sensor); //this sets the activeRecording to the saved state //TODO: also seed active sensor to correct one
+            if (snapshot == null) return false;
+
+            // Stage 1: wait for BT to be confirmed ready by StatusViewModel (max 15s)
+            RecoveryStatusLabel.Text = Localisation.RecoveryWaitingForInit;
+            await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(15));
+
+            // Stage 2: BT is ready — now run actual recovery
+            RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
+            bool recovered = await recoveryManager.TryAutoRecoverAsync(_mainPageViewModel.Sensor);
+
             if (!recovered)
             {
                 Logger.WriteToLog("Automatic Recovery failed, showing manual resume button");
-                // Show Manual Resume button
                 ManualResumeButton.IsVisible = true;
                 return false;
-                // Show UI: automatic recovery failed.
-                // Show Manual Resume Button => will use active Recording but with current sensor... might need to write that to the active recording
             }
 
             var snapshot2 = recoveryManager.LoadSnapshot();
             await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
             return true;
+        }
+
+        private async Task WaitForBluetoothReadyForRecoveryAsync(TimeSpan timeout)
+        {
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                if (!StatusViewModel.Instance.IsInitializing && StatusViewModel.Instance.IsBluetoothOn)
+                    return;
+                await Task.Delay(500);
+            }
+            Logger.WriteToLog("WaitForBluetoothReadyForRecoveryAsync: timed out");
         }
 
 

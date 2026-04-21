@@ -97,6 +97,9 @@
   <data name="RecordingNextUpdateLabel" xml:space="preserve">
     <value>prochaine mise à jour dans :</value>
   </data>
+  <data name="RecoveryWaitingForInit" xml:space="preserve">
+    <value>En attente d'initialisation...</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Soumettre l'enregistrement</value>
   </data>

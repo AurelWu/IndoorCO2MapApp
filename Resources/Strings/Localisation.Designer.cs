@@ -263,7 +263,13 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
                 return ResourceManager.GetString("RecordingNextUpdateLabel", resourceCulture);
             }
         }
-        
+
+        internal static string RecoveryWaitingForInit {
+            get {
+                return ResourceManager.GetString("RecoveryWaitingForInit", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Scanning for devices... ähnelt.
         /// </summary>

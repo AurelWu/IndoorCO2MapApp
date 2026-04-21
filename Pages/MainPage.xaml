@@ -36,7 +36,8 @@
         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
         <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
             <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-            <Label Text="{x:Static t:Localisation.MainMenuResumingRecording}"
+            <Label x:Name="RecoveryStatusLabel"
+                   Text="{x:Static t:Localisation.MainMenuResumingRecording}"
                    TextColor="White"
                    FontSize="15"
                    FontAttributes="Bold"

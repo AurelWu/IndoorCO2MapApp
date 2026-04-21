@@ -71,10 +71,6 @@ namespace IndoorCO2MapAppV2.Recording
             var deviceIdString = snapshot.MonitorDeviceId;
             if (string.IsNullOrWhiteSpace(deviceIdString)) return false;
 
-            // On iOS the CBCentralManager starts as Unknown and needs time to reach PoweredOn.
-            // Poll up to 8 seconds before giving up — scan attempts before BT is ready find nothing.
-            await WaitForBluetoothReadyAsync(TimeSpan.FromSeconds(8));
-
             // GAP 2: allow ~2s for Android to tear down GATT handles from the killed process.
             // Without this, GetSystemConnectedOrPairedDevices() may return a stale "connected"
             // device whose GATT handles are no longer valid, causing silent read failures.
@@ -109,34 +105,6 @@ namespace IndoorCO2MapAppV2.Recording
             }
 
             return false;
-        }
-
-        // ------------------------------------------------------------------------------
-        // BLUETOOTH READINESS
-        // ------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Polls until the BLE adapter reports PoweredOn, or the timeout elapses.
-        /// On iOS the CBCentralManager starts as Unknown and takes 1-2s to settle.
-        /// </summary>
-        private static async Task WaitForBluetoothReadyAsync(TimeSpan timeout)
-        {
-            var deadline = DateTime.UtcNow + timeout;
-            while (DateTime.UtcNow < deadline)
-            {
-                var state = CrossBluetoothLE.Current.State;
-                Logger.WriteToLog($"RecoveryManager|WaitForBT: state={state}");
-                if (state == BluetoothState.On)
-                    return;
-                // If it's definitively off/unavailable, stop waiting early
-                if (state == BluetoothState.Off || state == BluetoothState.Unavailable)
-                {
-                    Logger.WriteToLog("RecoveryManager|WaitForBT: BT is off/unavailable, not waiting further");
-                    return;
-                }
-                await Task.Delay(500);
-            }
-            Logger.WriteToLog("RecoveryManager|WaitForBT: timed out waiting for BT");
         }
 
         // ------------------------------------------------------------------------------
