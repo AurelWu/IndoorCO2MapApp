@@ -13,6 +13,11 @@
     <Label x:Name="MeasuredLocationLabel" Text="[ReplacedByLocationName]"
            Style="{StaticResource PageTitleStyle}"/>
 
+    <Label x:Name="NextUpdateLabel"
+           FontSize="12"
+           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+           HorizontalOptions="End" />
+
     <!-- Chart + trim slider share the same grid area so the slider touch zone
          extends all the way up to the top of the chart. The slider draws its
          track at the bottom of its allocated height; the invisible upper portion

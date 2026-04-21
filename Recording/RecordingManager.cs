@@ -112,6 +112,12 @@ namespace IndoorCO2MapAppV2.Recording
 #endif
         }
 
+        public Task TriggerImmediateUpdateAsync()
+        {
+            if (!IsRecording) return Task.CompletedTask;
+            return ReadAndStoreLatestAsync();
+        }
+
         // ----------------------------------------------------------------------
         // MAIN LOOP
         // ----------------------------------------------------------------------

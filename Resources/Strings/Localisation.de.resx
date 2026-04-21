@@ -94,6 +94,9 @@
   <data name="CancelRecordingButton" xml:space="preserve">
     <value>Aufnahme abbrechen</value>
   </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>nächste Aktualisierung in:</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Messung &#252;bermitteln</value>
   </data>

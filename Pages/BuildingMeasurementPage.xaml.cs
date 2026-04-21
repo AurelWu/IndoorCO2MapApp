@@ -14,6 +14,8 @@ namespace IndoorCO2MapAppV2.Pages
     {
         private TriState _doorsWindowsState = TriState.Unknown;
         private TriState _ventilationState = TriState.Unknown;
+        private IDispatcherTimer? _countdownTimer;
+        private int _secondsUntilUpdate;
 
         public BuildingMeasurementPage()
         {
@@ -26,6 +28,12 @@ namespace IndoorCO2MapAppV2.Pages
 
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
+
+            if (RecordingManager.Instance.IsRecording)
+                _ = RecordingManager.Instance.TriggerImmediateUpdateAsync();
+
+            _secondsUntilUpdate = 30;
+            StartCountdownTimer();
 
             // Clears chart so previous recording doesn't show
             lineChartView.Clear();
@@ -89,6 +97,7 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnDisappearing();
 
+            _countdownTimer?.Stop();
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
         }
 
@@ -106,7 +115,23 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnMeasurementUpdated()
         {
+            _secondsUntilUpdate = 30;
             MainThread.BeginInvokeOnMainThread(async () => await UpdateChartAsync());
+        }
+
+        private void StartCountdownTimer()
+        {
+            _countdownTimer?.Stop();
+            _countdownTimer = Dispatcher.CreateTimer();
+            _countdownTimer.Interval = TimeSpan.FromSeconds(1);
+            _countdownTimer.Tick += OnCountdownTick;
+            _countdownTimer.Start();
+        }
+
+        private void OnCountdownTick(object? sender, EventArgs e)
+        {
+            if (_secondsUntilUpdate > 0) _secondsUntilUpdate--;
+            NextUpdateLabel.Text = $"{Localisation.RecordingNextUpdateLabel} {_secondsUntilUpdate}s";
         }
 
         private async Task UpdateChartAsync()

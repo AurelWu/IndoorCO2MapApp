@@ -54,6 +54,7 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Debug' AND '$(TargetFramework)'=='net10.0-ios'">
 		<ProvisioningType>automatic</ProvisioningType>
 		<CodesignKey>Apple Development</CodesignKey>
+		<CodesignProvision>VS: com.aurelwuensch.indoorco2datacollector Development</CodesignProvision>
 	</PropertyGroup>
 
 	<!-- iOS Release: distribution signing for App Store -->
@@ -64,10 +65,6 @@
 		<CodesignProvision>indoorco2DataCollector2026Provisioning</CodesignProvision>
 		<BuildIpa>true</BuildIpa>
 		<ArchiveOnBuild>false</ArchiveOnBuild>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='Debug' AND '$(TargetFramework)'=='net10.0-ios'">
-	  <CodesignKey>Apple Development</CodesignKey>
-	  <CodesignProvision>VS: com.aurelwuensch.indoorco2map Development</CodesignProvision>
 	</PropertyGroup>
 	
 

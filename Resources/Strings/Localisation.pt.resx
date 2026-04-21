@@ -94,6 +94,9 @@
   <data name="CancelRecordingButton" xml:space="preserve">
     <value>Cancelar grava&#231;&#227;o</value>
   </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>pr&#243;xima atualiza&#231;&#227;o em:</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Enviar grava&#231;&#227;o</value>
   </data>

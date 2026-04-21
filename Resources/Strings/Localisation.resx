@@ -153,6 +153,9 @@
   <data name="CancelRecordingButton" xml:space="preserve">
     <value>Cancel Recording</value>
   </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>check for new data in:</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Submit Recording</value>
   </data>

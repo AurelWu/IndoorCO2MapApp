@@ -21,6 +21,11 @@
     <Label x:Name="MeasuredLocationLabel" Text="{x:Static t:Localisation.TransitRouteStationPlaceholder}"
            Style="{StaticResource PageTitleStyle}"/>
 
+    <Label x:Name="NextUpdateLabel"
+           FontSize="12"
+           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+           HorizontalOptions="End" />
+
     <!-- Chart + slider share the grid area. Slider spans both rows so its
          transparent hit-extensions cover the full chart height. Chart sits
          on top visually (added last = higher z-order) but is InputTransparent

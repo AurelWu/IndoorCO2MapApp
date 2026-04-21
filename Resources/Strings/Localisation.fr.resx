@@ -94,6 +94,9 @@
   <data name="CancelRecordingButton" xml:space="preserve">
     <value>Annuler l'enregistrement</value>
   </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>prochaine mise à jour dans :</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Soumettre l'enregistrement</value>
   </data>
