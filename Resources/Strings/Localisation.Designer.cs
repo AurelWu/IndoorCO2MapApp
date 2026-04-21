@@ -257,6 +257,12 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
                 return ResourceManager.GetString("RecordingLocationLabel", resourceCulture);
             }
         }
+
+        internal static string RecordingNextUpdateLabel {
+            get {
+                return ResourceManager.GetString("RecordingNextUpdateLabel", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Scanning for devices... ähnelt.
