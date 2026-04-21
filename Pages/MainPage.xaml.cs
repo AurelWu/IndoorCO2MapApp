@@ -199,6 +199,30 @@ namespace IndoorCO2MapAppV2.Pages
             pageActive = true;
             // Sync the route-preview setting so it updates when user navigates back from Settings
             _mainPageViewModel.Transit.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
+
+            // Request permissions FIRST so BT is authorised before recovery/scan runs.
+            // On iOS the CBCentralManager starts as Unknown until permission is granted;
+            // recovery and scan attempts before that point silently find nothing.
+            // _permissionsRequested ensures this block only runs once on first launch.
+            if (!_permissionsRequested)
+            {
+                _permissionsRequested = true;
+
+                var locationService = LocationServicePlatformProvider.CreateOrUse();
+                if (!await locationService.HasLocationPermissionAsync())
+                    await locationService.RequestLocationPermissionAsync();
+
+                var btHelper = BluetoothPlatformProvider.CreateOrUse();
+                if (!btHelper.CheckPermissions())
+                    await btHelper.RequestPermissionsAsync();
+
+                await StatusViewModel.Instance.RefreshNowAsync();
+
+                // Immediately attempt GPS now that permission has been granted/confirmed,
+                // rather than waiting for the first loop iteration (up to 15 seconds).
+                try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
+            }
+
             bool recovered = false;
             try
             {
@@ -228,29 +252,13 @@ namespace IndoorCO2MapAppV2.Pages
             // If recovery was attempted (whether it succeeded or failed), the BLE throttle
             // may already be close to its limit — skip the scan to avoid competing.
             // ManualResumeButton.IsVisible == true means recovery was tried but failed.
-            if (!_initialRefreshDone && !recovered && !ManualResumeButton.IsVisible)
+            // Also skip if the sensor is already connected (e.g. returning from a recovered recording
+            // that was just submitted/aborted) — the live timer handles refresh from here.
+            if (!_initialRefreshDone && !recovered && !ManualResumeButton.IsVisible
+                && !_mainPageViewModel.Sensor.IsDeviceConnected)
             {
                 _initialRefreshDone = true;
                 OnRefreshSensorListClicked(RefreshButton, EventArgs.Empty);
-            }
-
-            if (!_permissionsRequested)
-            {
-                _permissionsRequested = true;
-
-                var locationService = LocationServicePlatformProvider.CreateOrUse();
-                if (!await locationService.HasLocationPermissionAsync())
-                    await locationService.RequestLocationPermissionAsync();
-
-                var btHelper = BluetoothPlatformProvider.CreateOrUse();
-                if (!btHelper.CheckPermissions())
-                    await btHelper.RequestPermissionsAsync();
-
-                await StatusViewModel.Instance.RefreshNowAsync();
-
-                // Immediately attempt GPS now that permission has been granted/confirmed,
-                // rather than waiting for the first loop iteration (up to 15 seconds).
-                try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
             }
 
             _gpsCts?.Cancel();
