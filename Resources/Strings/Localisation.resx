@@ -156,6 +156,9 @@
   <data name="RecordingNextUpdateLabel" xml:space="preserve">
     <value>check for new data in:</value>
   </data>
+  <data name="RecoveryAbortButton" xml:space="preserve">
+    <value>Abort automatic recovery</value>
+  </data>
   <data name="RecoveryWaitingForInit" xml:space="preserve">
     <value>Waiting for initialization...</value>
   </data>

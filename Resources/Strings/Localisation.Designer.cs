@@ -264,6 +264,12 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
             }
         }
 
+        internal static string RecoveryAbortButton {
+            get {
+                return ResourceManager.GetString("RecoveryAbortButton", resourceCulture);
+            }
+        }
+
         internal static string RecoveryWaitingForInit {
             get {
                 return ResourceManager.GetString("RecoveryWaitingForInit", resourceCulture);

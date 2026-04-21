@@ -34,15 +34,25 @@
             Padding="20,18"
             ZIndex="10">
         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
-        <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
-            <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-            <Label x:Name="RecoveryStatusLabel"
-                   Text="{x:Static t:Localisation.MainMenuResumingRecording}"
-                   TextColor="White"
-                   FontSize="15"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center"/>
-        </HorizontalStackLayout>
+        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                <Label x:Name="RecoveryStatusLabel"
+                       Text="{x:Static t:Localisation.MainMenuResumingRecording}"
+                       TextColor="White"
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+            <Button Text="{x:Static t:Localisation.RecoveryAbortButton}"
+                    Clicked="OnAbortRecoveryClicked"
+                    BackgroundColor="Transparent"
+                    BorderColor="Transparent"
+                    TextColor="White"
+                    FontSize="13"
+                    HorizontalOptions="Center"
+                    Padding="0" />
+        </VerticalStackLayout>
     </Border>
 
     <!-- Success banner (overlays content, slides in from top) -->
@@ -62,7 +72,7 @@
                HorizontalOptions="Center" />
     </Border>
 
-    <ScrollView>
+    <ScrollView x:Name="MainScrollView">
         <VerticalStackLayout Padding="30" Spacing="14">
 
 

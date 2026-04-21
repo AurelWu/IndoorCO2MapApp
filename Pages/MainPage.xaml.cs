@@ -39,6 +39,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private IDispatcherTimer? _co2liveValueUpdateTimer;
         private CancellationTokenSource? _gpsCts;
+        private CancellationTokenSource? _recoveryCts;
         private List<BluetoothDeviceModel> _filteredDevices = [];
 
         private bool pageActive = true;
@@ -200,6 +201,11 @@ namespace IndoorCO2MapAppV2.Pages
             // Sync the route-preview setting so it updates when user navigates back from Settings
             _mainPageViewModel.Transit.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
 
+            // Show recovery overlay immediately if a snapshot exists — before the permission
+            // block runs — so the user sees feedback right away instead of a blank screen.
+            if (RecoveryManager.Instance.LoadSnapshot() != null)
+                RecoveryOverlay.IsVisible = true;
+
             // Request permissions FIRST so BT is authorised before recovery/scan runs.
             // On iOS the CBCentralManager starts as Unknown until permission is granted;
             // recovery and scan attempts before that point silently find nothing.
@@ -224,10 +230,17 @@ namespace IndoorCO2MapAppV2.Pages
             }
 
             bool recovered = false;
+            _recoveryCts = new CancellationTokenSource();
             try
             {
                 RecoveryOverlay.IsVisible = true;
-                recovered = await TryRecoverRecordingAsync();
+                MainScrollView.IsEnabled = false;
+                recovered = await TryRecoverRecordingAsync(_recoveryCts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.WriteToLog("Recovery aborted by user");
+                ManualResumeButton.IsVisible = true;
             }
             catch (Exception ex)
             {
@@ -237,6 +250,9 @@ namespace IndoorCO2MapAppV2.Pages
             finally
             {
                 RecoveryOverlay.IsVisible = false;
+                MainScrollView.IsEnabled = true;
+                _recoveryCts.Dispose();
+                _recoveryCts = null;
             }
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();
@@ -295,7 +311,7 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
-        protected async Task<bool> TryRecoverRecordingAsync()
+        protected async Task<bool> TryRecoverRecordingAsync(CancellationToken ct = default)
         {
             ManualResumeButton.IsVisible = false;
             var recoveryManager = RecoveryManager.Instance;
@@ -306,13 +322,17 @@ namespace IndoorCO2MapAppV2.Pages
 
             // Stage 1: wait for BT to be confirmed ready by StatusViewModel (max 15s)
             RecoveryStatusLabel.Text = Localisation.RecoveryWaitingForInit;
-            await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(15));
+            await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(15), ct);
 
             // Stage 2: run the general sensor scan — this also serves as the initial scan,
             // so we mark it done to avoid a duplicate scan after recovery completes.
             RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
             _initialRefreshDone = true;
-            await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
+            // Race the scan against cancellation — StartScanAsync has no external CT support
+            await Task.WhenAny(
+                _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType),
+                Task.Delay(Timeout.Infinite, ct));
+            ct.ThrowIfCancellationRequested();
 
             // Check if the saved device appeared in the scan results
             var targetId = snapshot.MonitorDeviceId;
@@ -337,16 +357,28 @@ namespace IndoorCO2MapAppV2.Pages
             return false;
         }
 
-        private async Task WaitForBluetoothReadyForRecoveryAsync(TimeSpan timeout)
+        private async Task WaitForBluetoothReadyForRecoveryAsync(TimeSpan timeout, CancellationToken ct = default)
         {
             var deadline = DateTime.UtcNow + timeout;
             while (DateTime.UtcNow < deadline)
             {
+                ct.ThrowIfCancellationRequested();
                 if (!StatusViewModel.Instance.IsInitializing && StatusViewModel.Instance.IsBluetoothOn)
                     return;
-                await Task.Delay(500);
+                await Task.Delay(500, ct);
             }
             Logger.WriteToLog("WaitForBluetoothReadyForRecoveryAsync: timed out");
+        }
+
+        private void OnAbortRecoveryClicked(object sender, EventArgs e)
+        {
+            // Update UI immediately for instant feel;
+            // the finally block in OnAppearing will confirm the same state.
+            // Snapshot is kept so the user can still manually resume.
+            RecoveryOverlay.IsVisible = false;
+            MainScrollView.IsEnabled = true;
+            ManualResumeButton.IsVisible = true;
+            _recoveryCts?.Cancel();
         }
 
 
@@ -480,26 +512,49 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel.BuildingSearch.RefreshBuildings();            
         }
 
+        private bool _manualResumeInProgress = false;
+
         private async void OnManualResumeClicked(object sender, EventArgs e)
         {
-            var recoveryService = RecoveryManager.Instance;
-            var snapshot = recoveryService.LoadSnapshot();
-            if (snapshot == null) return;
+            if (_manualResumeInProgress) return;
+            _manualResumeInProgress = true;
+            ManualResumeButton.IsEnabled = false;
 
-            // Use current selected sensor
-            var selectedDevice = _mainPageViewModel.Sensor.SelectedDevice;
-            if (selectedDevice == null)
+            try
             {
-                await DisplayAlertAsync("No Sensor", "Please select a sensor first.", "OK");
-                return;
+                var recoveryService = RecoveryManager.Instance;
+                var snapshot = recoveryService.LoadSnapshot();
+                if (snapshot == null) return;
+
+                // Use current selected sensor
+                var selectedDevice = _mainPageViewModel.Sensor.SelectedDevice;
+                if (selectedDevice == null)
+                {
+                    await DisplayAlertAsync("No Sensor", "Please select a sensor first.", "OK");
+                    return;
+                }
+
+                await _mainPageViewModel.Sensor.SelectDeviceAsync(selectedDevice);
+
+                // Abort if the sensor didn't actually connect — avoids starting a recording
+                // loop with a null provider which would crash on the first RefreshHistoryAsync.
+                if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider == null)
+                {
+                    await DisplayAlertAsync("Sensor Not Ready", "Could not connect to the sensor. Please try again.", "OK");
+                    return;
+                }
+
+                await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, selectedDevice.Id.ToString());
+
+                ManualResumeButton.IsVisible = false;
+
+                await NavigateAsync("///building");
             }
-
-            await _mainPageViewModel.Sensor.SelectDeviceAsync(selectedDevice);
-            await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, selectedDevice.Id.ToString());
-
-            ManualResumeButton.IsVisible = false;
-
-            await NavigateAsync("///building");
+            finally
+            {
+                _manualResumeInProgress = false;
+                ManualResumeButton.IsEnabled = true;
+            }
         }
 
         private void StartCo2TimerOnce()

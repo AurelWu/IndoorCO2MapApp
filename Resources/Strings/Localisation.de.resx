@@ -97,6 +97,9 @@
   <data name="RecordingNextUpdateLabel" xml:space="preserve">
     <value>nächste Aktualisierung in:</value>
   </data>
+  <data name="RecoveryAbortButton" xml:space="preserve">
+    <value>Automatische Wiederherstellung abbrechen</value>
+  </data>
   <data name="RecoveryWaitingForInit" xml:space="preserve">
     <value>Warte auf Initialisierung...</value>
   </data>

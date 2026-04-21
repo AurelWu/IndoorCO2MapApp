@@ -97,6 +97,9 @@
   <data name="RecordingNextUpdateLabel" xml:space="preserve">
     <value>pr&#243;xima atualiza&#231;&#227;o em:</value>
   </data>
+  <data name="RecoveryAbortButton" xml:space="preserve">
+    <value>Cancelar recuperação automática</value>
+  </data>
   <data name="RecoveryWaitingForInit" xml:space="preserve">
     <value>Aguardando inicializa&#231;&#227;o...</value>
   </data>
