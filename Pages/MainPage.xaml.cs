@@ -308,20 +308,33 @@ namespace IndoorCO2MapAppV2.Pages
             RecoveryStatusLabel.Text = Localisation.RecoveryWaitingForInit;
             await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(15));
 
-            // Stage 2: BT is ready — now run actual recovery
+            // Stage 2: run the general sensor scan — this also serves as the initial scan,
+            // so we mark it done to avoid a duplicate scan after recovery completes.
             RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
-            bool recovered = await recoveryManager.TryAutoRecoverAsync(_mainPageViewModel.Sensor);
+            _initialRefreshDone = true;
+            await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
 
-            if (!recovered)
+            // Check if the saved device appeared in the scan results
+            var targetId = snapshot.MonitorDeviceId;
+            var foundDevice = _mainPageViewModel.Sensor.Devices.FirstOrDefault(d =>
+                d.Id.Equals(targetId, StringComparison.OrdinalIgnoreCase) ||
+                d.Name.Equals(targetId, StringComparison.OrdinalIgnoreCase));
+
+            if (foundDevice != null)
             {
-                Logger.WriteToLog("Automatic Recovery failed, showing manual resume button");
-                ManualResumeButton.IsVisible = true;
-                return false;
+                await _mainPageViewModel.Sensor.SelectDeviceAsync(foundDevice);
+                if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider != null)
+                {
+                    await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, targetId);
+                    var snapshot2 = recoveryManager.LoadSnapshot();
+                    await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
+                    return true;
+                }
             }
 
-            var snapshot2 = recoveryManager.LoadSnapshot();
-            await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
-            return true;
+            Logger.WriteToLog("Automatic Recovery failed, showing manual resume button");
+            ManualResumeButton.IsVisible = true;
+            return false;
         }
 
         private async Task WaitForBluetoothReadyForRecoveryAsync(TimeSpan timeout)
