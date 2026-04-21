@@ -86,7 +86,7 @@ public partial class RangeSlider : ContentView
             UpdateLayoutPositions();
         };
         if (Application.Current != null)
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateTrackColors();
+            Application.Current.RequestedThemeChanged += (s, e) => { UpdateTrackColors(); UpdateLayoutPositions(); };
 
         // Gesture recognizers on thumb visuals
         var lowerPan = new PanGestureRecognizer();
@@ -268,7 +268,7 @@ public partial class RangeSlider : ContentView
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-        if (width > 0 && height > 0 && _layout.Width > 0 && _layout.Height > 0)
+        if (width > 0 && height > 0)
         {
             if (!_isInitialized) _isInitialized = true;
             UpdateLayoutPositions();
