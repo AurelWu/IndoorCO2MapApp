@@ -23,7 +23,7 @@
 		<ApplicationTitle>IndoorCO2MapAppV2</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.aurelwuensch.indoorco2map</ApplicationId>
+		<ApplicationId>com.aurelwuensch.indoorco2datacollector</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -61,7 +61,7 @@
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<ProvisioningType>manual</ProvisioningType>
 		<CodesignKey>Apple Distribution</CodesignKey>
-		<CodesignProvision>Indoorco2map2026Provisioning</CodesignProvision>
+		<CodesignProvision>indoorco2DataCollector2026Provisioning</CodesignProvision>
 		<BuildIpa>true</BuildIpa>
 		<ArchiveOnBuild>false</ArchiveOnBuild>
 	</PropertyGroup>
