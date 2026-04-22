@@ -23,6 +23,12 @@ namespace IndoorCO2MapAppV2
         public AppShell()
         {
             InitializeComponent();
+#if DEBUG
+            Routing.RegisterRoute("sensorDebug",           typeof(Pages.DebugSensorPage));
+            Routing.RegisterRoute("overpassDebug",         typeof(Pages.DebugOverpassRequestPage));
+            Routing.RegisterRoute("buildingRecordingDebug",typeof(Pages.DebugBuildingRecordingPage));
+            Routing.RegisterRoute("debugMainMenu",         typeof(Pages.DebugMainMenu));
+#endif
         }
 
         protected override void OnNavigated(ShellNavigatedEventArgs args)

@@ -5,7 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:IndoorCO2MapAppV2"
     xmlns:pages="clr-namespace:IndoorCO2MapAppV2.Pages"
-    Title="IndoorCO2MapAppV2">
+    Title="IndoorCO2MapAppV2"
+    FlyoutBehavior="Disabled">
 
     <!-- HOME -->
     <ShellContent
@@ -58,28 +59,7 @@
         Shell.NavBarIsVisible="False"
         Shell.TabBarIsVisible="False"/>
 
-    <ShellContent
-        Route="sensorDebug"
-        ContentTemplate="{DataTemplate pages:DebugSensorPage}" 
-        Shell.NavBarIsVisible="False"
-        Shell.TabBarIsVisible="False"/>
-
-    <ShellContent
-        Route="overpassDebug"
-        ContentTemplate="{DataTemplate pages:DebugOverpassRequestPage}"
-        Shell.NavBarIsVisible="False"
-        Shell.TabBarIsVisible="False"/>
-
-    <ShellContent
-        Route="buildingRecordingDebug"
-        ContentTemplate="{DataTemplate pages:DebugBuildingRecordingPage}"
-        Shell.NavBarIsVisible="False"
-        Shell.TabBarIsVisible="False"/>
-    <ShellContent
-        Route="debugMainMenu"
-        ContentTemplate="{DataTemplate pages:DebugMainMenu}" 
-        Shell.NavBarIsVisible="False"
-        Shell.TabBarIsVisible="False"/>
+    <!-- Debug routes registered in code-behind only for DEBUG builds -->
 
 
 
