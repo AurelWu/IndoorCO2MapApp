@@ -1,3 +1,4 @@
+using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DataUpload;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.ExtensionMethods;
@@ -35,6 +36,7 @@ namespace IndoorCO2MapAppV2.Pages
                 _ = RecordingManager.Instance.TriggerImmediateUpdateAsync();
 
             _secondsUntilUpdate = 30;
+            UpdateSensorInfoLabel();
             StartCountdownTimer();
 
             lineChartView.Clear();
@@ -90,6 +92,16 @@ namespace IndoorCO2MapAppV2.Pages
         {
             if (_secondsUntilUpdate > 0) _secondsUntilUpdate--;
             NextUpdateLabel.Text = $"{Localisation.RecordingNextUpdateLabel} {_secondsUntilUpdate}s";
+            UpdateSensorInfoLabel();
+        }
+
+        private void UpdateSensorInfoLabel()
+        {
+            var device = CO2MonitorManager.Instance.SelectedDevice;
+            var co2 = CO2MonitorManager.Instance.CurrentCO2;
+            string name = device?.DisplayName ?? "-";
+            string co2Text = co2 > 0 ? $"{co2}ppm" : "-";
+            SensorInfoLabel.Text = $"{name} | Current CO2: {co2Text}";
         }
 
         private async Task UpdateChartAsync()
