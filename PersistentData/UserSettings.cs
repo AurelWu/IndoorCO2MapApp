@@ -55,7 +55,7 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _enableLocationCaching, value);
         }
 
-        private bool _sortBuildingsAlphabetical = true;
+        private bool _sortBuildingsAlphabetical = false;
         public bool SortBuildingsAlphabetical
         {
             get => _sortBuildingsAlphabetical;
