@@ -31,6 +31,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         ICharacteristic? _airValentHistory;
         ICharacteristic? _airValentHistoryPointer;
         ICharacteristic? _airValentChunkCounter;
+        private int _latestCO2FromHistory = -1;
 
 
 
@@ -52,19 +53,23 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         protected override async Task<int> DoReadCurrentCO2Async()
         {
+            // After a history read the pointer is left pointing at an old chunk, so direct
+            // reads return a stuck historical value. Prefer the freshest value extracted
+            // during the last DoReadHistoryAsync call if one exists.
+            if (_latestCO2FromHistory > 0) return _latestCO2FromHistory;
+
             if (!IsGattValid()) return -1;
 
             try
             {
-                // Read the latest history chunk
+                // Fallback: used only before the first history read (pointer not yet set)
                 var reply = await _airValentHistory.ReadAsync();
                 var bytes = reply.data.ToList();
 
-                if (bytes.Count <= 8) return -1; // no valid data
+                if (bytes.Count <= 8) return -1;
 
-                bytes.RemoveRange(0, 8); // remove header/meta data
+                bytes.RemoveRange(0, 8);
 
-                // The newest entry is the last 8 bytes
                 int lastIndex = bytes.Count - 8;
                 byte co2byte2shift = (byte)(bytes[lastIndex + 1] << 2);
                 co2byte2shift = (byte)(co2byte2shift >> 2);
@@ -97,18 +102,14 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     await _airValentHistoryPointer.WriteAsync(msg);
                 }
 
-                // 3️ Read history chunks — stop once we have enough minutes or exhaust available chunks
+                // 3️ Read history chunks
                 var historyBytesList = new List<byte>();
-                int availableChunks = chunkCount > 0 ? chunkCount : 1;
-                int minutesAccumulated = 0;
-
-                for (int i = 0; i < availableChunks && minutesAccumulated < amountOfMinutes; i++)
+                for (int i = 0; i < (chunkCount > 0 ? 2 : 1); i++)
                 {
                     var reply = await _airValentHistory.ReadAsync();
                     var bytes = reply.data.ToList();
                     if (bytes.Count > 8) bytes.RemoveRange(0, 8); // skip header
                     historyBytesList.AddRange(bytes);
-                    minutesAccumulated += bytes.Count / 8; // 8 bytes per minute record
                 }
 
                 // 4️ Convert to CO2 values
@@ -146,6 +147,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     elapsedIntervals = co2Values.Count;
 
                 var result = co2Values.Skip(co2Values.Count - elapsedIntervals).Take(elapsedIntervals).ToArray();
+                if (result.Length > 0) _latestCO2FromHistory = result[result.Length - 1];
                 return result;
             }
             catch

@@ -195,7 +195,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     minutes,
                     CO2MonitorManager.Instance.UpdateInterval);
                 if (hist != null)
+                {
                     Co2History = [.. hist];
+                    if (hist.Length > 0)
+                        CurrentCO2 = hist[hist.Length - 1];
+                }
             }
             finally
             {
