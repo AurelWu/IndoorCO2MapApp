@@ -24,7 +24,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/appiconapple.appiconset</string>
+	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>We need access to Bluetooth to connect to nearby devices.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
@@ -43,11 +43,11 @@
 	<key>CFBundleDisplayName</key>
 	<string>IndoorCO2DataRecorder</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aurelwuensch.indoorco2datacollector</string>
+	<string>com.aurelwu.indoorairqualitycollector</string>
 	<key>CFBundleShortVersionString</key>
-	<string>224</string>
+	<string>225</string>
 	<key>CFBundleVersion</key>
-	<string>224</string>
+	<string>225</string>
 	<key>UIStatusBarHidden</key>
 	<true/>
 </dict>
