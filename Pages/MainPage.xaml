@@ -465,6 +465,12 @@
                     HorizontalOptions="Fill"
                     IsVisible="{Binding Settings.ShowImprintButton}"/>
 
+        <Label x:Name="VersionLabel"
+               HorizontalOptions="Center"
+               FontSize="12"
+               TextColor="{AppThemeBinding Light=#888888, Dark=#666666}"
+               Margin="0,8,0,4" />
+
         </VerticalStackLayout>
     </ScrollView>
 

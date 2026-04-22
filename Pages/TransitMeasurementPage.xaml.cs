@@ -23,6 +23,7 @@ namespace IndoorCO2MapAppV2.Pages
         public TransitMeasurementPage()
         {
             InitializeComponent();
+            VersionLabel.Text = $"Version {AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
         }
 
         protected override void OnAppearing()

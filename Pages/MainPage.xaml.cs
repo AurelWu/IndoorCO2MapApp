@@ -52,6 +52,7 @@ namespace IndoorCO2MapAppV2.Pages
         public MainPage()
         {
             InitializeComponent();
+            VersionLabel.Text = $"Version {AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
             _mainPageViewModel = new MainPageViewModel();
             BindingContext = _mainPageViewModel;
 

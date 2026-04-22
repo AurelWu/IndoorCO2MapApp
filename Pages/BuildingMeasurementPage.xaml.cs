@@ -20,6 +20,7 @@ namespace IndoorCO2MapAppV2.Pages
         public BuildingMeasurementPage()
         {
             InitializeComponent();
+            VersionLabel.Text = $"Version {AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
         }
 
         protected override void OnAppearing()
