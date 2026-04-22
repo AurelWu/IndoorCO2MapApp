@@ -35,6 +35,8 @@ namespace IndoorCO2MapAppV2.PersistentData
         public double? DestinationLongitude { get; set; }
         public string DestinationName { get; set; } = "";
 
+        public bool IsTransitRecording { get; set; }
+
         // Matches the "d" field sent to the backend — used later to allow deletion of faulty submissions
         public string SubmissionId { get; set; } = "";
     }

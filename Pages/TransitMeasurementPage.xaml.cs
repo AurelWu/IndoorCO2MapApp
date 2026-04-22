@@ -382,23 +382,29 @@ namespace IndoorCO2MapAppV2.Pages
                         .Take(trimMax - trimMin + 1)
                         .ToList();
 
+                    double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("startLat", "0"),
+                        System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double startLat);
+                    double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("startLon", "0"),
+                        System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double startLon);
+
                     var persistentRecording = new PersistentRecording
                     {
                         DateTime = rec.RecordingStart,
                         LocationName = locationName,
                         NWRId = rec.NwrId,
                         NWRType = rec.NwrType,
-                        Latitude = rec.Latitude,
-                        Longitude = rec.Longitude,
+                        Latitude = startLat != 0 ? startLat : rec.Latitude,
+                        Longitude = startLon != 0 ? startLon : rec.Longitude,
                         AvgCO2 = trimmed.Average(x => x.Ppm),
                         Values = string.Join(";", trimmed.Select(x => x.Ppm)),
                         DoorWindowState = _windowsState,
                         VentilationState = _ventilationState,
                         CustomNotes = customNote,
                         SensorType = rec.CO2MonitorType,
-                        DestinationLatitude  = endpoint?.Latitude,
-                        DestinationLongitude = endpoint?.Longitude,
-                        DestinationName      = endpoint?.Name ?? "",
+                        DestinationLatitude   = endpoint?.Latitude,
+                        DestinationLongitude  = endpoint?.Longitude,
+                        DestinationName       = endpoint?.Name ?? "",
+                        IsTransitRecording    = true,
                         SubmissionId         = submissionId,
                     };
                     await App.HistoryDatabase.SaveRecordingAsync(persistentRecording);

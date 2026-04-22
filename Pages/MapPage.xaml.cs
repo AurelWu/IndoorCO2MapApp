@@ -43,8 +43,8 @@ namespace IndoorCO2MapAppV2.Pages
 
         private List<PersistentRecording> FilteredRecordings() =>
             _showTransit
-                ? _allRecordings.Where(r => r.NWRId.HasValue).ToList()
-                : _allRecordings.Where(r => !r.NWRId.HasValue).ToList();
+                ? _allRecordings.Where(r => r.IsTransitRecording || r.DestinationLatitude.HasValue).ToList()
+                : _allRecordings.Where(r => !r.IsTransitRecording && !r.DestinationLatitude.HasValue).ToList();
 
         private void OnBuildingsToggleClicked(object sender, EventArgs e)
         {
@@ -90,9 +90,13 @@ namespace IndoorCO2MapAppV2.Pages
 #if !WINDOWS
         private void BuildMap(List<PersistentRecording> recordings)
         {
-            // Group by NWRType+NWRId when available, else by LocationName
+            // Buildings: group by OSM id so multiple visits collapse to one pin.
+            // Transit: each unique journey (LocationName encodes route+start+end) is its own entry;
+            // grouping by route id would average positions across different start stations.
             static string GroupKey(PersistentRecording r) =>
-                r.NWRId.HasValue ? $"{r.NWRType}:{r.NWRId}" : r.LocationName;
+                r.IsTransitRecording ? r.LocationName
+                    : r.NWRId.HasValue ? $"{r.NWRType}:{r.NWRId}"
+                    : r.LocationName;
 
             var groups = recordings
                 .GroupBy(GroupKey)
