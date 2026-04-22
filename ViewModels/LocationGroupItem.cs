@@ -37,8 +37,10 @@ namespace IndoorCO2MapAppV2.ViewModels
         public bool IsExpanded
         {
             get => _isExpanded;
-            set { _isExpanded = value; Notify(); Notify(nameof(LocationNameWithChevron)); }
+            set { _isExpanded = value; Notify(); Notify(nameof(LocationNameWithChevron)); Notify(nameof(ExpandedHeight)); }
         }
+
+        public double ExpandedHeight => _isExpanded ? -1 : 0;
 
         public string LocationNameWithChevron =>
             $"{LocationName} {(_isExpanded ? "▼" : "▶")}";

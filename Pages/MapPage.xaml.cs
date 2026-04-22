@@ -206,9 +206,8 @@ namespace IndoorCO2MapAppV2.Pages
                 _labelLayer = new MemoryLayer  { Name = "Labels", Features = labelFeatures, Style = null };
                 map.Layers.Add(_labelLayer);
 
-                double cx = groups.Average(g => g.lon);
-                double cy = groups.Average(g => g.lat);
-                var (mx, my) = SphericalMercator.FromLonLat(cx, cy);
+                var mostRecent = groups.OrderByDescending(g => g.recs.Max(r => r.DateTime)).First();
+                var (mx, my) = SphericalMercator.FromLonLat(mostRecent.lon, mostRecent.lat);
                 map.ViewportInitialized += (_, __) =>
                 {
                     if (map.Navigator.Resolutions.Count > 14)

@@ -262,6 +262,9 @@ namespace IndoorCO2MapAppV2.Pages
             if (PendingSuccessBanner)
             {
                 PendingSuccessBanner = false;
+                _mainPageViewModel.BuildingSearch.SelectedBuilding = null;
+                _mainPageViewModel.Transit.SelectedStation = null;
+                _mainPageViewModel.Transit.SelectedRoute = null;
                 _ = ShowSuccessBannerAsync();
             }
 

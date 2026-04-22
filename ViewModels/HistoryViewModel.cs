@@ -221,8 +221,11 @@ namespace IndoorCO2MapAppV2.ViewModels
                 _isExpanded = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LocationNameWithChevron)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExpandedHeight)));
             }
         }
+
+        public double ExpandedHeight => _isExpanded ? -1 : 0;
 
         private bool _isDeleting;
         public bool IsDeleting
