@@ -52,6 +52,14 @@ namespace IndoorCO2MapAppV2.Pages
                     NoteEditor.Text = activeRec.CustomNotes;
                     _windowsState = activeRec.DoorWindowState;
                     _ventilationState = activeRec.VentilationState;
+
+                    WindowsUnknownRb.IsChecked = _windowsState == TriState.Unknown;
+                    WindowsYesRb.IsChecked    = _windowsState == TriState.Yes;
+                    WindowsNoRb.IsChecked     = _windowsState == TriState.No;
+
+                    VentilationUnknownRb.IsChecked = _ventilationState == TriState.Unknown;
+                    VentilationYesRb.IsChecked    = _ventilationState == TriState.Yes;
+                    VentilationNoRb.IsChecked     = _ventilationState == TriState.No;
                 }
 
                 await UpdateChartAsync();
@@ -175,14 +183,20 @@ namespace IndoorCO2MapAppV2.Pages
         {
             if (!e.Value) return;
             if (sender is RadioButton rb && rb.Value is TriState state)
+            {
                 _windowsState = state;
+                RecordingManager.Instance.UpdateRecoverySnapshot(_windowsState, _ventilationState, NoteEditor.Text ?? "");
+            }
         }
 
         private void OnVentilationChanged(object sender, CheckedChangedEventArgs e)
         {
             if (!e.Value) return;
             if (sender is RadioButton rb && rb.Value is TriState state)
+            {
                 _ventilationState = state;
+                RecordingManager.Instance.UpdateRecoverySnapshot(_windowsState, _ventilationState, NoteEditor.Text ?? "");
+            }
         }
 
         private void OnCustomNotesChanged(object sender, TextChangedEventArgs e)

@@ -348,10 +348,14 @@ namespace IndoorCO2MapAppV2.Recording
             CurrentSnapShot.DoorWindowState = doorWindowstate;
             CurrentSnapShot.VentilationState = ventilationState;
             CurrentSnapShot.CustomNote = customNote;
-            //TODO: this will set windowsDoorState / Ventilation / Custom Notes and TrimSlider Values ; should be called whenever any of these change
+            if (ActiveRecording != null)
+            {
+                ActiveRecording.DoorWindowState = doorWindowstate;
+                ActiveRecording.VentilationState = ventilationState;
+                ActiveRecording.CustomNotes = customNote;
+            }
             var json = JsonSerializer.Serialize(CurrentSnapShot);
             Preferences.Set("RecordingState", json);
-            
         }
     }
 }
