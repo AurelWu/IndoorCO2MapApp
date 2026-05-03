@@ -8,6 +8,7 @@ using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
+using System.Globalization;
 using System.Linq;
 
 namespace IndoorCO2MapAppV2.Pages
@@ -60,6 +61,24 @@ namespace IndoorCO2MapAppV2.Pages
                     VentilationUnknownRb.IsChecked = _ventilationState == TriState.Unknown;
                     VentilationYesRb.IsChecked    = _ventilationState == TriState.Yes;
                     VentilationNoRb.IsChecked     = _ventilationState == TriState.No;
+
+                    if (activeRec.AdditionalDataByParameter.TryGetValue("endpointName", out var epName)
+                        && !string.IsNullOrEmpty(epName))
+                    {
+                        double.TryParse(activeRec.AdditionalDataByParameter.GetValueOrDefault("endpointLat", "0"),
+                            NumberStyles.Float, CultureInfo.InvariantCulture, out double epLat);
+                        double.TryParse(activeRec.AdditionalDataByParameter.GetValueOrDefault("endpointLon", "0"),
+                            NumberStyles.Float, CultureInfo.InvariantCulture, out double epLon);
+                        activeRec.AdditionalDataByParameter.TryGetValue("endpointType", out var epType);
+                        long.TryParse(activeRec.AdditionalDataByParameter.GetValueOrDefault("endpointId", "0"), out long epId);
+
+                        var recovered = new LocationData(epType ?? "node", epId, epName, epLat, epLon, epLat, epLon);
+                        _endpointStations = [recovered];
+                        EndpointPicker.ItemsSource = _endpointStations;
+                        EndpointPicker.SelectedItem = recovered;
+                        bool isFav = UserSettings.Instance.FavouriteLocationKeys.Contains(recovered.FavouriteKey);
+                        EndpointStarLabel.TextColor = isFav ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+                    }
                 }
 
                 await UpdateChartAsync();
@@ -213,10 +232,12 @@ namespace IndoorCO2MapAppV2.Pages
             if (loc == null)
             {
                 EndpointStarLabel.TextColor = Color.FromArgb("#BDBDBD");
+                RecordingManager.Instance.UpdateEndpointSnapshot(null);
                 return;
             }
             bool isFav = UserSettings.Instance.FavouriteLocationKeys.Contains(loc.FavouriteKey);
             EndpointStarLabel.TextColor = isFav ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+            RecordingManager.Instance.UpdateEndpointSnapshot(loc);
         }
 
         private void OnEndpointStarTapped(object sender, EventArgs e)

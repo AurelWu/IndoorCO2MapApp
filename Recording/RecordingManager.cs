@@ -3,7 +3,9 @@ using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Enumerations;
 using IndoorCO2MapAppV2.Resources.Strings;
+using IndoorCO2MapAppV2.Spatial;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 
 namespace IndoorCO2MapAppV2.Recording
@@ -341,6 +343,26 @@ namespace IndoorCO2MapAppV2.Recording
             _wakeLock = null;
         }
 #endif
+
+        public void UpdateEndpointSnapshot(LocationData? endpoint)
+        {
+            if (!IsRecording || ActiveRecording == null) return;
+            var d = ActiveRecording.AdditionalDataByParameter;
+            if (endpoint != null)
+            {
+                d["endpointName"] = endpoint.Name;
+                d["endpointLat"]  = endpoint.Latitude.ToString(CultureInfo.InvariantCulture);
+                d["endpointLon"]  = endpoint.Longitude.ToString(CultureInfo.InvariantCulture);
+                d["endpointType"] = endpoint.Type;
+                d["endpointId"]   = endpoint.ID.ToString();
+            }
+            else
+            {
+                foreach (var key in new[] { "endpointName", "endpointLat", "endpointLon", "endpointType", "endpointId" })
+                    d.Remove(key);
+            }
+            SaveRecoverySnapshot(ActiveRecording, ActiveRecording.MonitorID);
+        }
 
         public void UpdateRecoverySnapshot(TriState doorWindowstate, TriState ventilationState, string customNote)
         {
