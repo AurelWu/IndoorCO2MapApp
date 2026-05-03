@@ -263,8 +263,10 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 PendingSuccessBanner = false;
                 _mainPageViewModel.BuildingSearch.SelectedBuilding = null;
+                _mainPageViewModel.BuildingSearch.FilterText = "";
                 _mainPageViewModel.Transit.SelectedStation = null;
                 _mainPageViewModel.Transit.SelectedRoute = null;
+                _mainPageViewModel.Transit.RouteFilterText = "";
                 _ = ShowSuccessBannerAsync();
             }
 
@@ -552,7 +554,7 @@ namespace IndoorCO2MapAppV2.Pages
 
                 ManualResumeButton.IsVisible = false;
 
-                await NavigateAsync("///building");
+                await NavigateAsync(snapshot.IsTransitRecording ? "///transit" : "///building");
             }
             finally
             {
