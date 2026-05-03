@@ -311,6 +311,15 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        private void ResetEndpointPicker()
+        {
+            _endpointStations = [];
+            EndpointPicker.ItemsSource = null;
+            EndpointPicker.SelectedItem = null;
+            EndpointStarLabel.TextColor = Color.FromArgb("#BDBDBD");
+            EndpointStatusLabel.IsVisible = false;
+        }
+
         private void OnCancelClicked(object sender, EventArgs e)
         {
             CancelMeasurementAsync().SafeFireAndForget("TransitMeasurementPage|OnCancelClicked|CancelMeasurementAsync");
@@ -328,6 +337,7 @@ namespace IndoorCO2MapAppV2.Pages
             if (answer)
             {
                 await RecordingManager.Instance.StopRecordingAsync();
+                ResetEndpointPicker();
                 await NavigateAsync("///home");
             }
         }
@@ -427,6 +437,7 @@ namespace IndoorCO2MapAppV2.Pages
 
                 MainPage.PendingSuccessBanner = true;
                 await RecordingManager.Instance.StopRecordingAsync();
+                ResetEndpointPicker();
                 await NavigateAsync("///home");
             }
             catch (Exception ex)
