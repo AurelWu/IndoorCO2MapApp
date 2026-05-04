@@ -159,6 +159,30 @@ namespace IndoorCO2MapAppV2.Pages
             UpdateSensorInfoLabel();
         }
 
+        private bool _isInstantUpdating;
+
+        private void OnInstantUpdateClicked(object sender, EventArgs e)
+        {
+            if (_isInstantUpdating) return;
+            DoInstantUpdateAsync().SafeFireAndForget("OnInstantUpdateClicked");
+        }
+
+        private async Task DoInstantUpdateAsync()
+        {
+            _isInstantUpdating = true;
+            InstantUpdateButton.IsEnabled = false;
+            _secondsUntilUpdate = 0;
+            try
+            {
+                await RecordingManager.Instance.TriggerImmediateUpdateAsync();
+            }
+            finally
+            {
+                _isInstantUpdating = false;
+                InstantUpdateButton.IsEnabled = true;
+            }
+        }
+
         private void UpdateSensorInfoLabel()
         {
             var device = CO2MonitorManager.Instance.SelectedDevice;
