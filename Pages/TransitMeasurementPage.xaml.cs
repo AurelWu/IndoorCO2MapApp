@@ -20,6 +20,7 @@ namespace IndoorCO2MapAppV2.Pages
         private List<LocationData> _endpointStations = [];
         private IDispatcherTimer? _countdownTimer;
         private int _secondsUntilUpdate;
+        private CancellationTokenSource? _submitDelayCts;
 
         public TransitMeasurementPage()
         {
@@ -82,6 +83,17 @@ namespace IndoorCO2MapAppV2.Pages
                 }
 
                 await UpdateChartAsync();
+
+                var rec = RecordingManager.Instance.ActiveRecording;
+                if (rec != null
+                    && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimLow"),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out double tLow)
+                    && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out double tHigh))
+                {
+                    TrimSlider.LowerValue = Math.Clamp(tLow, TrimSlider.Minimum, TrimSlider.Maximum);
+                    TrimSlider.UpperValue = Math.Clamp(tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
+                }
             });
         }
 
@@ -89,7 +101,28 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnDisappearing();
             _countdownTimer?.Stop();
+            _submitDelayCts?.Cancel();
+            _submitDelayCts?.Dispose();
+            _submitDelayCts = null;
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
+        }
+
+        private void TemporarilyDisableSubmit()
+        {
+            _submitDelayCts?.Cancel();
+            _submitDelayCts?.Dispose();
+            _submitDelayCts = new CancellationTokenSource();
+            var token = _submitDelayCts.Token;
+            SubmitButton.IsEnabled = false;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(2000, token);
+                    MainThread.BeginInvokeOnMainThread(UpdateSubmitButtonState);
+                }
+                catch (OperationCanceledException) { }
+            });
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -166,6 +199,8 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
+            RecordingManager.Instance.UpdateTrimSnapshot(TrimSlider.LowerValue, TrimSlider.UpperValue);
+            TemporarilyDisableSubmit();
             _ = UpdateChartAsync();
         }
 
@@ -205,6 +240,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 _windowsState = state;
                 RecordingManager.Instance.UpdateRecoverySnapshot(_windowsState, _ventilationState, NoteEditor.Text ?? "");
+                TemporarilyDisableSubmit();
             }
         }
 
@@ -215,6 +251,7 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 _ventilationState = state;
                 RecordingManager.Instance.UpdateRecoverySnapshot(_windowsState, _ventilationState, NoteEditor.Text ?? "");
+                TemporarilyDisableSubmit();
             }
         }
 
@@ -224,6 +261,7 @@ namespace IndoorCO2MapAppV2.Pages
                 _windowsState,
                 _ventilationState,
                 NoteEditor.Text ?? "");
+            TemporarilyDisableSubmit();
         }
 
         private void OnEndpointPickerSelectionChanged(object sender, EventArgs e)

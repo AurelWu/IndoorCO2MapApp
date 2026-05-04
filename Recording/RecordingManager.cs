@@ -344,6 +344,14 @@ namespace IndoorCO2MapAppV2.Recording
         }
 #endif
 
+        public void UpdateTrimSnapshot(double low, double high)
+        {
+            if (!IsRecording || ActiveRecording == null) return;
+            ActiveRecording.AdditionalDataByParameter["trimLow"]  = low.ToString(CultureInfo.InvariantCulture);
+            ActiveRecording.AdditionalDataByParameter["trimHigh"] = high.ToString(CultureInfo.InvariantCulture);
+            SaveRecoverySnapshot(ActiveRecording, ActiveRecording.MonitorID);
+        }
+
         public void UpdateEndpointSnapshot(LocationData? endpoint)
         {
             if (!IsRecording || ActiveRecording == null) return;
