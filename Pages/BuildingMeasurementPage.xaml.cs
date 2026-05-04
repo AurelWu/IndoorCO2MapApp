@@ -17,6 +17,7 @@ namespace IndoorCO2MapAppV2.Pages
         private IDispatcherTimer? _countdownTimer;
         private int _secondsUntilUpdate;
         private CancellationTokenSource? _submitDelayCts;
+        private bool _programmaticSliderUpdate;
 
         public BuildingMeasurementPage()
         {
@@ -54,8 +55,10 @@ namespace IndoorCO2MapAppV2.Pages
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
                         System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double tHigh))
                 {
+                    _programmaticSliderUpdate = true;
                     TrimSlider.LowerValue = Math.Clamp((int)tLow, TrimSlider.Minimum, TrimSlider.Maximum);
                     TrimSlider.UpperValue = Math.Clamp((int)tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
+                    _programmaticSliderUpdate = false;
                 }
             });
 
@@ -197,12 +200,20 @@ namespace IndoorCO2MapAppV2.Pages
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 if (TrimSlider == null || lineChartView == null) return;
-                if (data.Count >= 2)
+                _programmaticSliderUpdate = true;
+                try
                 {
-                    bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
-                    TrimSlider.Maximum = data.Count - 1;
-                    if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
-                        TrimSlider.UpperValue = data.Count - 1;
+                    if (data.Count >= 2)
+                    {
+                        bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
+                        TrimSlider.Maximum = data.Count - 1;
+                        if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+                            TrimSlider.UpperValue = data.Count - 1;
+                    }
+                }
+                finally
+                {
+                    _programmaticSliderUpdate = false;
                 }
 
                 lineChartView.SetData(
@@ -217,6 +228,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
+            if (_programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
             RecordingManager.Instance.UpdateTrimSnapshot(TrimSlider.LowerValue, TrimSlider.UpperValue);
             TemporarilyDisableSubmit();
             _ = UpdateChartAsync();
