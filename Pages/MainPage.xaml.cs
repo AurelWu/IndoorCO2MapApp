@@ -335,9 +335,20 @@ namespace IndoorCO2MapAppV2.Pages
             RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
             _initialRefreshDone = true;
             // Race the scan against cancellation — StartScanAsync has no external CT support
-            await Task.WhenAny(
-                _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType),
-                Task.Delay(Timeout.Infinite, ct));
+            try
+            {
+                await Task.WhenAny(
+                    _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType),
+                    Task.Delay(Timeout.Infinite, ct));
+            }
+#if ANDROID
+            catch (Java.Lang.SecurityException ex)
+            {
+                Logger.WriteToLog($"TryRecoverRecordingAsync: BT permission denied — {ex.Message}");
+                ManualResumeButton.IsVisible = true;
+                return false;
+            }
+#endif
             ct.ThrowIfCancellationRequested();
 
             // Check if the saved device appeared in the scan results

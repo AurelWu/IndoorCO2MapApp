@@ -312,7 +312,7 @@ namespace IndoorCO2MapAppV2.Recording
                 Longitude = recording.Longitude,
                 MonitorType = recording.CO2MonitorType,
                 MonitorDeviceId = deviceId,
-                CO2Values = recording.MeasurementData,
+                CO2Values = [.. recording.MeasurementData],
                 DoorWindowState = recording.DoorWindowState,
                 VentilationState = recording.VentilationState,
                 CustomNote = recording.CustomNotes,
@@ -321,8 +321,7 @@ namespace IndoorCO2MapAppV2.Recording
             };
 
             CurrentSnapShot = snapshot;
-            var json = JsonSerializer.Serialize(snapshot);
-            Preferences.Set("RecordingState", json);
+            Task.Run(() => Preferences.Set("RecordingState", JsonSerializer.Serialize(snapshot)));
         }
 
 #if ANDROID
@@ -384,8 +383,8 @@ namespace IndoorCO2MapAppV2.Recording
                 ActiveRecording.VentilationState = ventilationState;
                 ActiveRecording.CustomNotes = customNote;
             }
-            var json = JsonSerializer.Serialize(CurrentSnapShot);
-            Preferences.Set("RecordingState", json);
+            var snap = CurrentSnapShot;
+            Task.Run(() => Preferences.Set("RecordingState", JsonSerializer.Serialize(snap)));
         }
     }
 }

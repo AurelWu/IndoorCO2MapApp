@@ -84,13 +84,52 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnAppearing();
             UpdateTicker();
+#if ANDROID
+            RegisterAndroidBackCallback();
+#endif
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
             StopTicker();
+#if ANDROID
+            _androidBackCallback?.Remove();
+            _androidBackCallback = null;
+#endif
         }
+
+#if ANDROID
+        private AndroidX.Activity.OnBackPressedCallback? _androidBackCallback;
+
+        // Bridges protected OnBackButtonPressed() so the nested callback can invoke it.
+        internal bool InvokeOnBackButtonPressed() => OnBackButtonPressed();
+
+        private void RegisterAndroidBackCallback()
+        {
+            if (Platform.CurrentActivity is not AndroidX.AppCompat.App.AppCompatActivity activity) return;
+            _androidBackCallback?.Remove();
+            _androidBackCallback = new AndroidPageBackCallback(this);
+            activity.OnBackPressedDispatcher.AddCallback(activity, _androidBackCallback);
+        }
+
+        private sealed class AndroidPageBackCallback : AndroidX.Activity.OnBackPressedCallback
+        {
+            private readonly AppPage _page;
+            public AndroidPageBackCallback(AppPage page) : base(true) => _page = page;
+
+            public override void HandleOnBackPressed()
+            {
+                if (_page.InvokeOnBackButtonPressed()) return;
+                // Page didn't handle it — disable ourselves and let the dispatcher
+                // fall through to system default (exit / navigate up).
+                IsEnabled = false;
+                (Platform.CurrentActivity as AndroidX.AppCompat.App.AppCompatActivity)
+                    ?.OnBackPressedDispatcher.OnBackPressed();
+                IsEnabled = true;
+            }
+        }
+#endif
 
         private void UpdateTicker()
         {
