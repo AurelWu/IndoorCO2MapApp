@@ -8,6 +8,8 @@ namespace IndoorCO2MapAppV2
     {
         public static HistoryDatabase HistoryDatabase { get; private set; }
         public static LocationCacheDatabase LocationCacheDb { get; private set; }
+        public static LocationCacheDatabase TransitStationCacheDb { get; private set; }
+        public static TransitLineCacheDatabase TransitLineCacheDb { get; private set; }
         public static DatabaseBackupService BackupService { get; private set; }
 
         public static string historyDBPath { get; private set; }
@@ -31,6 +33,10 @@ namespace IndoorCO2MapAppV2
             HistoryDatabase = new HistoryDatabase(historyDBPath);
 
             LocationCacheDb = new LocationCacheDatabase(locationCacheDbPath);
+            TransitStationCacheDb = new LocationCacheDatabase(
+                Path.Combine(FileSystem.AppDataDirectory, "transit_station_cache.db3"));
+            TransitLineCacheDb = new TransitLineCacheDatabase(
+                Path.Combine(FileSystem.AppDataDirectory, "transit_line_cache.db3"));
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

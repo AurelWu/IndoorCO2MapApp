@@ -272,10 +272,19 @@
                     <!-- Transit search section -->
                     <VerticalStackLayout IsVisible="{Binding IsTransitMode}" Spacing="10">
 
-                        <Button Text="{Binding Transit.SearchButtonText}"
-                                Clicked="OnSearchTransitClicked"
-                                IsEnabled="{Binding BuildingSearch.HasValidGPS}"
-                                HorizontalOptions="Fill" />
+                        <Grid ColumnDefinitions="3*,1*" ColumnSpacing="10">
+                            <Button Text="{Binding Transit.SearchButtonText}"
+                                    Clicked="OnSearchTransitClicked"
+                                    IsEnabled="{Binding BuildingSearch.HasValidGPS}"
+                                    HorizontalOptions="Fill"
+                                    Grid.Column="0" />
+                            <Button Text="📁"
+                                    FontSize="20"
+                                    Clicked="OnGetCachedTransitLocationsClicked"
+                                    IsEnabled="{Binding BuildingSearch.HasValidGPS}"
+                                    HorizontalOptions="Fill"
+                                    Grid.Column="1" />
+                        </Grid>
 
                         <HorizontalStackLayout
                             Spacing="10"

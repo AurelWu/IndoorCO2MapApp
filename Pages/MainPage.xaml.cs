@@ -518,6 +518,39 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel.BuildingSearch.RefreshBuildings();            
         }
 
+        private void OnGetCachedTransitLocationsClicked(object sender, EventArgs e)
+        {
+            LoadCachedTransitLocationsAsync().SafeFireAndForget("OnGetCachedTransitLocationsClicked");
+        }
+
+        private async Task LoadCachedTransitLocationsAsync()
+        {
+            await _mainPageViewModel.BuildingSearch.GetGpsAsync();
+            if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
+            {
+                _mainPageViewModel.Transit.Status = "No valid GPS data yet.";
+                return;
+            }
+
+            double userLat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
+            double userLon = _mainPageViewModel.BuildingSearch.Longitude!.Value;
+            int overrideMeters = UserSettings.Instance.CacheRangeOverrideMeters;
+            int range = overrideMeters > 0 ? overrideMeters : _transitSearchRange;
+
+            var stations = await App.TransitStationCacheDb.GetAllAsync(userLat, userLon);
+            var filteredStations = stations.Where(s => s.Distance <= range).ToHashSet();
+
+            var routes = await App.TransitLineCacheDb.GetAllAsync(userLat, userLon, range);
+
+            _mainPageViewModel.Transit.SetSearchCoordinates(userLat, userLon);
+            LocationStore.Instance.SetTransportStartLocations(filteredStations);
+            LocationStore.Instance.SetTransitLines(routes);
+
+            _mainPageViewModel.Transit.RefreshStations();
+            _mainPageViewModel.Transit.RefreshRoutes(preserveSelection: false);
+            _mainPageViewModel.Transit.Status = $"Loaded {filteredStations.Count} stops, {routes.Count} routes from cache.";
+        }
+
         private bool _manualResumeInProgress = false;
 
         private async void OnManualResumeClicked(object sender, EventArgs e)

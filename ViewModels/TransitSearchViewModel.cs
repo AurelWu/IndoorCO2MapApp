@@ -165,6 +165,14 @@ namespace IndoorCO2MapAppV2.ViewModels
             finally { IsLoadingRouteGeometry = false; }
         }
 
+        public void SetSearchCoordinates(double lat, double lon)
+        {
+            _searchLat = lat;
+            _searchLon = lon;
+            TransitRouteDisplayConverter.CurrentSearchLat = lat;
+            TransitRouteDisplayConverter.CurrentSearchLon = lon;
+        }
+
         public async Task SearchTransitAsync(double lat, double lon, int searchRange, CancellationToken ct = default)
         {
             IsSearching = true;
@@ -185,16 +193,21 @@ namespace IndoorCO2MapAppV2.ViewModels
                     routes = result.routes;
                 }
 
-                _searchLat = lat;
-                _searchLon = lon;
-                TransitRouteDisplayConverter.CurrentSearchLat = lat;
-                TransitRouteDisplayConverter.CurrentSearchLon = lon;
+                SetSearchCoordinates(lat, lon);
 
                 _locationStore.SetTransportStartLocations(stations);
                 _locationStore.SetTransitLines(routes);
 
                 RefreshStations();
                 RefreshRoutes(preserveSelection: false);
+
+                if (UserSettings.Instance.EnableLocationCaching)
+                {
+                    foreach (var s in stations)
+                        await App.TransitStationCacheDb.InsertOrReplaceAsync(s);
+                    foreach (var r in routes)
+                        await App.TransitLineCacheDb.InsertOrReplaceAsync(r);
+                }
 
                 Status = $"Found {stations.Count} stops, {routes.Count} routes.";
                 Logger.WriteToLog($"TransitSearchViewModel|SearchTransitAsync: {stations.Count} stations, {routes.Count} routes");
