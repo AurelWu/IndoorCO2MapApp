@@ -91,8 +91,8 @@ namespace IndoorCO2MapAppV2.Pages
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
                         NumberStyles.Float, CultureInfo.InvariantCulture, out double tHigh))
                 {
-                    TrimSlider.LowerValue = Math.Clamp(tLow, TrimSlider.Minimum, TrimSlider.Maximum);
-                    TrimSlider.UpperValue = Math.Clamp(tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
+                    TrimSlider.LowerValue = Math.Clamp((int)tLow, TrimSlider.Minimum, TrimSlider.Maximum);
+                    TrimSlider.UpperValue = Math.Clamp((int)tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
                 }
             });
         }
