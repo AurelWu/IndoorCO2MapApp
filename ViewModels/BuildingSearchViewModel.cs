@@ -200,6 +200,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                     try { await App.LocationCacheDb.InsertOrReplaceAsync(location); }
                     catch (Exception ex) { Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}"); }
                 }
+                await App.LocationCacheDb.TrimAsync(100_000);
             }
 
             RefreshBuildings();
@@ -220,6 +221,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                         try { await App.LocationCacheDb.InsertOrReplaceAsync(location); }
                         catch (Exception ex) { Logger.WriteToLog($"Failed to cache location {location.ID}: {ex.Message}"); }
                     }
+                    await App.LocationCacheDb.TrimAsync(100_000);
                 }
 
                 LocationStore.Instance.SetBuildingLocations(results.ToHashSet());

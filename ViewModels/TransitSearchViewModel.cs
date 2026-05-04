@@ -207,6 +207,8 @@ namespace IndoorCO2MapAppV2.ViewModels
                         await App.TransitStationCacheDb.InsertOrReplaceAsync(s);
                     foreach (var r in routes)
                         await App.TransitLineCacheDb.InsertOrReplaceAsync(r, lat, lon);
+                    await App.TransitStationCacheDb.TrimAsync(100_000);
+                    await App.TransitLineCacheDb.TrimAsync(100_000);
                 }
 
                 Status = $"Found {stations.Count} stops, {routes.Count} routes.";

@@ -44,6 +44,16 @@ namespace IndoorCO2MapAppV2.Spatial
                 .ToHashSet();
         }
 
+        public async Task TrimAsync(int maxRows)
+        {
+            int count = await db.Table<CachedLocation>().CountAsync().ConfigureAwait(false);
+            if (count <= maxRows) return;
+            int toDelete = count - maxRows;
+            await db.ExecuteAsync(
+                $"DELETE FROM CachedLocation WHERE rowid IN (SELECT rowid FROM CachedLocation ORDER BY rowid ASC LIMIT {toDelete})")
+                .ConfigureAwait(false);
+        }
+
         public Task ClearAsync()
             => db.DeleteAllAsync<CachedLocation>();
     }

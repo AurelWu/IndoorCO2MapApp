@@ -42,6 +42,16 @@ namespace IndoorCO2MapAppV2.Spatial
                 .ToList();
         }
 
+        public async Task TrimAsync(int maxRows)
+        {
+            int count = await _db.Table<CachedTransitLine>().CountAsync().ConfigureAwait(false);
+            if (count <= maxRows) return;
+            int toDelete = count - maxRows;
+            await _db.ExecuteAsync(
+                $"DELETE FROM CachedTransitLine WHERE rowid IN (SELECT rowid FROM CachedTransitLine ORDER BY rowid ASC LIMIT {toDelete})")
+                .ConfigureAwait(false);
+        }
+
         public Task ClearAsync() => _db.DeleteAllAsync<CachedTransitLine>();
     }
 }
