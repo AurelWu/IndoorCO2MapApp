@@ -123,10 +123,10 @@ namespace IndoorCO2MapAppV2.Pages
                 if (_page.InvokeOnBackButtonPressed()) return;
                 // Page didn't handle it — disable ourselves and let the dispatcher
                 // fall through to system default (exit / navigate up).
-                IsEnabled = false;
+                Enabled = false;
                 (Platform.CurrentActivity as AndroidX.AppCompat.App.AppCompatActivity)
                     ?.OnBackPressedDispatcher.OnBackPressed();
-                IsEnabled = true;
+                Enabled = true;
             }
         }
 #endif

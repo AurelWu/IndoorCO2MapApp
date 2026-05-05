@@ -341,14 +341,12 @@ namespace IndoorCO2MapAppV2.Pages
                     _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType),
                     Task.Delay(Timeout.Infinite, ct));
             }
-#if ANDROID
-            catch (Java.Lang.SecurityException ex)
+            catch (Exception ex) when (IsBtPermissionDenied(ex))
             {
                 Logger.WriteToLog($"TryRecoverRecordingAsync: BT permission denied — {ex.Message}");
                 ManualResumeButton.IsVisible = true;
                 return false;
             }
-#endif
             ct.ThrowIfCancellationRequested();
 
             // Check if the saved device appeared in the scan results
@@ -385,6 +383,15 @@ namespace IndoorCO2MapAppV2.Pages
                 await Task.Delay(500, ct);
             }
             Logger.WriteToLog("WaitForBluetoothReadyForRecoveryAsync: timed out");
+        }
+
+        private static bool IsBtPermissionDenied(Exception ex)
+        {
+#if ANDROID
+            return ex is Java.Lang.SecurityException;
+#else
+            return false;
+#endif
         }
 
         private void OnAbortRecoveryClicked(object sender, EventArgs e)
