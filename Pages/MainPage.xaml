@@ -440,12 +440,23 @@
                     HorizontalOptions="Fill"/>
 
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                <Button Text="{x:Static t:Localisation.MainMenuNewsButton}"
-                        Clicked="OnNavigateClicked"
-                        CommandParameter="///news"
-                        Style="{StaticResource TonalButtonStyle}"
-                        HorizontalOptions="Fill"
-                        Grid.Column="0"/>
+                <Grid Grid.Column="0">
+                    <Button Text="{x:Static t:Localisation.MainMenuNewsButton}"
+                            Clicked="OnNavigateClicked"
+                            CommandParameter="///news"
+                            Style="{StaticResource TonalButtonStyle}"
+                            HorizontalOptions="Fill" />
+                    <Border x:Name="NewsBadge"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                            WidthRequest="10" HeightRequest="10"
+                            HorizontalOptions="End" VerticalOptions="Start"
+                            Margin="0,6,6,0"
+                            IsVisible="False"
+                            InputTransparent="True">
+                        <Border.StrokeShape><Ellipse /></Border.StrokeShape>
+                        <Border.Shadow><Shadow Brush="Black" Opacity="0.3" Radius="2" Offset="0,1"/></Border.Shadow>
+                    </Border>
+                </Grid>
                 <Button Text="{x:Static t:Localisation.MainMenuStatisticsButton}"
                         Clicked="OnNavigateClicked"
                         CommandParameter="///statistics"

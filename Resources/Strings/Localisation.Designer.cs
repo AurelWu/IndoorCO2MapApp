@@ -406,6 +406,7 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string MainMenuResumeRecording { get { return ResourceManager.GetString("MainMenuResumeRecording", resourceCulture); } }
         internal static string MainMenuRoutePreview { get { return ResourceManager.GetString("MainMenuRoutePreview", resourceCulture); } }
         internal static string MainMenuNewsButton { get { return ResourceManager.GetString("MainMenuNewsButton", resourceCulture); } }
+        internal static string SettingsShowNewsNotification { get { return ResourceManager.GetString("SettingsShowNewsNotification", resourceCulture); } }
         internal static string MainMenuStatisticsButton { get { return ResourceManager.GetString("MainMenuStatisticsButton", resourceCulture); } }
         internal static string MainMenuOpenMapInBrowser { get { return ResourceManager.GetString("MainMenuOpenMapInBrowser", resourceCulture); } }
         internal static string MainMenuDataProtectionImprint { get { return ResourceManager.GetString("MainMenuDataProtectionImprint", resourceCulture); } }

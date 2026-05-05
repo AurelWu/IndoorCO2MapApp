@@ -17,7 +17,9 @@ namespace IndoorCO2MapAppV2.Pages
 
             if (BindingContext is NewsViewModel vm)
             {
-                vm.LoadAsync().SafeFireAndForget("NewsPage|OnAppearing|vm.LoadAsync");
+                vm.LoadAsync()
+                  .ContinueWith(_ => NewsViewModel.MarkAsRead(), TaskScheduler.Default)
+                  .SafeFireAndForget("NewsPage|OnAppearing|LoadAsync");
             }
         }
 

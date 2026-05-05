@@ -282,6 +282,9 @@
   <data name="MainMenuNewsButton" xml:space="preserve">
     <value>News</value>
   </data>
+  <data name="SettingsShowNewsNotification" xml:space="preserve">
+    <value>Show news notification badge</value>
+  </data>
   <data name="MainMenuStatisticsButton" xml:space="preserve">
     <value>Statistics</value>
   </data>

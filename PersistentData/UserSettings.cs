@@ -146,6 +146,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showImprintButton, value);
         }
 
+        private bool _showNewsNotification = true;
+        public bool ShowNewsNotification
+        {
+            get => _showNewsNotification;
+            set => SetProperty(ref _showNewsNotification, value);
+        }
+
         private string _language = "en";
         public string Language
         {

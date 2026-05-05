@@ -36,6 +36,7 @@ namespace IndoorCO2MapAppV2.Pages
         private bool _permissionsRequested = false;
 
         private bool sortAlphabetical = false;
+        private bool _recoveryInProgress = false;
 
         private IDispatcherTimer? _co2liveValueUpdateTimer;
         private CancellationTokenSource? _gpsCts;
@@ -202,6 +203,12 @@ namespace IndoorCO2MapAppV2.Pages
             // Sync the route-preview setting so it updates when user navigates back from Settings
             _mainPageViewModel.Transit.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
 
+            NewsBadge.IsVisible = NewsViewModel.HasUnreadNews && UserSettings.Instance.ShowNewsNotification;
+            _ = NewsViewModel.CheckForNewNewsAsync().ContinueWith(_ =>
+                MainThread.BeginInvokeOnMainThread(() =>
+                    NewsBadge.IsVisible = NewsViewModel.HasUnreadNews
+                                          && UserSettings.Instance.ShowNewsNotification));
+
             // Show recovery overlay immediately if a snapshot exists — before the permission
             // block runs — so the user sees feedback right away instead of a blank screen.
             if (RecoveryManager.Instance.LoadSnapshot() != null)
@@ -231,29 +238,34 @@ namespace IndoorCO2MapAppV2.Pages
             }
 
             bool recovered = false;
-            _recoveryCts = new CancellationTokenSource();
-            try
+            if (!_recoveryInProgress)
             {
-                RecoveryOverlay.IsVisible = true;
-                MainScrollView.IsEnabled = false;
-                recovered = await TryRecoverRecordingAsync(_recoveryCts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.WriteToLog("Recovery aborted by user");
-                ManualResumeButton.IsVisible = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.WriteToLog($"TryRecoverRecordingAsync failed: {ex.Message}");
-                ManualResumeButton.IsVisible = true;
-            }
-            finally
-            {
-                RecoveryOverlay.IsVisible = false;
-                MainScrollView.IsEnabled = true;
-                _recoveryCts.Dispose();
-                _recoveryCts = null;
+                _recoveryInProgress = true;
+                _recoveryCts = new CancellationTokenSource();
+                try
+                {
+                    RecoveryOverlay.IsVisible = true;
+                    MainScrollView.IsEnabled = false;
+                    recovered = await TryRecoverRecordingAsync(_recoveryCts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Logger.WriteToLog("Recovery aborted by user");
+                    ManualResumeButton.IsVisible = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteToLog($"TryRecoverRecordingAsync failed: {ex.Message}");
+                    ManualResumeButton.IsVisible = true;
+                }
+                finally
+                {
+                    RecoveryOverlay.IsVisible = false;
+                    MainScrollView.IsEnabled = true;
+                    _recoveryCts.Dispose();
+                    _recoveryCts = null;
+                    _recoveryInProgress = false;
+                }
             }
             _mainPageViewModel.Settings.EnablePreRecording = false;
             StartCo2TimerOnce();

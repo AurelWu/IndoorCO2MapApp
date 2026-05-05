@@ -223,6 +223,9 @@
   <data name="MainMenuNewsButton" xml:space="preserve">
     <value>Not&#237;cias</value>
   </data>
+  <data name="SettingsShowNewsNotification" xml:space="preserve">
+    <value>Mostrar emblema de novidades</value>
+  </data>
   <data name="MainMenuStatisticsButton" xml:space="preserve">
     <value>Estat&#237;sticas</value>
   </data>
