@@ -2,13 +2,15 @@ using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.ViewModels;
 #if !WINDOWS
+using BruTile;
 using BruTile.Cache;
 using BruTile.Predefined;
+using BruTile.Web;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Projections;
-using Mapsui.Tiling;
+using Mapsui.Tiling.Layers;
 #endif
 
 namespace IndoorCO2MapAppV2.Pages
@@ -260,7 +262,7 @@ namespace IndoorCO2MapAppV2.Pages
             Directory.CreateDirectory(cacheDir);
             TrimTileCache(cacheDir, maxBytes: 50L * 1024 * 1024);
             var tileSource = new HttpTileSource(
-                new GlobalSphericalMercator(yAxis: YAxis.OSM),
+                new GlobalSphericalMercator(YAxis.OSM),
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 new[] { "a", "b", "c" },
                 name: "OpenStreetMap",
@@ -287,9 +289,6 @@ namespace IndoorCO2MapAppV2.Pages
             catch { }
         }
 
-        private void OnReloadTilesClicked(object sender, EventArgs e)
-            => BuildMap(FilteredRecordings());
-
         private void ShowDetailPanel(LocationGroupItem group)
         {
             DetailLocationName.Text = group.LocationName;
@@ -300,6 +299,13 @@ namespace IndoorCO2MapAppV2.Pages
         }
 
 #endif
+
+        private void OnReloadTilesClicked(object sender, EventArgs e)
+        {
+#if !WINDOWS
+            BuildMap(FilteredRecordings());
+#endif
+        }
 
         private void OnDetailPanelClose(object sender, EventArgs e)
             => DetailPanel.IsVisible = false;
