@@ -187,9 +187,18 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        protected virtual bool ShowStatusBars => true;
+
         private void UpdateBars()
         {
             if (LargeBar == null || SmallBar == null) return;
+
+            if (!ShowStatusBars)
+            {
+                LargeBar.IsVisible = false;
+                SmallBar.IsVisible = false;
+                return;
+            }
 
             bool allReady = StatusViewModel.Instance.AllReady;
             LargeBar.IsVisible = !allReady;

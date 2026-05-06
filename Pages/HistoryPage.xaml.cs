@@ -6,6 +6,7 @@ namespace IndoorCO2MapAppV2.Pages
 {
     public partial class HistoryPage : AppPage
     {
+        protected override bool ShowStatusBars => false;
         public HistoryPage()
         {
             InitializeComponent();
