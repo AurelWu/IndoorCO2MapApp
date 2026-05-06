@@ -164,6 +164,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.ShowNewsNotification = value; OnPropertyChanged(); }
         }
 
+        public bool ShowChangeRouteInRecording
+        {
+            get => UserSettings.Instance.ShowChangeRouteInRecording;
+            set { UserSettings.Instance.ShowChangeRouteInRecording = value; OnPropertyChanged(); }
+        }
+
         public string AppVersion =>
             $"Version {AppInfo.VersionString} ({AppInfo.BuildString})";
 

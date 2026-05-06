@@ -8,8 +8,16 @@ using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
+using IndoorCO2MapAppV2.ViewModels;
 using System.Globalization;
 using System.Linq;
+#if !WINDOWS
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Nts;
+using Mapsui.Projections;
+using Mapsui.Tiling;
+#endif
 
 namespace IndoorCO2MapAppV2.Pages
 {
@@ -22,6 +30,12 @@ namespace IndoorCO2MapAppV2.Pages
         private int _secondsUntilUpdate;
         private CancellationTokenSource? _submitDelayCts;
         private bool _programmaticSliderUpdate;
+
+        private readonly TransitSearchViewModel _changeRouteVm = new();
+        private bool _changeRouteExpanded;
+#if !WINDOWS
+        private Mapsui.UI.Maui.MapControl? _changeRouteMapControl;
+#endif
 
         public TransitMeasurementPage()
         {
@@ -97,6 +111,33 @@ namespace IndoorCO2MapAppV2.Pages
                     TrimSlider.UpperValue = Math.Clamp((int)tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
                     _programmaticSliderUpdate = false;
                 }
+
+                // ---- Change-route section setup ----
+                ChangeRouteCard.IsVisible = UserSettings.Instance.ShowChangeRouteInRecording;
+                if (!UserSettings.Instance.ShowChangeRouteInRecording) return;
+                _changeRouteVm.ShowRoutePreview = UserSettings.Instance.ShowRoutePreview;
+                RouteModeFilter.Items = new List<string>(_changeRouteVm.ModeFilterOptions);
+                RouteModeFilter.SelectedItem = _changeRouteVm.ModeFilter;
+                RouteModeFilter.SelectionChanged -= OnRouteModeFilterChanged;
+                RouteModeFilter.SelectionChanged += OnRouteModeFilterChanged;
+
+                _changeRouteVm.RefreshRoutes(preserveSelection: false);
+                ChangeRoutePicker.ItemsSource = _changeRouteVm.FilteredRoutes;
+
+                var activeRec2 = RecordingManager.Instance.ActiveRecording;
+                if (activeRec2 != null && activeRec2.AdditionalDataByParameter.TryGetValue("routeName", out var currentRoute))
+                    CurrentRouteLabel.Text = currentRoute;
+
+                if (activeRec2 != null &&
+                    double.TryParse(activeRec2.AdditionalDataByParameter.GetValueOrDefault("startLat", "0"),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out double sLat) &&
+                    double.TryParse(activeRec2.AdditionalDataByParameter.GetValueOrDefault("startLon", "0"),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out double sLon) &&
+                    sLat != 0)
+                    _changeRouteVm.SetSearchCoordinates(sLat, sLon);
+
+                _changeRouteVm.PropertyChanged -= OnChangeRouteVmPropertyChanged;
+                _changeRouteVm.PropertyChanged += OnChangeRouteVmPropertyChanged;
             });
         }
 
@@ -551,5 +592,203 @@ namespace IndoorCO2MapAppV2.Pages
                 });
             }
         }
+
+        // ---- Change Transit Line ----
+
+        private void OnChangeRouteVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(TransitSearchViewModel.SelectedRouteGeometry) ||
+                e.PropertyName == nameof(TransitSearchViewModel.IsLoadingRouteGeometry))
+                MainThread.BeginInvokeOnMainThread(UpdateChangeRoutePreview);
+        }
+
+        private void OnChangeRouteToggleClicked(object sender, EventArgs e)
+        {
+            _changeRouteExpanded = !_changeRouteExpanded;
+            ChangeRouteSection.IsVisible = _changeRouteExpanded;
+            ChangeRouteToggleButton.Text = _changeRouteExpanded ? "▲" : "▼";
+        }
+
+        private void OnRouteModeFilterChanged(object? sender, string mode)
+        {
+            _changeRouteVm.ModeFilterChangedCommand.Execute(mode);
+            RefreshChangeRoutePickerItems();
+        }
+
+        private void OnChangeRoutePickerChanged(object sender, EventArgs e)
+        {
+            if (ChangeRoutePicker.SelectedItem is not TransitLineData route) return;
+            _changeRouteVm.SelectedRoute = route;
+            UpdateChangeRouteStarColor();
+        }
+
+        private void OnChangeRouteStarTapped(object sender, EventArgs e)
+        {
+            _changeRouteVm.ToggleRouteFavouriteCommand.Execute(null);
+            RefreshChangeRoutePickerItems();
+            UpdateChangeRouteStarColor();
+        }
+
+        private void OnRouteFilterTextChanged(object sender, TextChangedEventArgs e)
+        {
+            _changeRouteVm.RouteFilterText = e.NewTextValue ?? "";
+            RefreshChangeRoutePickerItems();
+        }
+
+        private void RefreshChangeRoutePickerItems()
+        {
+            ChangeRoutePicker.ItemsSource = null;
+            ChangeRoutePicker.ItemsSource = _changeRouteVm.FilteredRoutes;
+            if (_changeRouteVm.SelectedRoute != null &&
+                _changeRouteVm.FilteredRoutes.Contains(_changeRouteVm.SelectedRoute))
+                ChangeRoutePicker.SelectedItem = _changeRouteVm.SelectedRoute;
+        }
+
+        private void UpdateChangeRouteStarColor()
+        {
+            ChangeRouteStarLabel.TextColor = _changeRouteVm.IsRouteFavourited
+                ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+        }
+
+        private void OnSearchRoutesClicked(object sender, EventArgs e)
+            => SearchRoutesAsync().SafeFireAndForget("TransitMeasurementPage|OnSearchRoutesClicked");
+
+        private async Task SearchRoutesAsync()
+        {
+            RouteSearchButton.IsEnabled = false;
+            RouteSearchIndicator.IsVisible = true;
+            RouteSearchIndicator.IsRunning = true;
+            try
+            {
+#if WINDOWS
+                double lat = 51.3406, lon = 12.3747;
+#else
+                var loc = await LocationServicePlatformProvider.CreateOrUse().GetCurrentLocationAsync();
+                if (loc == null) return;
+                double lat = loc.Latitude, lon = loc.Longitude;
+#endif
+                await _changeRouteVm.SearchTransitAsync(lat, lon, 250);
+                RefreshChangeRoutePickerItems();
+            }
+            finally
+            {
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    RouteSearchIndicator.IsVisible = false;
+                    RouteSearchIndicator.IsRunning = false;
+                    RouteSearchButton.IsEnabled = true;
+                });
+            }
+        }
+
+        private void OnConfirmRouteChangeClicked(object sender, EventArgs e)
+        {
+            var route = _changeRouteVm.SelectedRoute;
+            if (route == null) return;
+            RecordingManager.Instance.UpdateRouteSnapshot(route.ID.ToString(), route.Name);
+            MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
+            CurrentRouteLabel.Text = route.Name;
+            _changeRouteExpanded = false;
+            ChangeRouteSection.IsVisible = false;
+            ChangeRouteToggleButton.Text = "▼";
+        }
+
+        private void UpdateChangeRoutePreview()
+        {
+            RoutePreviewLoadingIndicator.IsVisible = _changeRouteVm.IsLoadingRouteGeometry;
+            RoutePreviewLoadingIndicator.IsRunning = _changeRouteVm.IsLoadingRouteGeometry;
+
+            var geometry = _changeRouteVm.SelectedRouteGeometry;
+            if (!UserSettings.Instance.ShowRoutePreview || geometry == null || geometry.Points.Count < 2)
+            {
+                RoutePreviewBorder.IsVisible = false;
+                ChangeRoutePreviewContainer.Content = null;
+                return;
+            }
+
+#if !WINDOWS
+            var map = new Mapsui.Map();
+            map.Widgets.Clear();
+            map.Navigator.RotationLock = true;
+            map.Layers.Add(OpenStreetMap.CreateTileLayer());
+
+            var routeColor = Mapsui.Styles.Color.FromArgb(255, 81, 43, 212);
+            if (!string.IsNullOrEmpty(geometry.Color))
+            {
+                try
+                {
+                    var hex = geometry.Color.TrimStart('#');
+                    if (hex.Length == 6)
+                    {
+                        int r = Convert.ToInt32(hex[..2], 16);
+                        int g = Convert.ToInt32(hex[2..4], 16);
+                        int b = Convert.ToInt32(hex[4..6], 16);
+                        routeColor = Mapsui.Styles.Color.FromArgb(255, r, g, b);
+                    }
+                }
+                catch { }
+            }
+
+            var coords = geometry.Points
+                .Select(p =>
+                {
+                    var (mx, my) = SphericalMercator.FromLonLat(p.Lon, p.Lat);
+                    return new NetTopologySuite.Geometries.Coordinate(mx, my);
+                }).ToArray();
+
+            var line = new NetTopologySuite.Geometries.GeometryFactory().CreateLineString(coords);
+            var routeFeature = new GeometryFeature { Geometry = line };
+            routeFeature.Styles.Add(new Mapsui.Styles.VectorStyle
+            {
+                Line = new Mapsui.Styles.Pen(routeColor, 3)
+            });
+            map.Layers.Add(new MemoryLayer { Name = "Route", Features = [routeFeature], Style = null });
+
+            var minLon = geometry.Points.Min(p => p.Lon);
+            var maxLon = geometry.Points.Max(p => p.Lon);
+            var minLat = geometry.Points.Min(p => p.Lat);
+            var maxLat = geometry.Points.Max(p => p.Lat);
+            var (x0, y0) = SphericalMercator.FromLonLat(minLon, minLat);
+            var (x1, y1) = SphericalMercator.FromLonLat(maxLon, maxLat);
+            double padX = (x1 - x0) * 0.05;
+            double padY = (y1 - y0) * 0.05;
+            map.Navigator.ZoomToBox(new MRect(x0 - padX, y0 - padY, x1 + padX, y1 + padY), MBoxFit.Fit);
+
+            _changeRouteMapControl = new Mapsui.UI.Maui.MapControl { Map = map, IsEnabled = false };
+            ChangeRoutePreviewContainer.Content = _changeRouteMapControl;
+#if ANDROID
+            _changeRouteMapControl.HandlerChanged += (s, ev) => SetupAndroidChangeRouteMapTouchInterception();
+#endif
+#else
+            ChangeRoutePreviewContainer.Content = new Label
+            {
+                Text = $"Route: {geometry.Points.Count} points",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                FontSize = 12
+            };
+#endif
+            RoutePreviewBorder.IsVisible = true;
+        }
+
+#if ANDROID
+        private void SetupAndroidChangeRouteMapTouchInterception()
+        {
+            if (_changeRouteMapControl?.Handler?.PlatformView is not Android.Views.View nativeView) return;
+            nativeView.Touch += (s, args) =>
+            {
+                switch (args.Event?.ActionMasked)
+                {
+                    case Android.Views.MotionEventActions.Down:
+                    case Android.Views.MotionEventActions.PointerDown:
+                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(true); break;
+                    case Android.Views.MotionEventActions.Up:
+                    case Android.Views.MotionEventActions.Cancel:
+                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(false); break;
+                }
+                args.Handled = false;
+            };
+        }
+#endif
     }
 }

@@ -59,6 +59,7 @@
             <VerticalStackLayout Spacing="10">
                 <Label Text="Transit" Style="{StaticResource SectionLabelStyle}" />
                 <c:LabeledSwitch Text="Show Route Preview Map" IsToggled="{Binding ShowRoutePreview}" />
+                <c:LabeledSwitch Text="Show 'Change Route' option during transit recording" IsToggled="{Binding ShowChangeRouteInRecording}" />
             </VerticalStackLayout>
         </Border>
 

@@ -153,6 +153,13 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showNewsNotification, value);
         }
 
+        private bool _showChangeRouteInRecording = false;
+        public bool ShowChangeRouteInRecording
+        {
+            get => _showChangeRouteInRecording;
+            set => SetProperty(ref _showChangeRouteInRecording, value);
+        }
+
         private string _language = "en";
         public string Language
         {

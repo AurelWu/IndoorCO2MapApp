@@ -12,6 +12,7 @@
     <local:AppPage.Resources>
         <ResourceDictionary>
             <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
+            <ui:TransitRouteDisplayConverter x:Key="TransitRouteDisplayConverter" />
         </ResourceDictionary>
     </local:AppPage.Resources>
 
@@ -68,6 +69,91 @@
                                 WidthRequest="400"
                                 InputTransparent="True" />
     </Grid>
+
+        <!-- Change Transit Line -->
+        <Border x:Name="ChangeRouteCard" Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- Header row: current route label + expand toggle -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <Label Text="Transit Line" Style="{StaticResource SectionLabelStyle}" />
+                        <Label x:Name="CurrentRouteLabel" FontSize="13" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            x:Name="ChangeRouteToggleButton"
+                            Text="▼"
+                            Clicked="OnChangeRouteToggleClicked"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            HeightRequest="36" Padding="10,0"
+                            VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Expandable content (collapsed by default) -->
+                <VerticalStackLayout x:Name="ChangeRouteSection" IsVisible="False" Spacing="8">
+
+                    <!-- Search button + spinner -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Button x:Name="RouteSearchButton" Grid.Column="0"
+                                Text="Search routes near me"
+                                Clicked="OnSearchRoutesClicked"
+                                HorizontalOptions="Fill" />
+                        <ActivityIndicator x:Name="RouteSearchIndicator" Grid.Column="1"
+                                           IsVisible="False" IsRunning="False"
+                                           WidthRequest="24" HeightRequest="24"
+                                           VerticalOptions="Center" />
+                    </Grid>
+
+                    <!-- Mode filter -->
+                    <controls:LabeledSegmentedControl x:Name="RouteModeFilter"
+                        Label="" FillWidth="True" MaxItemsPerRow="3" />
+
+                    <!-- Route picker + favourite star -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center" HorizontalOptions="Fill">
+                        <Border Grid.Column="0"
+                                Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                                StrokeThickness="{OnPlatform iOS=2, Android=0}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                            <Picker x:Name="ChangeRoutePicker"
+                                    ItemDisplayBinding="{Binding Converter={StaticResource TransitRouteDisplayConverter}}"
+                                    SelectedIndexChanged="OnChangeRoutePickerChanged"
+                                    Title="Select route..." />
+                        </Border>
+                        <Label x:Name="ChangeRouteStarLabel"
+                               Grid.Column="1" Text="★" FontSize="30"
+                               TextColor="#BDBDBD" VerticalOptions="Center" Margin="8,0,0,0">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnChangeRouteStarTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <!-- Route text filter -->
+                    <Entry x:Name="RouteFilterEntry"
+                           Placeholder="{x:Static t:Localisation.TransitSearchRoutesByName}"
+                           TextChanged="OnRouteFilterTextChanged" />
+
+                    <!-- Route preview map -->
+                    <ActivityIndicator x:Name="RoutePreviewLoadingIndicator"
+                                       IsVisible="False" IsRunning="False"
+                                       HorizontalOptions="Center" />
+                    <Border x:Name="RoutePreviewBorder"
+                            IsVisible="False" HeightRequest="200"
+                            Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
+                            StrokeThickness="1">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <controls:MapContainerView x:Name="ChangeRoutePreviewContainer" />
+                    </Border>
+
+                    <!-- Confirm button -->
+                    <Button x:Name="ConfirmRouteButton"
+                            Text="Apply Route Change"
+                            Clicked="OnConfirmRouteChangeClicked"
+                            HorizontalOptions="Fill" />
+
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
 
         <!-- Destination (optional) -->
         <Border Style="{StaticResource CardBorderStyle}">

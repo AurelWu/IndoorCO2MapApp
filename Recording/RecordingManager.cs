@@ -371,6 +371,19 @@ namespace IndoorCO2MapAppV2.Recording
             SaveRecoverySnapshot(ActiveRecording, ActiveRecording.MonitorID);
         }
 
+        public void UpdateRouteSnapshot(string routeId, string routeName)
+        {
+            if (!IsRecording || ActiveRecording == null) return;
+            var d = ActiveRecording.AdditionalDataByParameter;
+            d["routeID"]   = routeId;
+            d["routeName"] = routeName;
+            if (d.TryGetValue("startName", out var startName))
+                ActiveRecording.LocationName = $"{routeName} ({startName})";
+            else
+                ActiveRecording.LocationName = routeName;
+            SaveRecoverySnapshot(ActiveRecording, ActiveRecording.MonitorID);
+        }
+
         public void UpdateRecoverySnapshot(TriState doorWindowstate, TriState ventilationState, string customNote)
         {
             if (!IsRecording) return;
