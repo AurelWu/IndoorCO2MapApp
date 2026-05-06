@@ -21,10 +21,6 @@
         <!-- Top UI (fixed area) -->
         <VerticalStackLayout Grid.Row="0" Spacing="12">
 
-            <Label Text="History"
-                   Style="{StaticResource PageTitleStyle}"
-                   HorizontalOptions="Center" />
-
             <Button Text="Main Menu"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///home"
@@ -128,7 +124,7 @@
                                 </Grid>
 
                                 <!-- Expanded section -->
-                                <StackLayout IsVisible="{Binding IsExpanded}" HeightRequest="{Binding ExpandedHeight}" Padding="6,0,6,8" Spacing="6">
+                                <StackLayout HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="6">
                                     <Label Text="{Binding StatsLine}"
                                            FontSize="12"
                                            Style="{StaticResource CaptionLabelStyle}" />
@@ -235,7 +231,7 @@
                         </Grid>
 
                         <!-- Expanded section -->
-                        <StackLayout IsVisible="{Binding IsExpanded}" HeightRequest="{Binding ExpandedHeight}" Padding="6,0,6,8" Spacing="8">
+                        <StackLayout HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="8">
 
                             <!-- Multi-line chart -->
                             <controls:LineChartView
