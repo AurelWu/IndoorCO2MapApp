@@ -2,6 +2,8 @@ using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.ViewModels;
 #if !WINDOWS
+using BruTile.Cache;
+using BruTile.Predefined;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
@@ -19,6 +21,7 @@ namespace IndoorCO2MapAppV2.Pages
 #endif
         private List<PersistentRecording> _allRecordings = new();
         private bool _showTransit = false;
+        private CancellationTokenSource? _pageCts;
 
         public MapPage()
         {
@@ -29,6 +32,11 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnAppearing();
             UpdateToggleVisuals();
+
+            _pageCts?.Cancel();
+            _pageCts = new CancellationTokenSource();
+            var ct = _pageCts.Token;
+
 #if WINDOWS
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
@@ -38,6 +46,17 @@ namespace IndoorCO2MapAppV2.Pages
             BuildMap(FilteredRecordings());
             LoadingIndicator.IsRunning = false;
             LoadingIndicator.IsVisible = false;
+
+            // Single auto-retry: tiles that failed because the network wasn't ready
+            // at page-open are re-requested once the device has had time to connect.
+            // Cached tiles load instantly from disk; only the gaps hit the network.
+            _ = Task.Run(async () =>
+            {
+                try { await Task.Delay(4000, ct); }
+                catch (OperationCanceledException) { return; }
+                if (ct.IsCancellationRequested) return;
+                MainThread.BeginInvokeOnMainThread(() => BuildMap(FilteredRecordings()));
+            });
 #endif
         }
 
@@ -81,6 +100,13 @@ namespace IndoorCO2MapAppV2.Pages
             TransitToggleBtn.TextColor         = _showTransit ? activeText    : inactiveText;
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _pageCts?.Cancel();
+            _pageCts = null;
+        }
+
         protected override bool OnBackButtonPressed()
         {
             _ = NavigateAsync("///history");
@@ -119,7 +145,7 @@ namespace IndoorCO2MapAppV2.Pages
             var map = new Mapsui.Map();
             map.Widgets.Clear();
             map.Navigator.RotationLock = true;
-            map.Layers.Add(OpenStreetMap.CreateTileLayer());
+            map.Layers.Add(CreateCachedOsmTileLayer());
 
             MemoryLayer? pinLayer = null;
             if (groups.Count > 0)
@@ -227,6 +253,42 @@ namespace IndoorCO2MapAppV2.Pages
                 MainThread.BeginInvokeOnMainThread(() => ShowDetailPanel(group));
             };
         }
+
+        private static TileLayer CreateCachedOsmTileLayer()
+        {
+            var cacheDir = Path.Combine(FileSystem.CacheDirectory, "osmtiles");
+            Directory.CreateDirectory(cacheDir);
+            TrimTileCache(cacheDir, maxBytes: 50L * 1024 * 1024);
+            var tileSource = new HttpTileSource(
+                new GlobalSphericalMercator(yAxis: YAxis.OSM),
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                new[] { "a", "b", "c" },
+                name: "OpenStreetMap",
+                persistentCache: new FileCache(cacheDir, "png", TimeSpan.FromDays(14)));
+            return new TileLayer(tileSource) { Name = "OpenStreetMap" };
+        }
+
+        private static void TrimTileCache(string cacheDir, long maxBytes)
+        {
+            try
+            {
+                var files = new DirectoryInfo(cacheDir)
+                    .GetFiles("*.png", SearchOption.AllDirectories)
+                    .OrderBy(f => f.LastWriteTimeUtc)
+                    .ToList();
+                long total = files.Sum(f => f.Length);
+                foreach (var file in files)
+                {
+                    if (total <= maxBytes) break;
+                    total -= file.Length;
+                    file.Delete();
+                }
+            }
+            catch { }
+        }
+
+        private void OnReloadTilesClicked(object sender, EventArgs e)
+            => BuildMap(FilteredRecordings());
 
         private void ShowDetailPanel(LocationGroupItem group)
         {

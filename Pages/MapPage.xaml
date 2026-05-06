@@ -9,13 +9,20 @@
     <Grid RowDefinitions="Auto, *">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Padding="10,10,10,4" ColumnSpacing="10">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto" Padding="10,10,10,4" ColumnSpacing="10">
             <Button Grid.Column="0"
                     Text="← History"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///history"
                     Style="{StaticResource TonalButtonStyle}" />
-            <Border Grid.Column="2"
+            <Button Grid.Column="2"
+                    Text="↻"
+                    FontSize="18"
+                    Clicked="OnReloadTilesClicked"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    HeightRequest="36" WidthRequest="44" Padding="0"
+                    ToolTipProperties.Text="Reload map tiles" />
+            <Border Grid.Column="3"
                     StrokeShape="RoundRectangle 8"
                     BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
                     Stroke="Transparent" Padding="3">
