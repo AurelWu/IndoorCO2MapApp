@@ -133,7 +133,11 @@ namespace IndoorCO2MapAppV2.Pages
                 try
                 {
                     await Task.Delay(2000, token);
-                    MainThread.BeginInvokeOnMainThread(UpdateSubmitButtonState);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        _submitDelayCts = null;
+                        UpdateSubmitButtonState();
+                    });
                 }
                 catch (OperationCanceledException) { }
             });
@@ -392,6 +396,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void UpdateSubmitButtonState()
         {
+            if (_submitDelayCts != null && !_submitDelayCts.IsCancellationRequested) return;
             var rec = RecordingManager.Instance.ActiveRecording;
             if (rec == null || rec.MeasurementData == null || TrimSlider == null || SubmitButton == null)
                 return;
