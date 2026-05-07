@@ -162,10 +162,20 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 try
                 {
-                    await Task.Delay(2000, token);
+                    var end = DateTime.UtcNow.AddMilliseconds(2000);
+                    while (true)
+                    {
+                        double remaining = (end - DateTime.UtcNow).TotalSeconds;
+                        if (remaining <= 0) break;
+                        int label = (int)Math.Ceiling(remaining);
+                        MainThread.BeginInvokeOnMainThread(() =>
+                            SubmitButton.Text = $"{Localisation.SubmitRecordingButton} ({label}s)");
+                        await Task.Delay(100, token);
+                    }
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         _submitDelayCts = null;
+                        SubmitButton.Text = Localisation.SubmitRecordingButton;
                         UpdateSubmitButtonState();
                     });
                 }
