@@ -30,6 +30,8 @@ namespace IndoorCO2MapAppV2.Pages
         private int _secondsUntilUpdate;
         private CancellationTokenSource? _submitDelayCts;
         private bool _programmaticSliderUpdate;
+        private double? _pendingTrimLow;
+        private double? _pendingTrimHigh;
 
         private readonly TransitSearchViewModel _changeRouteVm = new();
         private bool _changeRouteExpanded;
@@ -106,10 +108,9 @@ namespace IndoorCO2MapAppV2.Pages
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
                         NumberStyles.Float, CultureInfo.InvariantCulture, out double tHigh))
                 {
-                    _programmaticSliderUpdate = true;
-                    TrimSlider.LowerValue = Math.Clamp((int)tLow, TrimSlider.Minimum, TrimSlider.Maximum);
-                    TrimSlider.UpperValue = Math.Clamp((int)tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
-                    _programmaticSliderUpdate = false;
+                    _pendingTrimLow = tLow;
+                    _pendingTrimHigh = tHigh;
+                    await UpdateChartAsync();
                 }
 
                 // ---- Change-route section setup ----
@@ -272,8 +273,34 @@ namespace IndoorCO2MapAppV2.Pages
                     {
                         bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
                         TrimSlider.Maximum = data.Count - 1;
-                        if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+
+                        if (_pendingTrimHigh.HasValue)
+                        {
+                            int targetHigh = (int)_pendingTrimHigh.Value;
+                            if (data.Count - 1 >= targetHigh)
+                            {
+                                TrimSlider.UpperValue = targetHigh;
+                                _pendingTrimHigh = null;
+                            }
+                            else
+                            {
+                                TrimSlider.UpperValue = data.Count - 1;
+                            }
+                        }
+                        else if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+                        {
                             TrimSlider.UpperValue = data.Count - 1;
+                        }
+
+                        if (_pendingTrimLow.HasValue)
+                        {
+                            int targetLow = (int)_pendingTrimLow.Value;
+                            if (targetLow <= (int)TrimSlider.UpperValue)
+                            {
+                                TrimSlider.LowerValue = targetLow;
+                                _pendingTrimLow = null;
+                            }
+                        }
                     }
                 }
                 finally
@@ -378,23 +405,29 @@ namespace IndoorCO2MapAppV2.Pages
             var keys = new List<string>(UserSettings.Instance.FavouriteLocationKeys);
             if (!keys.Remove(key)) keys.Add(key);
             UserSettings.Instance.FavouriteLocationKeys = keys;
-            bool isFav = keys.Contains(key);
-            EndpointStarLabel.TextColor = isFav ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+            EndpointStarLabel.TextColor = keys.Contains(key) ? Color.FromArgb("#512BD4") : Color.FromArgb("#BDBDBD");
+            SetEndpointPickerSource(_endpointStations);
+            EndpointPicker.SelectedItem = loc;
+        }
 
-            // Re-sort endpoint list with favourites first
-            if (_endpointStations.Count == 0) return;
+        private void SetEndpointPickerSource(List<LocationData> stations)
+        {
+            _endpointStations = stations;
+            var favKeys = UserSettings.Instance.FavouriteLocationKeys;
             var sorted = _endpointStations
-                .Where(s => UserSettings.Instance.FavouriteLocationKeys.Contains(s.FavouriteKey))
-                .Concat(_endpointStations.Where(s => !UserSettings.Instance.FavouriteLocationKeys.Contains(s.FavouriteKey)))
+                .Where(s => favKeys.Contains(s.FavouriteKey))
+                .Concat(_endpointStations.Where(s => !favKeys.Contains(s.FavouriteKey)))
+                .Cast<LocationData?>()
                 .ToList();
+            sorted.Add(null); // blank entry = no destination selected
             EndpointPicker.ItemsSource = sorted;
-            var stillSelected = sorted.FirstOrDefault(s => s.FavouriteKey == key);
-            if (stillSelected != null)
-                EndpointPicker.SelectedItem = stillSelected;
         }
 
         private void OnSearchEndpointClicked(object sender, EventArgs e)
             => SearchEndpointAsync().SafeFireAndForget("TransitMeasurementPage|OnSearchEndpointClicked");
+
+        private void OnLoadEndpointCacheClicked(object sender, EventArgs e)
+            => LoadEndpointFromCacheAsync().SafeFireAndForget("TransitMeasurementPage|OnLoadEndpointCacheClicked");
 
         private async Task SearchEndpointAsync()
         {
@@ -402,6 +435,7 @@ namespace IndoorCO2MapAppV2.Pages
             EndpointSearchIndicator.IsRunning = true;
             EndpointStatusLabel.IsVisible = false;
             SearchEndpointButton.IsEnabled = false;
+            LoadEndpointCacheButton.IsEnabled = false;
             try
             {
 #if WINDOWS
@@ -420,22 +454,13 @@ namespace IndoorCO2MapAppV2.Pages
                 }
                 double lat = loc.Latitude, lon = loc.Longitude;
 #endif
-                var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(
-                    lat, lon, 250);
-
-                _endpointStations = stations;
-
+                var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, 250);
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    var favKeys = UserSettings.Instance.FavouriteLocationKeys;
-                    var sorted = _endpointStations
-                        .Where(s => favKeys.Contains(s.FavouriteKey))
-                        .Concat(_endpointStations.Where(s => !favKeys.Contains(s.FavouriteKey)))
-                        .ToList();
-                    EndpointPicker.ItemsSource = sorted;
-                    if (sorted.Count > 0)
+                    SetEndpointPickerSource(stations);
+                    if (stations.Count > 0)
                         EndpointPicker.SelectedIndex = 0;
-                    if (_endpointStations.Count == 0)
+                    else
                     {
                         EndpointStatusLabel.Text = "No stops found nearby.";
                         EndpointStatusLabel.IsVisible = true;
@@ -458,7 +483,62 @@ namespace IndoorCO2MapAppV2.Pages
                     EndpointSearchIndicator.IsVisible = false;
                     EndpointSearchIndicator.IsRunning = false;
                     SearchEndpointButton.IsEnabled = true;
+                    LoadEndpointCacheButton.IsEnabled = true;
                 });
+            }
+        }
+
+        private async Task LoadEndpointFromCacheAsync()
+        {
+            EndpointStatusLabel.IsVisible = false;
+            try
+            {
+                double lat, lon;
+#if WINDOWS
+                lat = 51.3406; lon = 12.3747;
+#else
+                var active = RecordingManager.Instance.ActiveRecording;
+                if (active != null &&
+                    double.TryParse(active.AdditionalDataByParameter.GetValueOrDefault("startLat", ""),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out lat) &&
+                    double.TryParse(active.AdditionalDataByParameter.GetValueOrDefault("startLon", ""),
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out lon) &&
+                    lat != 0)
+                {
+                    // start station coordinates available — no GPS call needed
+                }
+                else
+                {
+                    var locationService = LocationServicePlatformProvider.CreateOrUse();
+                    var loc = await locationService.GetCurrentLocationAsync();
+                    if (loc == null)
+                    {
+                        EndpointStatusLabel.Text = "Could not get GPS position.";
+                        EndpointStatusLabel.IsVisible = true;
+                        return;
+                    }
+                    lat = loc.Latitude;
+                    lon = loc.Longitude;
+                }
+#endif
+                int range = UserSettings.Instance.CacheRangeOverrideMeters > 0
+                    ? UserSettings.Instance.CacheRangeOverrideMeters : 250;
+                var all = await App.TransitStationCacheDb.GetAllAsync(lat, lon);
+                var stations = all.Where(s => s.Distance <= range).ToList();
+                SetEndpointPickerSource(stations);
+                if (stations.Count > 0)
+                    EndpointPicker.SelectedIndex = 0;
+                else
+                {
+                    EndpointStatusLabel.Text = "No cached stops found nearby.";
+                    EndpointStatusLabel.IsVisible = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("TransitMeasurementPage|LoadEndpointFromCacheAsync failed: " + ex.Message);
+                EndpointStatusLabel.Text = "Cache load failed.";
+                EndpointStatusLabel.IsVisible = true;
             }
         }
 

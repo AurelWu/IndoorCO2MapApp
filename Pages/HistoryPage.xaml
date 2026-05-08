@@ -91,7 +91,8 @@
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer
                                             Command="{Binding BindingContext.ToggleExpandCommand, Source={x:Reference RecordingsCollection}}"
-                                            CommandParameter="{Binding .}" />
+                                            CommandParameter="{Binding .}"
+                                            Tapped="OnExpandTapped" />
                                     </Grid.GestureRecognizers>
                                     <VerticalStackLayout Grid.Column="0" Spacing="2">
                                         <Label Text="{Binding DateTime, Converter={StaticResource UnixTimeToDateTimeConverter}}"
@@ -190,7 +191,8 @@
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding BindingContext.ToggleGroupExpandCommand, Source={x:Reference GroupedCollection}}"
-                                    CommandParameter="{Binding .}" />
+                                    CommandParameter="{Binding .}"
+                                    Tapped="OnExpandTapped" />
                             </Grid.GestureRecognizers>
                             <VerticalStackLayout Grid.Column="0" Spacing="2">
                                 <Label Text="{Binding LocationNameWithChevron}"

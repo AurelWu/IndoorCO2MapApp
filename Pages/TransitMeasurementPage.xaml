@@ -159,10 +159,17 @@
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
                 <Label Text="{x:Static t:Localisation.TransitDestinationLabel}" Style="{StaticResource SectionLabelStyle}" />
-                <Button x:Name="SearchEndpointButton"
-                        Text="{x:Static t:Localisation.TransitSearchNearbyStops}"
-                        Clicked="OnSearchEndpointClicked"
-                        HorizontalOptions="Fill" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Button Grid.Column="0" x:Name="SearchEndpointButton"
+                            Text="{x:Static t:Localisation.TransitSearchNearbyStops}"
+                            Clicked="OnSearchEndpointClicked"
+                            HorizontalOptions="Fill" />
+                    <Button Grid.Column="1" x:Name="LoadEndpointCacheButton"
+                            Text="📁"
+                            FontSize="20"
+                            Clicked="OnLoadEndpointCacheClicked"
+                            HorizontalOptions="Fill" />
+                </Grid>
                 <ActivityIndicator x:Name="EndpointSearchIndicator"
                                    IsVisible="False" IsRunning="False"
                                    HorizontalOptions="Center" />

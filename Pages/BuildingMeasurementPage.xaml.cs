@@ -18,6 +18,8 @@ namespace IndoorCO2MapAppV2.Pages
         private int _secondsUntilUpdate;
         private CancellationTokenSource? _submitDelayCts;
         private bool _programmaticSliderUpdate;
+        private double? _pendingTrimLow;
+        private double? _pendingTrimHigh;
 
         public BuildingMeasurementPage()
         {
@@ -55,10 +57,9 @@ namespace IndoorCO2MapAppV2.Pages
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
                         System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double tHigh))
                 {
-                    _programmaticSliderUpdate = true;
-                    TrimSlider.LowerValue = Math.Clamp((int)tLow, TrimSlider.Minimum, TrimSlider.Maximum);
-                    TrimSlider.UpperValue = Math.Clamp((int)tHigh, TrimSlider.Minimum, TrimSlider.Maximum);
-                    _programmaticSliderUpdate = false;
+                    _pendingTrimLow = tLow;
+                    _pendingTrimHigh = tHigh;
+                    await UpdateChartAsync();
                 }
             });
 
@@ -245,8 +246,34 @@ namespace IndoorCO2MapAppV2.Pages
                     {
                         bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
                         TrimSlider.Maximum = data.Count - 1;
-                        if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+
+                        if (_pendingTrimHigh.HasValue)
+                        {
+                            int targetHigh = (int)_pendingTrimHigh.Value;
+                            if (data.Count - 1 >= targetHigh)
+                            {
+                                TrimSlider.UpperValue = targetHigh;
+                                _pendingTrimHigh = null;
+                            }
+                            else
+                            {
+                                TrimSlider.UpperValue = data.Count - 1;
+                            }
+                        }
+                        else if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+                        {
                             TrimSlider.UpperValue = data.Count - 1;
+                        }
+
+                        if (_pendingTrimLow.HasValue)
+                        {
+                            int targetLow = (int)_pendingTrimLow.Value;
+                            if (targetLow <= (int)TrimSlider.UpperValue)
+                            {
+                                TrimSlider.LowerValue = targetLow;
+                                _pendingTrimLow = null;
+                            }
+                        }
                     }
                 }
                 finally

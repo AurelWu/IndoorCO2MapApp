@@ -23,6 +23,22 @@ namespace IndoorCO2MapAppV2.Pages
             }
         }
 
+        private void OnExpandTapped(object? sender, TappedEventArgs e)
+        {
+#if IOS
+            // iOS UICollectionView caches cell heights and won't resize when MAUI
+            // view sizes change. Posting InvalidateLayout() on the next run-loop
+            // cycle (after MAUI processes binding updates) forces a re-measure.
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (RecordingsCollection?.Handler?.PlatformView is UIKit.UICollectionView cv)
+                    cv.CollectionViewLayout.InvalidateLayout();
+                if (GroupedCollection?.Handler?.PlatformView is UIKit.UICollectionView gcv)
+                    gcv.CollectionViewLayout.InvalidateLayout();
+            });
+#endif
+        }
+
         protected override bool OnBackButtonPressed()
         {
             _ = NavigateAsync("///home");
