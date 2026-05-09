@@ -44,6 +44,9 @@ namespace IndoorCO2MapAppV2.Pages
             // Clears chart so previous recording doesn't show
             lineChartView.Clear();
 
+            _pendingTrimLow = null;
+            _pendingTrimHigh = null;
+
             // UI-safe async initialization
             MainThread.BeginInvokeOnMainThread(async () =>
             {

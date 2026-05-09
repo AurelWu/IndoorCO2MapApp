@@ -61,8 +61,19 @@ namespace IndoorCO2MapAppV2.Pages
 
             lineChartView.Clear();
 
+            _pendingTrimLow = null;
+            _pendingTrimHigh = null;
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
+                // Reset slider to XAML defaults so stale values from a prior recording don't persist
+                _programmaticSliderUpdate = true;
+                TrimSlider.Minimum = 0;
+                TrimSlider.Maximum = 20;
+                TrimSlider.LowerValue = 0;
+                TrimSlider.UpperValue = 20;
+                _programmaticSliderUpdate = false;
+
                 MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
 
                 var activeRec = RecordingManager.Instance.ActiveRecording;

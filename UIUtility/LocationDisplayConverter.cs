@@ -12,7 +12,7 @@ namespace IndoorCO2MapAppV2.UIUtility
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is not LocationData loc)
-                return "";
+                return parameter is string p && p.Length > 0 ? p : "";
 
             string name = loc.Name ?? "(no name)";
             bool isFav = UserSettings.Instance.FavouriteLocationKeys.Contains(loc.FavouriteKey);

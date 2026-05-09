@@ -184,7 +184,7 @@
                             StrokeThickness="{OnPlatform iOS=2, Android=0}">
                         <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
                         <Picker x:Name="EndpointPicker"
-                                ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}}"
+                                ItemDisplayBinding="{Binding Converter={StaticResource LocationDisplayConverter}, ConverterParameter='(no destination)'}"
                                 SelectedIndexChanged="OnEndpointPickerSelectionChanged"
                                 Title="{x:Static t:Localisation.TransitSelectDestination}" />
                     </Border>
