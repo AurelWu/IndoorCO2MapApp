@@ -262,6 +262,11 @@
             </VerticalStackLayout>
         </Border>
 
+        <Button x:Name="SubmitButton"
+                Text="{x:Static t:Localisation.SubmitRecordingButton}"
+                Clicked="OnSubmitRecordingClicked"
+                HorizontalOptions="Fill" />
+
         <!-- Custom Note -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
@@ -276,11 +281,6 @@
                     TextChanged="OnCustomNotesChanged" />
             </VerticalStackLayout>
         </Border>
-
-        <Button x:Name="SubmitButton"
-                Text="{x:Static t:Localisation.SubmitRecordingButton}"
-                Clicked="OnSubmitRecordingClicked"
-                HorizontalOptions="Fill" />
 
         <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
                 Style="{StaticResource SecondaryButtonStyle}"

@@ -127,33 +127,30 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Custom Note -->
-            <Border Style="{StaticResource CardBorderStyle}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
-                           Style="{StaticResource SectionLabelStyle}" />
-
-                    <Editor
-                    x:Name="NoteEditor"
-                    Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
-                    AutoSize="TextChanges"
-                    MinimumHeightRequest="80"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource InputBackground}, Dark={StaticResource InputBackgroundDark}}"
-                    TextChanged="OnCustomNotesChanged"
-                    />
-                </VerticalStackLayout>
-            </Border>
-
-
             <Button x:Name="SubmitButton"
                     Text="{x:Static t:Localisation.SubmitRecordingButton}"
                     Clicked="OnSubmitRecordingClicked"
                     HorizontalOptions="Fill" />
 
+            <!-- Custom Note -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
+                           Style="{StaticResource SectionLabelStyle}" />
+                    <Editor
+                        x:Name="NoteEditor"
+                        Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
+                        AutoSize="TextChanges"
+                        MinimumHeightRequest="80"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource InputBackground}, Dark={StaticResource InputBackgroundDark}}"
+                        TextChanged="OnCustomNotesChanged" />
+                </VerticalStackLayout>
+            </Border>
+
             <Button Text="{x:Static t:Localisation.CancelRecordingButton}"
-            Style="{StaticResource SecondaryButtonStyle}"
-            Clicked="OnCancelClicked"
-            HorizontalOptions="Fill" />
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Clicked="OnCancelClicked"
+                    HorizontalOptions="Fill" />
 
     <Label x:Name="VersionLabel"
            HorizontalOptions="Center"

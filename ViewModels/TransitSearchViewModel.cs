@@ -263,17 +263,17 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             var previous = preserveSelection ? SelectedRoute : null;
 
-            string? osm = null;
-            if (ModeFilter == Localisation.TransitModeBus)           osm = "bus";
-            else if (ModeFilter == Localisation.TransitModeTram)     osm = "tram";
-            else if (ModeFilter == Localisation.TransitModeTrain)    osm = "train";
-            else if (ModeFilter == Localisation.TransitModeLightRail) osm = "light_rail";
-            else if (ModeFilter == Localisation.TransitModeSubway)   osm = "subway";
+            string[] osmTypes = [];
+            if (ModeFilter == Localisation.TransitModeBus)            osmTypes = ["bus"];
+            else if (ModeFilter == Localisation.TransitModeTram)      osmTypes = ["tram"];
+            else if (ModeFilter == Localisation.TransitModeTrain)     osmTypes = ["train"];
+            else if (ModeFilter == Localisation.TransitModeLightRail) osmTypes = ["light_rail", "monorail"];
+            else if (ModeFilter == Localisation.TransitModeSubway)    osmTypes = ["subway"];
 
             IEnumerable<TransitLineData> data = _locationStore.TransitLines;
 
-            if (osm != null)
-                data = data.Where(r => string.Equals(r.VehicleType, osm, StringComparison.OrdinalIgnoreCase));
+            if (osmTypes.Length > 0)
+                data = data.Where(r => osmTypes.Contains(r.VehicleType, StringComparer.OrdinalIgnoreCase));
 
             var ft = RouteFilterText?.Trim() ?? "";
             if (!string.IsNullOrEmpty(ft))
