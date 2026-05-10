@@ -73,7 +73,8 @@
                         x:Name="RecordingsCollection"
                         Margin="0,8,0,0"
                         ItemsSource="{Binding Recordings}"
-                        IsVisible="{Binding IsGrouped, Converter={StaticResource InvertBooleanConverter}}">
+                        IsVisible="{Binding IsGrouped, Converter={StaticResource InvertBooleanConverter}}"
+                        Scrolled="OnHistoryScrolled">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -125,7 +126,7 @@
                                 </Grid>
 
                                 <!-- Expanded section -->
-                                <StackLayout HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="6">
+                                <StackLayout IsVisible="{Binding IsExpanded}" HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="6">
                                     <Label Text="{Binding StatsLine}"
                                            FontSize="12"
                                            Style="{StaticResource CaptionLabelStyle}" />
@@ -173,7 +174,8 @@
                         x:Name="GroupedCollection"
                         Margin="0,8,0,0"
                         ItemsSource="{Binding GroupedRecordings}"
-                        IsVisible="{Binding IsGrouped}">
+                        IsVisible="{Binding IsGrouped}"
+                        Scrolled="OnHistoryScrolled">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -233,7 +235,7 @@
                         </Grid>
 
                         <!-- Expanded section -->
-                        <StackLayout HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="8">
+                        <StackLayout IsVisible="{Binding IsExpanded}" HeightRequest="{Binding ExpandedHeight}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="8">
 
                             <!-- Multi-line chart -->
                             <controls:LineChartView
