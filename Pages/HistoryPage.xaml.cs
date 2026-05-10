@@ -10,7 +10,24 @@ namespace IndoorCO2MapAppV2.Pages
         public HistoryPage()
         {
             InitializeComponent();
-            BindingContext = new HistoryViewModel();
+            var vm = new HistoryViewModel();
+            BindingContext = vm;
+
+#if IOS
+            // iOS: BindableLayout in ScrollView. UICollectionView's self-sizing cell reuse
+            // caused expand/collapse whitespace and phantom expansion of reused cells that
+            // could not be reliably defeated via InvalidateLayout hacks.
+            BindableLayout.SetItemsSource(RecordingsListIOS, vm.Recordings);
+            BindableLayout.SetItemsSource(GroupedListIOS, vm.GroupedRecordings);
+            RecordingsCollection.IsVisible = false;
+            GroupedCollection.IsVisible = false;
+#else
+            // Android / Windows: keep virtualized CollectionView (perf for older Androids).
+            RecordingsCollection.ItemsSource = vm.Recordings;
+            GroupedCollection.ItemsSource = vm.GroupedRecordings;
+            RecordingsScrollIOS.IsVisible = false;
+            GroupedScrollIOS.IsVisible = false;
+#endif
         }
 
         protected override void OnAppearing()
@@ -21,41 +38,6 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 vm.ReloadRecordingsAsync().SafeFireAndForget("HistoryPage|OnAppearing|vm.ReloadRecordingsAsync");
             }
-        }
-
-        private void OnExpandTapped(object? sender, TappedEventArgs e)
-        {
-#if IOS
-            // Double-defer so InvalidateLayout fires after MAUI's DisplayLink-driven
-            // layout pass has committed HeightRequest=0 to the native UIView constraint.
-            // A single BeginInvokeOnMainThread races the ~16ms DisplayLink tick and
-            // UICollectionView re-queries before MAUI has applied the new height.
-            MainThread.BeginInvokeOnMainThread(() =>
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    if (RecordingsCollection?.Handler?.PlatformView is UIKit.UICollectionView cv)
-                        cv.CollectionViewLayout.InvalidateLayout();
-                    if (GroupedCollection?.Handler?.PlatformView is UIKit.UICollectionView gcv)
-                        gcv.CollectionViewLayout.InvalidateLayout();
-                }));
-#endif
-        }
-
-        private void OnHistoryScrolled(object? sender, ItemsViewScrolledEventArgs e)
-        {
-#if IOS
-            // Cell reuse during scroll can leave phantom expanded heights.
-            // Force UICollectionView to re-query sizes after MAUI has updated
-            // the reused cell's bindings (double-defer for same timing reason).
-            MainThread.BeginInvokeOnMainThread(() =>
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    if (RecordingsCollection?.Handler?.PlatformView is UIKit.UICollectionView cv)
-                        cv.CollectionViewLayout.InvalidateLayout();
-                    if (GroupedCollection?.Handler?.PlatformView is UIKit.UICollectionView gcv)
-                        gcv.CollectionViewLayout.InvalidateLayout();
-                }));
-#endif
         }
 
         protected override bool OnBackButtonPressed()
