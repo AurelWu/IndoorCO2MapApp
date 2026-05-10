@@ -63,7 +63,9 @@
                             </Grid>
 
                             <!-- Expanded section -->
-                            <StackLayout IsVisible="{Binding IsExpanded}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="6">
+                            <StackLayout IsVisible="{Binding IsExpanded}"
+                                         HeightRequest="{Binding ExpandedHeight}"
+                                         IsClippedToBounds="True" Padding="6,0,6,8" Spacing="6">
                                 <Label Text="{Binding StatsLine}"
                                        FontSize="12"
                                        Style="{StaticResource CaptionLabelStyle}" />
@@ -160,7 +162,9 @@
                         </Grid>
 
                         <!-- Expanded section -->
-                        <StackLayout IsVisible="{Binding IsExpanded}" IsClippedToBounds="True" Padding="6,0,6,8" Spacing="8">
+                        <StackLayout IsVisible="{Binding IsExpanded}"
+                                     HeightRequest="{Binding ExpandedHeight}"
+                                     IsClippedToBounds="True" Padding="6,0,6,8" Spacing="8">
 
                             <!-- Multi-line chart -->
                             <controls:LineChartView
