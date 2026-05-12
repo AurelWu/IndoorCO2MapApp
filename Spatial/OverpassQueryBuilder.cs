@@ -144,6 +144,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[leisure=hackerspace];" +
                 "nwr[leisure=escape_game];" +
                 "nwr[leisure=dance];" +
+                "nwr[leisure=stadium];" +
                 "nwr[amenity=studio];" +
                 "nwr[amenity=townhall];" +
                 "nwr[amenity=car_rental];" +

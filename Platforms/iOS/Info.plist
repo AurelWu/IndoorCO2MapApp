@@ -45,9 +45,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.aurelwuensch.indoorco2datacollector</string>
 	<key>CFBundleShortVersionString</key>
-	<string>240</string>
+	<string>241</string>
 	<key>CFBundleVersion</key>
-	<string>240</string>
+	<string>241</string>
 	<key>UIStatusBarHidden</key>
 	<true/>
 </dict>

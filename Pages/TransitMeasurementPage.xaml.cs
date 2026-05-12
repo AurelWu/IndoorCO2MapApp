@@ -32,6 +32,7 @@ namespace IndoorCO2MapAppV2.Pages
         private bool _programmaticSliderUpdate;
         private double? _pendingTrimLow;
         private double? _pendingTrimHigh;
+        private bool _autoFollowMax = true;
 
         private readonly TransitSearchViewModel _changeRouteVm = new();
         private bool _changeRouteExpanded;
@@ -63,6 +64,7 @@ namespace IndoorCO2MapAppV2.Pages
 
             _pendingTrimLow = null;
             _pendingTrimHigh = null;
+            _autoFollowMax = true;
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
@@ -282,7 +284,6 @@ namespace IndoorCO2MapAppV2.Pages
                 {
                     if (data.Count >= 2)
                     {
-                        bool wasAtMax = TrimSlider.UpperValue >= TrimSlider.Maximum;
                         TrimSlider.Maximum = data.Count - 1;
 
                         if (_pendingTrimHigh.HasValue)
@@ -292,13 +293,14 @@ namespace IndoorCO2MapAppV2.Pages
                             {
                                 TrimSlider.UpperValue = targetHigh;
                                 _pendingTrimHigh = null;
+                                _autoFollowMax = false;
                             }
                             else
                             {
                                 TrimSlider.UpperValue = data.Count - 1;
                             }
                         }
-                        else if (wasAtMax || TrimSlider.UpperValue > data.Count - 1)
+                        else if (_autoFollowMax || TrimSlider.UpperValue > data.Count - 1)
                         {
                             TrimSlider.UpperValue = data.Count - 1;
                         }
@@ -328,6 +330,7 @@ namespace IndoorCO2MapAppV2.Pages
         private void OnTrimChanged(object sender, EventArgs e)
         {
             if (_programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
+            _autoFollowMax = false;
             RecordingManager.Instance.UpdateTrimSnapshot(TrimSlider.LowerValue, TrimSlider.UpperValue);
             TemporarilyDisableSubmit();
             _ = UpdateChartAsync();
