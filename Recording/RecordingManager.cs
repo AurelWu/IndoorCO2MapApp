@@ -29,6 +29,10 @@ namespace IndoorCO2MapAppV2.Recording
 
         public static RecordingRecoverySnapshot CurrentSnapShot { get; set; } = new RecordingRecoverySnapshot();
 
+        public bool NeedsTrimRestore { get; set; } = false;
+
+        private volatile int _snapshotGeneration = 0;
+
         bool inkBirdRecoveryDone = false;
 #if ANDROID
         private Android.OS.PowerManager.WakeLock? _wakeLock;
@@ -77,6 +81,8 @@ namespace IndoorCO2MapAppV2.Recording
             };
 
 
+            _snapshotGeneration++;
+            NeedsTrimRestore = false;
             ActiveRecording = rec;
             SaveRecoverySnapshot(rec, deviceID);
             _cts?.Cancel();
@@ -106,6 +112,8 @@ namespace IndoorCO2MapAppV2.Recording
             _timer?.Dispose();
             _timer = null;
 
+            _snapshotGeneration++;
+            NeedsTrimRestore = false;
             ActiveRecording = null;
             Preferences.Remove("RecordingState");
             CurrentSnapShot = new RecordingRecoverySnapshot();
@@ -275,6 +283,8 @@ namespace IndoorCO2MapAppV2.Recording
             foreach (var kv in snapshot.AdditionalDataByParameter)
                 ActiveRecording.AdditionalDataByParameter.TryAdd(kv.Key, kv.Value);
 
+            NeedsTrimRestore = ActiveRecording.AdditionalDataByParameter.ContainsKey("trimHigh");
+
             if(ActiveRecording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString())
             {
                 ActiveRecording.MeasurementData = snapshot.CO2Values;
@@ -321,7 +331,12 @@ namespace IndoorCO2MapAppV2.Recording
             };
 
             CurrentSnapShot = snapshot;
-            Task.Run(() => Preferences.Set("RecordingState", JsonSerializer.Serialize(snapshot)));
+            int gen = _snapshotGeneration;
+            Task.Run(() =>
+            {
+                if (_snapshotGeneration != gen) return;
+                Preferences.Set("RecordingState", JsonSerializer.Serialize(snapshot));
+            });
         }
 
 #if ANDROID

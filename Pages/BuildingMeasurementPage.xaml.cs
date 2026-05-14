@@ -64,11 +64,13 @@ namespace IndoorCO2MapAppV2.Pages
 
                 var rec = RecordingManager.Instance.ActiveRecording;
                 if (rec != null
+                    && RecordingManager.Instance.NeedsTrimRestore
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimLow"),
                         System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double tLow)
                     && double.TryParse(rec.AdditionalDataByParameter.GetValueOrDefault("trimHigh"),
                         System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double tHigh))
                 {
+                    RecordingManager.Instance.NeedsTrimRestore = false;
                     _pendingTrimLow = tLow;
                     _pendingTrimHigh = tHigh;
                     await UpdateChartAsync();
