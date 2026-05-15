@@ -513,29 +513,16 @@ namespace IndoorCO2MapAppV2.Pages
 #if WINDOWS
                 lat = 51.3406; lon = 12.3747;
 #else
-                var active = RecordingManager.Instance.ActiveRecording;
-                if (active != null &&
-                    double.TryParse(active.AdditionalDataByParameter.GetValueOrDefault("startLat", ""),
-                        NumberStyles.Float, CultureInfo.InvariantCulture, out lat) &&
-                    double.TryParse(active.AdditionalDataByParameter.GetValueOrDefault("startLon", ""),
-                        NumberStyles.Float, CultureInfo.InvariantCulture, out lon) &&
-                    lat != 0)
+                var locationService = LocationServicePlatformProvider.CreateOrUse();
+                var loc = await locationService.GetCurrentLocationAsync();
+                if (loc == null)
                 {
-                    // start station coordinates available — no GPS call needed
+                    EndpointStatusLabel.Text = "Could not get GPS position.";
+                    EndpointStatusLabel.IsVisible = true;
+                    return;
                 }
-                else
-                {
-                    var locationService = LocationServicePlatformProvider.CreateOrUse();
-                    var loc = await locationService.GetCurrentLocationAsync();
-                    if (loc == null)
-                    {
-                        EndpointStatusLabel.Text = "Could not get GPS position.";
-                        EndpointStatusLabel.IsVisible = true;
-                        return;
-                    }
-                    lat = loc.Latitude;
-                    lon = loc.Longitude;
-                }
+                lat = loc.Latitude;
+                lon = loc.Longitude;
 #endif
                 int range = UserSettings.Instance.CacheRangeOverrideMeters > 0
                     ? UserSettings.Instance.CacheRangeOverrideMeters : 250;
