@@ -471,6 +471,12 @@ namespace IndoorCO2MapAppV2.Pages
                 double lat = loc.Latitude, lon = loc.Longitude;
 #endif
                 var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, 250);
+                if (UserSettings.Instance.EnableLocationCaching)
+                {
+                    foreach (var s in stations)
+                        await App.TransitStationCacheDb.InsertOrReplaceAsync(s);
+                    await App.TransitStationCacheDb.TrimAsync(100_000);
+                }
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
                     SetEndpointPickerSource(stations);
