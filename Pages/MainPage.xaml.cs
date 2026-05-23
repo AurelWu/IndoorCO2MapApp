@@ -89,6 +89,8 @@ namespace IndoorCO2MapAppV2.Pages
             var map = new Mapsui.Map();
             map.Widgets.Clear();
             map.Navigator.RotationLock = true;
+            map.Navigator.PanLock = true;
+            map.Navigator.ZoomLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
             // Parse route color (fallback purple)
@@ -154,9 +156,6 @@ namespace IndoorCO2MapAppV2.Pages
 
             _routePreviewMap = new Mapsui.UI.Maui.MapControl { Map = map, IsEnabled = false };
             RoutePreviewContainer.Content = _routePreviewMap;
-#if ANDROID
-            _routePreviewMap.HandlerChanged += (s, e) => SetupAndroidMapTouchInterception();
-#endif
 #else
             RoutePreviewContainer.Content = geometry != null ? new Label
             {
@@ -168,28 +167,6 @@ namespace IndoorCO2MapAppV2.Pages
 #endif
         }
 
-#if ANDROID
-        private void SetupAndroidMapTouchInterception()
-        {
-            if (_routePreviewMap?.Handler?.PlatformView is not Android.Views.View nativeView)
-                return;
-            nativeView.Touch += (s, args) =>
-            {
-                switch (args.Event?.ActionMasked)
-                {
-                    case Android.Views.MotionEventActions.Down:
-                    case Android.Views.MotionEventActions.PointerDown:
-                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(true);
-                        break;
-                    case Android.Views.MotionEventActions.Up:
-                    case Android.Views.MotionEventActions.Cancel:
-                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(false);
-                        break;
-                }
-                args.Handled = false;
-            };
-        }
-#endif
 
         private async Task SearchBuildingsAsync()
         {

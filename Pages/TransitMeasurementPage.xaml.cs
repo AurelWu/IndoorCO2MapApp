@@ -814,6 +814,8 @@ namespace IndoorCO2MapAppV2.Pages
             var map = new Mapsui.Map();
             map.Widgets.Clear();
             map.Navigator.RotationLock = true;
+            map.Navigator.PanLock = true;
+            map.Navigator.ZoomLock = true;
             map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
             var routeColor = Mapsui.Styles.Color.FromArgb(255, 81, 43, 212);
@@ -860,9 +862,6 @@ namespace IndoorCO2MapAppV2.Pages
 
             _changeRouteMapControl = new Mapsui.UI.Maui.MapControl { Map = map, IsEnabled = false };
             ChangeRoutePreviewContainer.Content = _changeRouteMapControl;
-#if ANDROID
-            _changeRouteMapControl.HandlerChanged += (s, ev) => SetupAndroidChangeRouteMapTouchInterception();
-#endif
 #else
             ChangeRoutePreviewContainer.Content = new Label
             {
@@ -875,24 +874,5 @@ namespace IndoorCO2MapAppV2.Pages
             RoutePreviewBorder.IsVisible = true;
         }
 
-#if ANDROID
-        private void SetupAndroidChangeRouteMapTouchInterception()
-        {
-            if (_changeRouteMapControl?.Handler?.PlatformView is not Android.Views.View nativeView) return;
-            nativeView.Touch += (s, args) =>
-            {
-                switch (args.Event?.ActionMasked)
-                {
-                    case Android.Views.MotionEventActions.Down:
-                    case Android.Views.MotionEventActions.PointerDown:
-                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(true); break;
-                    case Android.Views.MotionEventActions.Up:
-                    case Android.Views.MotionEventActions.Cancel:
-                        nativeView.Parent?.RequestDisallowInterceptTouchEvent(false); break;
-                }
-                args.Handled = false;
-            };
-        }
-#endif
     }
 }
