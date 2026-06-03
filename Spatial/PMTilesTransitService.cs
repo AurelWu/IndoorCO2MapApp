@@ -54,43 +54,59 @@ namespace IndoorCO2MapAppV2.Spatial
             double userLat, double userLon, int searchRange,
             CancellationToken ct = default)
         {
-            var (header, rootDir) = await EnsureHeaderAsync(ct);
             var tiles = GetTilesForRadius(userLat, userLon, searchRange);
             Logger.WriteToLog($"PMTilesTransit: querying {tiles.Count} tile(s) range={searchRange}m");
 
-            // Collect raw data per layer
-            var stationCandidates = new Dictionary<string, StationCandidate>(); // key = name (lower)
-            var routeMap = new Dictionary<long, TransitLineData>(); // key = @id
-
-            foreach (var (tx, ty) in tiles)
+            for (int attempt = 0; attempt <= 1; attempt++)
             {
-                ct.ThrowIfCancellationRequested();
-                ulong tileId = TileXYZToId(Zoom, tx, ty);
-                var entry = await FindTileAsync(rootDir, tileId, header, ct);
-                if (entry == null) continue;
+                if (attempt == 1) InvalidateCache();
+                var (header, rootDir) = await EnsureHeaderAsync(ct);
+                var stationCandidates = new Dictionary<string, StationCandidate>();
+                var routeMap = new Dictionary<long, TransitLineData>();
 
-                long start = (long)(header.DataOffset + entry.Value.Offset);
-                long end = start + (long)entry.Value.Length - 1;
-                var raw = await FetchRangeAsync(start, end, ct);
-                var tileData = Decompress(raw, header.TileComp);
+                try
+                {
+                    foreach (var (tx, ty) in tiles)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        ulong tileId = TileXYZToId(Zoom, tx, ty);
+                        var entry = await FindTileAsync(rootDir, tileId, header, ct);
+                        if (entry == null) continue;
 
-                DecodeTile(tileData, userLat, userLon, tx, ty, searchRange,
-                    stationCandidates, routeMap);
+                        long start = (long)(header.DataOffset + entry.Value.Offset);
+                        long end = start + (long)entry.Value.Length - 1;
+                        var raw = await FetchRangeAsync(start, end, ct);
+                        var tileData = Decompress(raw, header.TileComp);
+
+                        DecodeTile(tileData, userLat, userLon, tx, ty, searchRange,
+                            stationCandidates, routeMap);
+                    }
+
+                    var stations = new List<LocationData>();
+                    foreach (var kv in stationCandidates)
+                    {
+                        var c = kv.Value;
+                        stations.Add(new LocationData("node", c.Id, c.Name, c.Lat, c.Lon, userLat, userLon));
+                    }
+                    stations.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+
+                    var routes = routeMap.Values.ToList();
+                    Logger.WriteToLog($"PMTilesTransit: {stations.Count} stations, {routes.Count} routes");
+                    return (stations, routes);
+                }
+                catch (Exception ex) when (attempt == 0 && ex is not OperationCanceledException)
+                {
+                    Logger.WriteToLog($"PMTilesTransit: tile error (stale cache?), retrying with fresh header: {ex.Message}");
+                }
             }
+            return (new List<LocationData>(), new List<TransitLineData>());
+        }
 
-            // Finalize stations: keep best candidate per name
-            var stations = new List<LocationData>();
-            foreach (var kv in stationCandidates)
-            {
-                var c = kv.Value;
-                stations.Add(new LocationData("node", c.Id, c.Name, c.Lat, c.Lon, userLat, userLon));
-            }
-            stations.Sort((a, b) => a.Distance.CompareTo(b.Distance));
-
-            var routes = routeMap.Values.ToList();
-
-            Logger.WriteToLog($"PMTilesTransit: {stations.Count} stations, {routes.Count} routes");
-            return (stations, routes);
+        private void InvalidateCache()
+        {
+            _header = null;
+            _rootDir = null;
+            _cacheTime = DateTime.MinValue;
         }
 
         // ── Header + root dir caching ─────────────────────────────────────────

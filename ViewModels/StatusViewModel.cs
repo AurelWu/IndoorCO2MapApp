@@ -107,12 +107,13 @@ namespace IndoorCO2MapAppV2.ViewModels
             try
             {
                 var text = (await _statusHttpClient.GetStringAsync("https://indoorco2map.com/appstatus.txt")).Trim();
-                Instance.StatusMessage = text.Equals("ok", StringComparison.OrdinalIgnoreCase) ? null : text;
+                var msg = text.Equals("ok", StringComparison.OrdinalIgnoreCase) ? null : text;
+                MainThread.BeginInvokeOnMainThread(() => Instance.StatusMessage = msg);
             }
             catch
             {
                 if (clearOnFailure)
-                    Instance.StatusMessage = null;
+                    MainThread.BeginInvokeOnMainThread(() => Instance.StatusMessage = null);
                 // else: keep previous state
             }
         }

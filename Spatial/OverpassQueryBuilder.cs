@@ -197,6 +197,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[amenity=bank];" +
                 "nwr[healthcare];" +
                 "nwr[tourism=museum];" +
+                "nwr[tourism=theme_park];" +
                 "nwr[tourism=attraction];" +
                 "nwr[tourism=zoo];" +
                 "nwr[tourism=gallery];" +

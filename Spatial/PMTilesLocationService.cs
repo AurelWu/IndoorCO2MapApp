@@ -41,35 +41,53 @@ namespace IndoorCO2MapAppV2.Spatial
             double userLat, double userLon, int rangeMeters,
             CancellationToken ct = default)
         {
-            var (header, rootDir) = await EnsureHeaderAsync(ct);
-
             var tiles = GetTilesForRadius(userLat, userLon, rangeMeters);
             Logger.WriteToLog($"PMTiles: querying {tiles.Count} tile(s) range={rangeMeters}m at ({userLat:F5},{userLon:F5})");
 
-            var results = new List<LocationData>();
-            var seen = new HashSet<string>();
-
-            foreach (var (tx, ty) in tiles)
+            for (int attempt = 0; attempt <= 1; attempt++)
             {
-                ct.ThrowIfCancellationRequested();
-                ulong tileId = TileXYZToId(Zoom, tx, ty);
-                var entry = await FindTileAsync(rootDir, tileId, header, ct);
-                if (entry == null)
+                if (attempt == 1) InvalidateCache();
+                var (header, rootDir) = await EnsureHeaderAsync(ct);
+                var results = new List<LocationData>();
+                var seen = new HashSet<string>();
+
+                try
                 {
-                    Logger.WriteToLog($"PMTiles: tile z={Zoom} x={tx} y={ty} not in index", LogMode.Verbose);
-                    continue;
+                    foreach (var (tx, ty) in tiles)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        ulong tileId = TileXYZToId(Zoom, tx, ty);
+                        var entry = await FindTileAsync(rootDir, tileId, header, ct);
+                        if (entry == null)
+                        {
+                            Logger.WriteToLog($"PMTiles: tile z={Zoom} x={tx} y={ty} not in index", LogMode.Verbose);
+                            continue;
+                        }
+
+                        long start = (long)(header.DataOffset + entry.Value.Offset);
+                        long end = start + (long)entry.Value.Length - 1;
+                        var raw = await FetchRangeAsync(start, end, ct);
+                        var tileData = Decompress(raw, header.TileComp);
+                        DecodeLayerInto(tileData, userLat, userLon, tx, ty, rangeMeters, seen, results);
+                    }
+
+                    results.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+                    Logger.WriteToLog($"PMTiles: found {results.Count} location(s)");
+                    return results;
                 }
-
-                long start = (long)(header.DataOffset + entry.Value.Offset);
-                long end = start + (long)entry.Value.Length - 1;
-                var raw = await FetchRangeAsync(start, end, ct);
-                var tileData = Decompress(raw, header.TileComp);
-                DecodeLayerInto(tileData, userLat, userLon, tx, ty, rangeMeters, seen, results);
+                catch (Exception ex) when (attempt == 0 && ex is not OperationCanceledException)
+                {
+                    Logger.WriteToLog($"PMTiles: tile error (stale cache?), retrying with fresh header: {ex.Message}");
+                }
             }
+            return new List<LocationData>();
+        }
 
-            results.Sort((a, b) => a.Distance.CompareTo(b.Distance));
-            Logger.WriteToLog($"PMTiles: found {results.Count} location(s)");
-            return results;
+        private void InvalidateCache()
+        {
+            _header = null;
+            _rootDir = null;
+            _cacheTime = DateTime.MinValue;
         }
 
         // ── Header + root dir caching ─────────────────────────────────────────
