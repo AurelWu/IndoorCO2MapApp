@@ -86,8 +86,13 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 if (_statusMessage == value) return;
                 _statusMessage = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusMessage)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasStatusMessage)));
+                void Notify()
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusMessage)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasStatusMessage)));
+                }
+                if (MainThread.IsMainThread) Notify();
+                else MainThread.BeginInvokeOnMainThread(Notify);
             }
         }
         public bool HasStatusMessage => !string.IsNullOrEmpty(_statusMessage);
@@ -107,13 +112,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             try
             {
                 var text = (await _statusHttpClient.GetStringAsync("https://indoorco2map.com/appstatus.txt")).Trim();
-                var msg = text.Equals("ok", StringComparison.OrdinalIgnoreCase) ? null : text;
-                MainThread.BeginInvokeOnMainThread(() => Instance.StatusMessage = msg);
+                Instance.StatusMessage = text.Equals("ok", StringComparison.OrdinalIgnoreCase) ? null : text;
             }
             catch
             {
                 if (clearOnFailure)
-                    MainThread.BeginInvokeOnMainThread(() => Instance.StatusMessage = null);
+                    Instance.StatusMessage = null;
                 // else: keep previous state
             }
         }
