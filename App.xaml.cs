@@ -45,6 +45,7 @@ namespace IndoorCO2MapAppV2
 
             window.Destroying += async (s, e) =>
             {
+                ViewModels.StatusViewModel.Instance.Stop();
                 await CO2MonitorManager.Instance.DisconnectAsync();
             };
 

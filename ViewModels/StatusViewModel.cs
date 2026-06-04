@@ -102,9 +102,19 @@ namespace IndoorCO2MapAppV2.ViewModels
             await FetchInternalAsync(clearOnFailure: true);
         }
 
+        private static CancellationTokenSource? _refreshCts;
+
         public static void StartPeriodicRefresh()
         {
-            _ = PeriodicRefreshLoopAsync();
+            _refreshCts?.Cancel();
+            _refreshCts = new CancellationTokenSource();
+            _ = PeriodicRefreshLoopAsync(_refreshCts.Token);
+        }
+
+        public void Stop()
+        {
+            _statusTimer.Stop();
+            _refreshCts?.Cancel();
         }
 
         private static async Task FetchInternalAsync(bool clearOnFailure)
@@ -122,13 +132,17 @@ namespace IndoorCO2MapAppV2.ViewModels
             }
         }
 
-        private static async Task PeriodicRefreshLoopAsync()
+        private static async Task PeriodicRefreshLoopAsync(CancellationToken ct)
         {
-            while (true)
+            try
             {
-                await Task.Delay(TimeSpan.FromMinutes(15));
-                await FetchInternalAsync(clearOnFailure: false);
+                while (true)
+                {
+                    await Task.Delay(TimeSpan.FromMinutes(15), ct);
+                    await FetchInternalAsync(clearOnFailure: false);
+                }
             }
+            catch (OperationCanceledException) { }
         }
 
         // --- PropertyChanged implementation ---
