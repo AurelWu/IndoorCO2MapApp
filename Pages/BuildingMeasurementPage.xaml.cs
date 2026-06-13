@@ -389,10 +389,22 @@ namespace IndoorCO2MapAppV2.Pages
                     .WithSubmissionId(submissionId)
                     .Build();
 
-                await Co2ApiGatewayClient.SubmitAsync(
+                var response = await Co2ApiGatewayClient.SubmitAsync(
                     submission.ToJson(),
                     SubmissionMode.Building
                 );
+
+                if (!response.Success)
+                {
+                    // Upload failed — keep the recording active so the user can retry,
+                    // do NOT save history or show the success banner.
+                    await DisplayAlertAsync(
+                        "Upload Failed",
+                        $"Your data could not be submitted and was NOT saved. Please try again.\n\nDetails: {response.ErrorMessage}",
+                        "OK"
+                    );
+                    return;
+                }
 
                 if (UserSettings.Instance.EnableHistory)
                 {

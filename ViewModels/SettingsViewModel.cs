@@ -158,6 +158,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.ShowImprintButton = value; OnPropertyChanged(); }
         }
 
+        public bool ShowManualButton
+        {
+            get => UserSettings.Instance.ShowManualButton;
+            set { UserSettings.Instance.ShowManualButton = value; OnPropertyChanged(); }
+        }
+
         public bool ShowNewsNotification
         {
             get => UserSettings.Instance.ShowNewsNotification;

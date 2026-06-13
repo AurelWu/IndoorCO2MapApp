@@ -291,6 +291,9 @@
   <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
     <value>🔗  Open Map in Browser</value>
   </data>
+  <data name="MainMenuManualButton" xml:space="preserve">
+    <value>📖  Manual</value>
+  </data>
   <data name="MainMenuDataProtectionImprint" xml:space="preserve">
     <value>🔗  Data Protection Info and Imprint</value>
   </data>

@@ -646,5 +646,14 @@ namespace IndoorCO2MapAppV2.Pages
                 Launcher.OpenAsync(new Uri(url)).SafeFireAndForget("OnOpenUrlClicked");
         }
 
+        private void OnOpenManualClicked(object sender, EventArgs e)
+        {
+            string lang = UserSettings.Instance.Language;
+            string url = string.IsNullOrEmpty(lang) || lang.Equals("en", StringComparison.OrdinalIgnoreCase)
+                ? "https://indoorco2map.com/manual2.pdf"
+                : $"https://indoorco2map.com/manual2_{lang.ToLowerInvariant()}.pdf";
+            Launcher.OpenAsync(new Uri(url)).SafeFireAndForget("OnOpenManualClicked");
+        }
+
     }
 }

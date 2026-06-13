@@ -478,6 +478,12 @@
                     HorizontalOptions="Fill"
                     IsVisible="{Binding Settings.ShowWebsiteButton}"/>
 
+            <Button Text="{x:Static t:Localisation.MainMenuManualButton}"
+                    Clicked="OnOpenManualClicked"
+                    Style="{StaticResource TonalButtonStyle}"
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding Settings.ShowManualButton}" />
+
             <Button Text="{x:Static t:Localisation.MainMenuDataProtectionImprint}"
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com/impressum.html"

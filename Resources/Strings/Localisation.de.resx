@@ -232,6 +232,9 @@
   <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
     <value>&#128279;  Karte im Browser &#246;ffnen</value>
   </data>
+  <data name="MainMenuManualButton" xml:space="preserve">
+    <value>&#128214;  Anleitung</value>
+  </data>
   <data name="MainMenuDataProtectionImprint" xml:space="preserve">
     <value>&#128279;  Datenschutz und Impressum</value>
   </data>

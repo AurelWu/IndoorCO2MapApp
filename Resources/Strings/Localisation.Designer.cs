@@ -410,6 +410,7 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string MainMenuStatisticsButton { get { return ResourceManager.GetString("MainMenuStatisticsButton", resourceCulture); } }
         internal static string MainMenuOpenMapInBrowser { get { return ResourceManager.GetString("MainMenuOpenMapInBrowser", resourceCulture); } }
         internal static string MainMenuDataProtectionImprint { get { return ResourceManager.GetString("MainMenuDataProtectionImprint", resourceCulture); } }
+        internal static string MainMenuManualButton { get { return ResourceManager.GetString("MainMenuManualButton", resourceCulture); } }
         internal static string TransitSearchRoutesByName { get { return ResourceManager.GetString("TransitSearchRoutesByName", resourceCulture); } }
         internal static string HistoryFilterPlaceholder { get { return ResourceManager.GetString("HistoryFilterPlaceholder", resourceCulture); } }
         internal static string HistoryGroupByLocation { get { return ResourceManager.GetString("HistoryGroupByLocation", resourceCulture); } }
