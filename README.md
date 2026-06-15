@@ -1,0 +1,1 @@
+This is the source code for the Indoor CO2 Data Collector App belonging to the www.IndoorCO2Map.com Project. The Code is multiplatform and works for both Android and iPhone with small parts of platform dependent code. 
