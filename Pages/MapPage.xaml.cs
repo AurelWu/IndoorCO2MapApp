@@ -231,7 +231,7 @@ namespace IndoorCO2MapAppV2.Pages
                 map.Layers.Add(new MemoryLayer { Name = "Lines", Features = lineFeatures, Style = null });
                 pinLayer = new MemoryLayer { Name = "Pins", Features = pinFeatures, Style = null };
                 map.Layers.Add(pinLayer);
-                _labelLayer = new MemoryLayer  { Name = "Labels", Features = labelFeatures, Style = null };
+                _labelLayer = new MemoryLayer  { Name = "Labels", Features = labelFeatures, Style = null, Enabled = ShowLabelsCheckBox.IsChecked };
                 map.Layers.Add(_labelLayer);
 
                 var mostRecent = groups.OrderByDescending(g => g.recs.Max(r => r.DateTime)).First();
