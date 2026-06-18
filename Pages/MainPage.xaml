@@ -426,6 +426,7 @@
                         x:Name="ManualResumeButton"
                         Text="{x:Static t:Localisation.MainMenuResumeRecording}"
                         IsVisible="False"
+                        IsEnabled="{Binding Sensor.HasSelectedDevice}"
                         Clicked="OnManualResumeClicked" />
 
                 </VerticalStackLayout>

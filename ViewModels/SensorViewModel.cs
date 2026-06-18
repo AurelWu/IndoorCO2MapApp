@@ -72,6 +72,8 @@ namespace IndoorCO2MapAppV2.ViewModels
         public bool IsDeviceConnected =>
             _monitorManager.ActiveCO2MonitorProvider != null && _monitorManager.SelectedDevice != null;
 
+        public bool HasSelectedDevice => SelectedDevice != null;
+
         public string SelectedDeviceStatusText
         {
             get
@@ -162,6 +164,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             OnPropertyChanged(nameof(SelectedDeviceStatusText));
             OnPropertyChanged(nameof(StatusDotColor));
+            OnPropertyChanged(nameof(HasSelectedDevice));
         }
 
         partial void OnCurrentCO2Changed(int value)

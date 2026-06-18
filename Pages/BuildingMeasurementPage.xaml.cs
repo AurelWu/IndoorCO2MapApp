@@ -21,6 +21,7 @@ namespace IndoorCO2MapAppV2.Pages
         private double? _pendingTrimLow;
         private double? _pendingTrimHigh;
         private bool _autoFollowMax = true;
+        private bool _trimUiReady;
 
         public BuildingMeasurementPage()
         {
@@ -48,12 +49,13 @@ namespace IndoorCO2MapAppV2.Pages
             _pendingTrimLow = null;
             _pendingTrimHigh = null;
             _autoFollowMax = true;
+            _trimUiReady = false;
 
             _programmaticSliderUpdate = true;
             TrimSlider.Minimum = 0;
-            TrimSlider.Maximum = 20;
+            TrimSlider.Maximum = 10;
             TrimSlider.LowerValue = 0;
-            TrimSlider.UpperValue = 20;
+            TrimSlider.UpperValue = 10;
             _programmaticSliderUpdate = false;
 
             // UI-safe async initialization
@@ -75,6 +77,9 @@ namespace IndoorCO2MapAppV2.Pages
                     _pendingTrimHigh = tHigh;
                     await UpdateChartAsync();
                 }
+
+                // Slider is now fully reset + restored; genuine user trims may take effect.
+                _trimUiReady = true;
             });
 
             // TODO: check activeRecording for recoveryValues to set UI
@@ -307,7 +312,9 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
-            if (_programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
+            if (!_trimUiReady || _programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
+            _pendingTrimHigh = null;   // user interaction overrides any pending recovery restore
+            _pendingTrimLow = null;
             _autoFollowMax = false;
             RecordingManager.Instance.UpdateTrimSnapshot(TrimSlider.LowerValue, TrimSlider.UpperValue);
             TemporarilyDisableSubmit();

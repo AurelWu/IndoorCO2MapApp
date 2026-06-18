@@ -564,7 +564,6 @@ namespace IndoorCO2MapAppV2.Pages
         {
             if (_manualResumeInProgress) return;
             _manualResumeInProgress = true;
-            ManualResumeButton.IsEnabled = false;
 
             try
             {
@@ -590,7 +589,7 @@ namespace IndoorCO2MapAppV2.Pages
                     return;
                 }
 
-                await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, selectedDevice.Id.ToString());
+                await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, selectedDevice.Id.ToString(), forceDeviceId: true);
 
                 ManualResumeButton.IsVisible = false;
 
@@ -599,7 +598,6 @@ namespace IndoorCO2MapAppV2.Pages
             finally
             {
                 _manualResumeInProgress = false;
-                ManualResumeButton.IsEnabled = true;
             }
         }
 

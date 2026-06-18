@@ -33,6 +33,7 @@ namespace IndoorCO2MapAppV2.Pages
         private double? _pendingTrimLow;
         private double? _pendingTrimHigh;
         private bool _autoFollowMax = true;
+        private bool _trimUiReady;
 
         private readonly TransitSearchViewModel _changeRouteVm = new();
         private bool _changeRouteExpanded;
@@ -65,15 +66,16 @@ namespace IndoorCO2MapAppV2.Pages
             _pendingTrimLow = null;
             _pendingTrimHigh = null;
             _autoFollowMax = true;
+            _trimUiReady = false;
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 // Reset slider to XAML defaults so stale values from a prior recording don't persist
                 _programmaticSliderUpdate = true;
                 TrimSlider.Minimum = 0;
-                TrimSlider.Maximum = 20;
+                TrimSlider.Maximum = 10;
                 TrimSlider.LowerValue = 0;
-                TrimSlider.UpperValue = 20;
+                TrimSlider.UpperValue = 10;
                 _programmaticSliderUpdate = false;
 
                 MeasuredLocationLabel.Text = RecordingManager.Instance.CurrentLocationDisplay;
@@ -81,7 +83,6 @@ namespace IndoorCO2MapAppV2.Pages
                 var activeRec = RecordingManager.Instance.ActiveRecording;
                 if (activeRec != null)
                 {
-                    NoteEditor.Text = activeRec.CustomNotes;
                     _windowsState = activeRec.DoorWindowState;
                     _ventilationState = activeRec.VentilationState;
 
@@ -92,6 +93,10 @@ namespace IndoorCO2MapAppV2.Pages
                     VentilationUnknownRb.IsChecked = _ventilationState == TriState.Unknown;
                     VentilationYesRb.IsChecked    = _ventilationState == TriState.Yes;
                     VentilationNoRb.IsChecked     = _ventilationState == TriState.No;
+
+                    // Set notes LAST: assigning NoteEditor.Text fires OnCustomNotesChanged,
+                    // which persists _windowsState/_ventilationState — they must be correct first.
+                    NoteEditor.Text = activeRec.CustomNotes;
 
                     if (activeRec.AdditionalDataByParameter.TryGetValue("endpointName", out var epName)
                         && !string.IsNullOrEmpty(epName))
@@ -127,6 +132,9 @@ namespace IndoorCO2MapAppV2.Pages
                     _pendingTrimHigh = tHigh;
                     await UpdateChartAsync();
                 }
+
+                // Slider is now fully reset + restored; genuine user trims may take effect.
+                _trimUiReady = true;
 
                 // ---- Change-route section setup ----
                 ChangeRouteCard.IsVisible = UserSettings.Instance.ShowChangeRouteInRecording;
@@ -331,7 +339,9 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnTrimChanged(object sender, EventArgs e)
         {
-            if (_programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
+            if (!_trimUiReady || _programmaticSliderUpdate || TrimSlider == null || !RecordingManager.Instance.IsRecording) return;
+            _pendingTrimHigh = null;   // user interaction overrides any pending recovery restore
+            _pendingTrimLow = null;
             _autoFollowMax = false;
             RecordingManager.Instance.UpdateTrimSnapshot(TrimSlider.LowerValue, TrimSlider.UpperValue);
             TemporarilyDisableSubmit();

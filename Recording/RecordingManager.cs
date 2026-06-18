@@ -257,10 +257,15 @@ namespace IndoorCO2MapAppV2.Recording
         /// Restore an active recording once the given deviceId is known/ready.
         /// This no longer reads Preferences; the caller supplies the snapshot.
         /// </summary>
-        public async Task TryRecoverRecordingAfterDeviceReadyAsync(RecordingRecoverySnapshot snapshot, string deviceId)
+        public async Task TryRecoverRecordingAfterDeviceReadyAsync(RecordingRecoverySnapshot snapshot, string deviceId, bool forceDeviceId = false)
         {
-            if (snapshot == null || snapshot.MonitorDeviceId != deviceId)
+            // Auto-recovery requires the ready device to match the saved one.
+            // Manual resume (forceDeviceId) trusts the user's explicit sensor choice —
+            // needed because BLE ids can change across app restarts (notably on iOS).
+            if (snapshot == null || (!forceDeviceId && snapshot.MonitorDeviceId != deviceId))
                 return;
+
+            string effectiveDeviceId = forceDeviceId ? deviceId : snapshot.MonitorDeviceId;
 
             // Restore active recording
             ActiveRecording = new BuildingRecording
@@ -272,8 +277,8 @@ namespace IndoorCO2MapAppV2.Recording
                 Longitude = snapshot.Longitude,
                 RecordingStart = snapshot.RecordingStart,
                 MeasurementData = new(),
-                CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed                
-                MonitorID = snapshot.MonitorDeviceId,
+                CO2MonitorType = snapshot.MonitorType, //TODO: currently not actually the monitorType but the searchSettings which include "All Monitors" we want the specific make of it though eventually - not important for now but should be changed
+                MonitorID = effectiveDeviceId,
                 DoorWindowState = snapshot.DoorWindowState,
                 VentilationState = snapshot.VentilationState,
                 CustomNotes = snapshot.CustomNote,                
