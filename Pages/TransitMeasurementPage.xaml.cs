@@ -34,6 +34,7 @@ namespace IndoorCO2MapAppV2.Pages
         private double? _pendingTrimHigh;
         private bool _autoFollowMax = true;
         private bool _trimUiReady;
+        private bool _suppressStatePersist;
 
         private readonly TransitSearchViewModel _changeRouteVm = new();
         private bool _changeRouteExpanded;
@@ -83,6 +84,11 @@ namespace IndoorCO2MapAppV2.Pages
                 var activeRec = RecordingManager.Instance.ActiveRecording;
                 if (activeRec != null)
                 {
+                    // Suppress persistence while restoring: setting radios/notes fires their
+                    // change handlers, which would otherwise overwrite the snapshot with
+                    // partially-restored state (e.g. erase the note with an empty NoteEditor).
+                    _suppressStatePersist = true;
+
                     _windowsState = activeRec.DoorWindowState;
                     _ventilationState = activeRec.VentilationState;
 
@@ -94,9 +100,9 @@ namespace IndoorCO2MapAppV2.Pages
                     VentilationYesRb.IsChecked    = _ventilationState == TriState.Yes;
                     VentilationNoRb.IsChecked     = _ventilationState == TriState.No;
 
-                    // Set notes LAST: assigning NoteEditor.Text fires OnCustomNotesChanged,
-                    // which persists _windowsState/_ventilationState — they must be correct first.
                     NoteEditor.Text = activeRec.CustomNotes;
+
+                    _suppressStatePersist = false;
 
                     if (activeRec.AdditionalDataByParameter.TryGetValue("endpointName", out var epName)
                         && !string.IsNullOrEmpty(epName))
@@ -380,6 +386,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnWindowsChanged(object sender, CheckedChangedEventArgs e)
         {
+            if (_suppressStatePersist) return;
             if (!e.Value) return;
             if (sender is RadioButton rb && rb.Value is TriState state)
             {
@@ -391,6 +398,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnVentilationChanged(object sender, CheckedChangedEventArgs e)
         {
+            if (_suppressStatePersist) return;
             if (!e.Value) return;
             if (sender is RadioButton rb && rb.Value is TriState state)
             {
@@ -402,6 +410,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnCustomNotesChanged(object sender, TextChangedEventArgs e)
         {
+            if (_suppressStatePersist) return;
             RecordingManager.Instance.UpdateRecoverySnapshot(
                 _windowsState,
                 _ventilationState,
