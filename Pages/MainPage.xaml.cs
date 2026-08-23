@@ -38,6 +38,13 @@ namespace IndoorCO2MapAppV2.Pages
         private bool sortAlphabetical = false;
         private bool _recoveryInProgress = false;
 
+        // Auto-recovery keeps looking for this long before falling back to manual resume.
+        // Duty-cycled scanning: RecoveryScanMs on, RecoveryPauseMs off, repeat.
+        private static readonly TimeSpan RecoveryBudget = TimeSpan.FromMinutes(10);
+        private const int RecoveryScanMs = 40000;
+        private const int RecoveryPauseMs = 20000;
+
+        private IDispatcherTimer? _recoveryCountdownTimer;
         private IDispatcherTimer? _co2liveValueUpdateTimer;
         private CancellationTokenSource? _gpsCts;
         private CancellationTokenSource? _recoveryCts;
@@ -186,10 +193,16 @@ namespace IndoorCO2MapAppV2.Pages
                     NewsBadge.IsVisible = NewsViewModel.HasUnreadNews
                                           && UserSettings.Instance.ShowNewsNotification));
 
-            // Show recovery overlay immediately if a snapshot exists — before the permission
-            // block runs — so the user sees feedback right away instead of a blank screen.
-            if (RecoveryManager.Instance.LoadSnapshot() != null)
-                RecoveryOverlay.IsVisible = true;
+            // Reset the recovery overlay to a clean state on every appearance, then show it
+            // immediately if a snapshot exists — before the permission block runs — so the
+            // user sees feedback right away instead of a blank screen.
+            // This is where the overlay gets torn down after a successful recovery: it stays
+            // up across the hand-off to the recording page (see OnDisappearing) and is only
+            // cleared once we are genuinely back on this page.
+            MainScrollView.IsEnabled = true;
+            RecoveryAbortButton.IsVisible = true;
+            RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
+            RecoveryOverlay.IsVisible = RecoveryManager.Instance.LoadSnapshot() != null;
 
             // Request permissions FIRST so BT is authorised before recovery/scan runs.
             // On iOS the CBCentralManager starts as Unknown until permission is granted;
@@ -237,8 +250,16 @@ namespace IndoorCO2MapAppV2.Pages
                 }
                 finally
                 {
-                    RecoveryOverlay.IsVisible = false;
-                    MainScrollView.IsEnabled = true;
+                    StopRecoveryCountdown();
+                    // On success we have already navigated, but GoToAsync returns before the
+                    // destination page is inflated and rendered. Tearing the overlay down here
+                    // would expose a bare main menu for that window, which reads as a failed
+                    // recovery. Leave it up; OnDisappearing clears it once the page is actually on.
+                    if (!recovered)
+                    {
+                        RecoveryOverlay.IsVisible = false;
+                        MainScrollView.IsEnabled = true;
+                    }
                     _recoveryCts.Dispose();
                     _recoveryCts = null;
                     _recoveryInProgress = false;
@@ -265,7 +286,9 @@ namespace IndoorCO2MapAppV2.Pages
             // ManualResumeButton.IsVisible == true means recovery was tried but failed.
             // Also skip if the sensor is already connected (e.g. returning from a recovered recording
             // that was just submitted/aborted) — the live timer handles refresh from here.
-            if (!_initialRefreshDone && !recovered
+            // _recoveryInProgress also guards a re-entrant OnAppearing: a scan started here
+            // would clear the device list that an in-flight recovery is depending on.
+            if (!_initialRefreshDone && !recovered && !_recoveryInProgress
                 && !_mainPageViewModel.Sensor.IsDeviceConnected)
             {
                 _initialRefreshDone = true;
@@ -293,6 +316,11 @@ namespace IndoorCO2MapAppV2.Pages
             pageActive = false;
             _gpsCts?.Cancel();
             _gpsCts = null;
+
+            // Deliberately NOT clearing the recovery overlay here. For Shell ///-navigation
+            // this fires when the route is committed, which is before the destination page
+            // is inflated — hiding it here flashes a bare main menu on slow builds, which is
+            // the exact bug this is meant to avoid. OnAppearing owns the reset instead.
         }
 
         private async Task GpsRefreshLoopAsync(CancellationToken ct)
@@ -315,50 +343,164 @@ namespace IndoorCO2MapAppV2.Pages
             var snapshot = recoveryManager.LoadSnapshot();
             if (snapshot == null) return false;
 
-            // Stage 1: wait for BT to be confirmed ready by StatusViewModel (max 15s)
-            RecoveryStatusLabel.Text = Localisation.RecoveryWaitingForInit;
-            await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(15), ct);
-
-            // Stage 2: run the general sensor scan — this also serves as the initial scan,
-            // so we mark it done to avoid a duplicate scan after recovery completes.
-            RecoveryStatusLabel.Text = Localisation.MainMenuResumingRecording;
+            // Claim the initial scan up front, not at Stage 2. A re-entrant OnAppearing that
+            // lands during the Bluetooth wait below would otherwise fire its own scan, and
+            // StartScanAsync clears the device list out from under this one.
             _initialRefreshDone = true;
-            // Race the scan against cancellation — StartScanAsync has no external CT support
-            try
-            {
-                await Task.WhenAny(
-                    _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType),
-                    Task.Delay(Timeout.Infinite, ct));
-            }
-            catch (Exception ex) when (IsBtPermissionDenied(ex))
-            {
-                Logger.WriteToLog($"TryRecoverRecordingAsync: BT permission denied — {ex.Message}");
-                ManualResumeButton.IsVisible = true;
-                return false;
-            }
-            ct.ThrowIfCancellationRequested();
 
-            // Check if the saved device appeared in the scan results
+            // The whole attempt — Bluetooth wait included — is capped at RecoveryBudget.
+            var deadline = DateTime.UtcNow + RecoveryBudget;
             var targetId = snapshot.MonitorDeviceId;
-            var foundDevice = _mainPageViewModel.Sensor.Devices.FirstOrDefault(d =>
+
+            // Stage 1: wait for BT to be confirmed ready by StatusViewModel (max 30s)
+            RecoveryStatusLabel.Text = Localisation.RecoveryWaitingForInit;
+            await WaitForBluetoothReadyForRecoveryAsync(TimeSpan.FromSeconds(30), ct);
+
+            // Stage 2: keep scanning until the budget runs out. Duty-cycled rather than
+            // continuous — a sensor coming into range is still caught within about a
+            // minute, at a fraction of the radio-on time, and one scan start per minute
+            // stays well clear of Android's 5-starts-per-30s throttle.
+            StartRecoveryCountdown(deadline);
+
+            int attempt = 0;
+            while (DateTime.UtcNow < deadline)
+            {
+                attempt++;
+                Logger.WriteToLog($"TryRecoverRecordingAsync: scan attempt {attempt} for '{targetId}'");
+
+                // Race the scan against cancellation — StartScanAsync has no external CT support
+                try
+                {
+                    var scanTask = _mainPageViewModel.Sensor.StartScanAsync(
+                        _mainPageViewModel.Sensor.SelectedMonitorType, scanDurationMs: RecoveryScanMs);
+                    // Await the winner, not just WhenAny — WhenAny alone never rethrows, which
+                    // made the permission-denied filter below unreachable.
+                    var winner = await Task.WhenAny(scanTask, Task.Delay(Timeout.Infinite, ct));
+                    await winner;
+                }
+                catch (Exception ex) when (IsBtPermissionDenied(ex))
+                {
+                    // Not worth retrying — the permission won't appear on its own.
+                    Logger.WriteToLog($"TryRecoverRecordingAsync: BT permission denied — {ex.Message}");
+                    ManualResumeButton.IsVisible = true;
+                    return false;
+                }
+                ct.ThrowIfCancellationRequested();
+
+                var foundDevice = await FindRecoveryTargetAsync(targetId);
+                if (foundDevice != null)
+                {
+                    await _mainPageViewModel.Sensor.SelectDeviceAsync(foundDevice);
+                    if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider != null)
+                    {
+                        await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, targetId);
+                        var snapshot2 = recoveryManager.LoadSnapshot();
+                        // Navigation is committed well before the page is inflated, so switch the
+                        // overlay to its final state and take the abort button away first.
+                        StopRecoveryCountdown();
+                        RecoveryStatusLabel.Text = Localisation.RecoveryOpeningRecording;
+                        RecoveryAbortButton.IsVisible = false;
+                        await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
+                        return true;
+                    }
+
+                    // Found but the connection didn't come up — retry rather than give up.
+                    Logger.WriteToLog($"TryRecoverRecordingAsync: attempt {attempt} connected to nothing, retrying");
+                }
+
+                if (DateTime.UtcNow >= deadline) break;
+                await Task.Delay(RecoveryPauseMs, ct);
+            }
+
+            Logger.WriteToLog($"Automatic Recovery failed after {attempt} attempts, showing manual resume button");
+            ManualResumeButton.IsVisible = true;
+            return false;
+        }
+
+        /// <summary>
+        /// Looks for the recovery target in the scan results, then in the system's
+        /// connected/paired list as a fallback.
+        /// </summary>
+        private async Task<BluetoothDeviceModel?> FindRecoveryTargetAsync(string targetId)
+        {
+            var foundDevice = FindDeviceInScanResults(targetId);
+
+            if (foundDevice == null)
+            {
+                // Devices are appended via BeginInvokeOnMainThread, so one seen in the final
+                // moments of the scan may not be in the collection yet — let the queue drain.
+                await Task.Yield();
+                foundDevice = FindDeviceInScanResults(targetId);
+            }
+
+            if (foundDevice == null)
+            {
+                // Last resort: an already-bonded sensor may never re-advertise during the scan.
+                foundDevice = FindPairedDevice(targetId);
+                if (foundDevice != null)
+                    Logger.WriteToLog($"TryRecoverRecordingAsync: '{targetId}' not seen in scan, using paired device");
+            }
+
+            return foundDevice;
+        }
+
+        /// <summary>
+        /// Ticks the overlay label once a second. Without this the text would only change
+        /// between scan windows and the overlay would look hung for a 10 minute search.
+        /// </summary>
+        private void StartRecoveryCountdown(DateTime deadline)
+        {
+            StopRecoveryCountdown();
+
+            void Render()
+            {
+                var remaining = deadline - DateTime.UtcNow;
+                if (remaining < TimeSpan.Zero) remaining = TimeSpan.Zero;
+                RecoveryStatusLabel.Text = string.Format(
+                    Localisation.RecoverySearchingWithTimeLeft,
+                    $"{(int)remaining.TotalMinutes}:{remaining.Seconds:00}");
+            }
+
+            Render();
+            _recoveryCountdownTimer = Dispatcher.CreateTimer();
+            _recoveryCountdownTimer.Interval = TimeSpan.FromSeconds(1);
+            _recoveryCountdownTimer.Tick += (_, _) => Render();
+            _recoveryCountdownTimer.Start();
+        }
+
+        private void StopRecoveryCountdown()
+        {
+            _recoveryCountdownTimer?.Stop();
+            _recoveryCountdownTimer = null;
+        }
+
+        private BluetoothDeviceModel? FindDeviceInScanResults(string targetId) =>
+            _mainPageViewModel.Sensor.Devices.FirstOrDefault(d =>
                 d.Id.Equals(targetId, StringComparison.OrdinalIgnoreCase) ||
                 d.Name.Equals(targetId, StringComparison.OrdinalIgnoreCase));
 
-            if (foundDevice != null)
+        /// <summary>
+        /// Falls back to the system's connected/paired list, mirroring the lookup in
+        /// RecoveryManager.TryFindDeviceAsync. Covers a bonded sensor that never
+        /// re-advertises during the scan window.
+        /// </summary>
+        private static BluetoothDeviceModel? FindPairedDevice(string targetId)
+        {
+            try
             {
-                await _mainPageViewModel.Sensor.SelectDeviceAsync(foundDevice);
-                if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider != null)
-                {
-                    await RecordingManager.Instance.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, targetId);
-                    var snapshot2 = recoveryManager.LoadSnapshot();
-                    await NavigateAsync(snapshot2?.IsTransitRecording == true ? "///transit" : "///building");
-                    return true;
-                }
-            }
+                var match = BLEDeviceManager.Instance._adapter
+                    .GetSystemConnectedOrPairedDevices()
+                    .FirstOrDefault(d =>
+                        d.Id.ToString().Equals(targetId, StringComparison.OrdinalIgnoreCase) ||
+                        (d.Name?.Equals(targetId, StringComparison.OrdinalIgnoreCase) ?? false));
 
-            Logger.WriteToLog("Automatic Recovery failed, showing manual resume button");
-            ManualResumeButton.IsVisible = true;
-            return false;
+                return match == null ? null : new BluetoothDeviceModel(match);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("MainPage|FindPairedDevice failed: " + ex.Message);
+                return null;
+            }
         }
 
         private async Task WaitForBluetoothReadyForRecoveryAsync(TimeSpan timeout, CancellationToken ct = default)

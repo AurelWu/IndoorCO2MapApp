@@ -160,6 +160,16 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showNewsNotification, value);
         }
 
+        // Android only: run the foreground service so a recording survives the app being
+        // backgrounded. On by default — without it Android throttles and eventually kills
+        // the process, which drops the sensor connection mid-measurement.
+        private bool _keepRecordingInBackground = true;
+        public bool KeepRecordingInBackground
+        {
+            get => _keepRecordingInBackground;
+            set => SetProperty(ref _keepRecordingInBackground, value);
+        }
+
         private bool _showChangeRouteInRecording = false;
         public bool ShowChangeRouteInRecording
         {

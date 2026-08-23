@@ -34,7 +34,7 @@
             Padding="20,18"
             ZIndex="10">
         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
-        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+        <VerticalStackLayout Spacing="14" HorizontalOptions="Center">
             <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
                 <ActivityIndicator IsRunning="True" Color="White" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                 <Label x:Name="RecoveryStatusLabel"
@@ -44,14 +44,19 @@
                        FontAttributes="Bold"
                        VerticalOptions="Center"/>
             </HorizontalStackLayout>
-            <Button Text="{x:Static t:Localisation.RecoveryAbortButton}"
+            <Button x:Name="RecoveryAbortButton"
+                    Text="{x:Static t:Localisation.RecoveryAbortButton}"
                     Clicked="OnAbortRecoveryClicked"
-                    BackgroundColor="Transparent"
-                    BorderColor="Transparent"
+                    BackgroundColor="#33FFFFFF"
+                    BorderColor="White"
+                    BorderWidth="1.5"
                     TextColor="White"
-                    FontSize="13"
-                    HorizontalOptions="Center"
-                    Padding="0" />
+                    FontSize="15"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    Padding="18,10"
+                    MinimumHeightRequest="44"
+                    HorizontalOptions="Center" />
         </VerticalStackLayout>
     </Border>
 

@@ -127,24 +127,18 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         }
 
-        public override async ValueTask DisposeAsync()
-        {            
-
+        // Disconnect and clearing ActiveDevice are handled by the base class.
+        protected override async Task OnTearDownAsync()
+        {
             if (_notifyCharacteristic != null)
             {
                 _notifyCharacteristic.ValueUpdated -= OnInkbirdCO2haracteristicValueChanged;
                 try { await _notifyCharacteristic.StopUpdatesAsync(); } catch (Exception ex) { Logger.WriteToLog("Inkbird StopUpdatesAsync failed: " + ex.Message, LogMode.Verbose); }
             }
 
-            if (ActiveDevice != null)
-            {
-                try { await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(ActiveDevice); } catch (Exception ex) { Logger.WriteToLog("Inkbird DisconnectDeviceAsync failed: " + ex.Message, LogMode.Verbose); }
-            }
-
             _service = null;
-
             _notifyCharacteristic = null;
-            ActiveDevice = null;            
+            _setupDone = false;
             Logger.WriteToLog("Inkbird disposed", minimumLogMode: LogMode.Verbose);
         }
     }

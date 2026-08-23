@@ -54,9 +54,10 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public ObservableCollection<BluetoothDeviceModel> Devices { get; }
 
-        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true)
+        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true, int scanDurationMs = 20000)
         {
             await _ble.StartScanningAsync(
+                scanDurationMs: scanDurationMs,
                 clearBeforeScan: clearBeforeScan,
                 filter: filter);
         }
@@ -205,6 +206,40 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             {
                 _opLock.Release();
             }
+        }
+
+        private BluetoothDeviceModel? _suspendedDevice;
+
+        /// <summary>
+        /// Closes the sensor connection when the app goes to the background, remembering
+        /// the device so <see cref="ResumeConnectionAsync"/> can bring it back. Without
+        /// this the GATT link dangles while the app is asleep and the stale handle
+        /// obstructs the next connect. Callers must skip this while recording.
+        /// </summary>
+        public async Task SuspendConnectionAsync()
+        {
+            var device = SelectedDevice;
+            if (device == null) return;
+
+            Logger.WriteToLog($"CO2MonitorManager|SuspendConnectionAsync: releasing {device.DisplayName}");
+            _suspendedDevice = device;
+            await DisconnectAsync();
+        }
+
+        /// <summary>
+        /// Reconnects the device released by <see cref="SuspendConnectionAsync"/>.
+        /// A cached handle can go stale over a long background period; if the reconnect
+        /// fails the provider simply stays null and the usual "no sensor" path applies.
+        /// </summary>
+        public async Task ResumeConnectionAsync()
+        {
+            var device = _suspendedDevice;
+            _suspendedDevice = null;
+
+            if (device == null || ActiveCO2MonitorProvider != null) return;
+
+            Logger.WriteToLog($"CO2MonitorManager|ResumeConnectionAsync: reconnecting {device.DisplayName}");
+            await SelectDeviceAsync(device);
         }
 
         public async Task DisconnectAsync()

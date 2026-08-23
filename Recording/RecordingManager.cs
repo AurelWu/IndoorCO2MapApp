@@ -34,9 +34,6 @@ namespace IndoorCO2MapAppV2.Recording
         private volatile int _snapshotGeneration = 0;
 
         bool inkBirdRecoveryDone = false;
-#if ANDROID
-        private Android.OS.PowerManager.WakeLock? _wakeLock;
-#endif
 
         private RecordingManager() { }
 
@@ -93,7 +90,8 @@ namespace IndoorCO2MapAppV2.Recording
 
             _ = RunLoopAsync(_cts.Token);
 #if ANDROID
-            AcquireWakeLockAndStartService();
+            await EnsureNotificationPermissionAsync();
+            StartRecordingService();
 #endif
         }
 
@@ -118,7 +116,7 @@ namespace IndoorCO2MapAppV2.Recording
             Preferences.Remove("RecordingState");
             CurrentSnapShot = new RecordingRecoverySnapshot();
 #if ANDROID
-            ReleaseWakeLockAndStopService();
+            StopRecordingService();
 #endif
         }
 
@@ -227,6 +225,9 @@ namespace IndoorCO2MapAppV2.Recording
             Logger.WriteToLog("ReadAndStoreLatestAsync |Before MeasurementDataUpdated?.Invoke()", LogMode.Verbose);
             SaveRecoverySnapshot(recording, recording.MonitorID);
             MeasurementDataUpdated?.Invoke();
+#if ANDROID
+            RecordingNotification.Update();
+#endif
         }
 
         // ----------------------------------------------------------------------
@@ -308,7 +309,11 @@ namespace IndoorCO2MapAppV2.Recording
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
             _ = RunLoopAsync(_cts.Token);
 #if ANDROID
-            AcquireWakeLockAndStartService();
+            // Deliberately no permission prompt here — recovery runs behind the resume
+            // overlay and a modal dialog at this point interrupts the handoff to the
+            // recording page. The service still runs; the notification just stays hidden
+            // until the user has been asked once via a normal recording start.
+            StartRecordingService();
 #endif
 
             // Optionally: signal UI to navigate to recording page.
@@ -345,21 +350,87 @@ namespace IndoorCO2MapAppV2.Recording
         }
 
 #if ANDROID
-        private void AcquireWakeLockAndStartService()
+        /// <summary>
+        /// Starts the foreground service that keeps the process (and with it the
+        /// sensor's GATT connection) alive while the app is backgrounded.
+        /// The wake lock lives inside the service itself.
+        /// </summary>
+        private void StartRecordingService()
         {
-            if (_wakeLock?.IsHeld == true)
-                _wakeLock.Release();
-            var pm = (Android.OS.PowerManager?)Android.App.Application.Context
-                .GetSystemService(Android.Content.Context.PowerService);
-            _wakeLock = pm?.NewWakeLock(Android.OS.WakeLockFlags.Partial, "IndoorCO2:Recording");
-            _wakeLock?.Acquire();
+            if (!PersistentData.UserSettings.Instance.KeepRecordingInBackground)
+            {
+                Logger.WriteToLog("RecordingManager|Background recording disabled in settings, service not started");
+                return;
+            }
+
+            try
+            {
+                var ctx = Android.App.Application.Context;
+                var intent = new Android.Content.Intent(ctx, typeof(MeasurementForegroundService));
+                if (OperatingSystem.IsAndroidVersionAtLeast(26))
+                    ctx.StartForegroundService(intent);
+                else
+                    ctx.StartService(intent);
+            }
+            catch (Exception ex)
+            {
+                // Android 12+ forbids starting a foreground service from the background.
+                // A recording must never fail to start just because we couldn't.
+                Logger.WriteToLog("RecordingManager|StartRecordingService failed: " + ex.Message);
+            }
         }
 
-        private void ReleaseWakeLockAndStopService()
+        private void StopRecordingService()
         {
-            if (_wakeLock?.IsHeld == true)
-                _wakeLock.Release();
-            _wakeLock = null;
+            try
+            {
+                var ctx = Android.App.Application.Context;
+                ctx.StopService(new Android.Content.Intent(ctx, typeof(MeasurementForegroundService)));
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("RecordingManager|StopRecordingService failed: " + ex.Message, LogMode.Verbose);
+            }
+        }
+
+        /// <summary>
+        /// Brings the foreground service in line with the current setting. Called when the
+        /// user flips the toggle so it takes effect on an already-running recording instead
+        /// of only on the next one.
+        /// </summary>
+        public void ApplyBackgroundRecordingSetting()
+        {
+            if (!IsRecording) return;
+
+            if (PersistentData.UserSettings.Instance.KeepRecordingInBackground)
+                StartRecordingService();
+            else
+                StopRecordingService();
+        }
+
+        /// <summary>
+        /// Asks for POST_NOTIFICATIONS once (Android 13+). The service runs and
+        /// protects the process either way — this only decides whether the user
+        /// gets to see the ongoing notification.
+        /// </summary>
+        private static async Task EnsureNotificationPermissionAsync()
+        {
+            if (!OperatingSystem.IsAndroidVersionAtLeast(33)) return;
+            // Nothing to show a notification for if background recording is off.
+            if (!PersistentData.UserSettings.Instance.KeepRecordingInBackground) return;
+            if (Preferences.Get("NotificationPermissionAsked", false)) return;
+
+            Preferences.Set("NotificationPermissionAsked", true);
+            try
+            {
+                // Must run on the main thread — the recovery path can reach here off it.
+                await MainThread.InvokeOnMainThreadAsync(
+                    () => Permissions.RequestAsync<Bluetooth.AndroidPostNotificationsPermission>());
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog("RecordingManager|POST_NOTIFICATIONS request failed: " + ex.Message, LogMode.Verbose);
+            }
         }
 #endif
 

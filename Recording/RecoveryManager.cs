@@ -57,57 +57,6 @@ namespace IndoorCO2MapAppV2.Recording
         public void ClearSnapshot() => Preferences.Remove("RecordingState");
 
         // ------------------------------------------------------------------------------
-        // AUTO RECOVERY
-        // ------------------------------------------------------------------------------
-
-        public async Task<bool> TryAutoRecoverAsync(SensorViewModel sensorViewModel)
-        {
-            if (_adapter == null || _recordingManager == null)
-                throw new InvalidOperationException("RecoveryManager not initialized. Call Initialize() first.");
-
-            var snapshot = LoadSnapshot();
-            if (snapshot == null) return false;
-
-            var deviceIdString = snapshot.MonitorDeviceId;
-            if (string.IsNullOrWhiteSpace(deviceIdString)) return false;
-
-            // GAP 2: allow ~2s for Android to tear down GATT handles from the killed process.
-            // Without this, GetSystemConnectedOrPairedDevices() may return a stale "connected"
-            // device whose GATT handles are no longer valid, causing silent read failures.
-            await Task.Delay(2000);
-
-            for (int attempt = 1; attempt <= MaxAttempts; attempt++)
-            {
-                Logger.WriteToLog($"Recovery attempt {attempt} for device {deviceIdString}");
-
-                var device = await TryFindDeviceAsync(deviceIdString);
-                if (device != null)
-                {
-                    await sensorViewModel.SelectDeviceAsync(new Bluetooth.BluetoothDeviceModel(device));
-
-                    // GAP 1: SelectDeviceAsync can fail silently (provider stays null on connect
-                    // timeout or InitializeAsync failure). Don't declare success unless the
-                    // provider is actually live — retry instead.
-                    if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider == null)
-                    {
-                        Logger.WriteToLog($"Recovery attempt {attempt}: provider null after SelectDeviceAsync, retrying");
-                        Preferences.Set("RecordingRecoveryAttempts", attempt);
-                        await Task.Delay(DelayBetweenAttemptsMs);
-                        continue;
-                    }
-
-                    await _recordingManager.TryRecoverRecordingAfterDeviceReadyAsync(snapshot, deviceIdString);
-                    return true;
-                }
-
-                Preferences.Set("RecordingRecoveryAttempts", attempt);
-                await Task.Delay(DelayBetweenAttemptsMs);
-            }
-
-            return false;
-        }
-
-        // ------------------------------------------------------------------------------
         // DEVICE DISCOVERY
         // ------------------------------------------------------------------------------
 

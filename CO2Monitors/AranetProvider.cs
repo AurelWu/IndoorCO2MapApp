@@ -72,6 +72,19 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 _historyV2Characteristic != null;
         }
 
+        // Drop the cached GATT handles; the base class disconnects afterwards. Keeping
+        // stale handles across a reconnect is what caused silent read failures.
+        protected override Task OnTearDownAsync()
+        {
+            _service = null;
+            _liveCharacteristic = null;
+            _totalDataPointsCharacteristic = null;
+            _writerCharacteristic = null;
+            _historyV2Characteristic = null;
+            Logger.WriteToLog("Aranet disposed", LogMode.Verbose);
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Discover all required characteristics in provided service.
         /// </summary>

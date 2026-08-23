@@ -176,6 +176,30 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.ShowChangeRouteInRecording = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Android only — the row is hidden elsewhere. Toggling mid-recording takes effect
+        /// immediately rather than waiting for the next recording to start.
+        /// </summary>
+        public bool KeepRecordingInBackground
+        {
+            get => UserSettings.Instance.KeepRecordingInBackground;
+            set
+            {
+                UserSettings.Instance.KeepRecordingInBackground = value;
+                OnPropertyChanged();
+#if ANDROID
+                Recording.RecordingManager.Instance.ApplyBackgroundRecordingSetting();
+#endif
+            }
+        }
+
+        public static bool IsBackgroundRecordingSupported =>
+#if ANDROID
+            true;
+#else
+            false;
+#endif
+
         public string AppVersion =>
             $"Version {AppInfo.VersionString} ({AppInfo.BuildString})";
 

@@ -103,6 +103,12 @@
   <data name="RecoveryWaitingForInit" xml:space="preserve">
     <value>En attente d'initialisation...</value>
   </data>
+  <data name="RecoveryOpeningRecording" xml:space="preserve">
+    <value>Ouverture de la mesure...</value>
+  </data>
+  <data name="RecoverySearchingWithTimeLeft" xml:space="preserve">
+    <value>Recherche du capteur... {0} restant</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Soumettre l'enregistrement</value>
   </data>
@@ -362,5 +368,14 @@
   </data>
   <data name="SmartHomeClose" xml:space="preserve">
     <value>Fermer</value>
+  </data>
+  <data name="NotificationRecordingTitle" xml:space="preserve">
+    <value>Mesure de CO2 en cours</value>
+  </data>
+  <data name="NotificationChannelDescription" xml:space="preserve">
+    <value>Maintient la connexion au capteur pendant la mesure</value>
+  </data>
+  <data name="NotificationRecordingTapToReturn" xml:space="preserve">
+    <value>Appuyez pour revenir &#224; l'application</value>
   </data>
 </root>

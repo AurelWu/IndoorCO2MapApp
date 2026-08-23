@@ -276,6 +276,18 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
             }
         }
 
+        internal static string RecoveryOpeningRecording {
+            get {
+                return ResourceManager.GetString("RecoveryOpeningRecording", resourceCulture);
+            }
+        }
+
+        internal static string RecoverySearchingWithTimeLeft {
+            get {
+                return ResourceManager.GetString("RecoverySearchingWithTimeLeft", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Scanning for devices... ähnelt.
         /// </summary>
@@ -452,5 +464,8 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string SmartHomeStep2 { get { return ResourceManager.GetString("SmartHomeStep2", resourceCulture); } }
         internal static string SmartHomeStep3 { get { return ResourceManager.GetString("SmartHomeStep3", resourceCulture); } }
         internal static string SmartHomeClose { get { return ResourceManager.GetString("SmartHomeClose", resourceCulture); } }
+        internal static string NotificationRecordingTitle { get { return ResourceManager.GetString("NotificationRecordingTitle", resourceCulture); } }
+        internal static string NotificationChannelDescription { get { return ResourceManager.GetString("NotificationChannelDescription", resourceCulture); } }
+        internal static string NotificationRecordingTapToReturn { get { return ResourceManager.GetString("NotificationRecordingTapToReturn", resourceCulture); } }
     }
 }

@@ -103,6 +103,12 @@
   <data name="RecoveryWaitingForInit" xml:space="preserve">
     <value>Aguardando inicializa&#231;&#227;o...</value>
   </data>
+  <data name="RecoveryOpeningRecording" xml:space="preserve">
+    <value>A abrir a grava&#231;&#227;o...</value>
+  </data>
+  <data name="RecoverySearchingWithTimeLeft" xml:space="preserve">
+    <value>A procurar o sensor... falta {0}</value>
+  </data>
   <data name="SubmitRecordingButton" xml:space="preserve">
     <value>Enviar grava&#231;&#227;o</value>
   </data>
@@ -362,5 +368,14 @@
   </data>
   <data name="SmartHomeClose" xml:space="preserve">
     <value>Fechar</value>
+  </data>
+  <data name="NotificationRecordingTitle" xml:space="preserve">
+    <value>Grava&#231;&#227;o de CO2 ativa</value>
+  </data>
+  <data name="NotificationChannelDescription" xml:space="preserve">
+    <value>Mant&#233;m a liga&#231;&#227;o ao sensor durante a grava&#231;&#227;o</value>
+  </data>
+  <data name="NotificationRecordingTapToReturn" xml:space="preserve">
+    <value>Toque para voltar &#224; aplica&#231;&#227;o</value>
   </data>
 </root>

@@ -49,6 +49,22 @@ namespace IndoorCO2MapAppV2
                 await CO2MonitorManager.Instance.DisconnectAsync();
             };
 
+#if ANDROID
+            // Stopped/Resumed map to Android OnStop/OnRestart — the app genuinely going
+            // away and coming back. Deliberately not Deactivated, which also fires for
+            // permission dialogs and would disconnect spuriously.
+            window.Stopped += async (s, e) =>
+            {
+                // Never while recording: the foreground service exists precisely to hold
+                // this connection open in the background.
+                if (Recording.RecordingManager.Instance.IsRecording) return;
+                await CO2MonitorManager.Instance.SuspendConnectionAsync();
+            };
+
+            window.Resumed += async (s, e) =>
+                await CO2MonitorManager.Instance.ResumeConnectionAsync();
+#endif
+
             return window;
         }
 

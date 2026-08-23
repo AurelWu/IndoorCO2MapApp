@@ -134,10 +134,46 @@ public abstract class BaseCO2MonitorProvider : IAsyncDisposable
     }
     protected abstract Task<ushort[]?> DoReadHistoryAsync(ushort startIndex, int sensorUpdateInterval);
 
-    public virtual ValueTask DisposeAsync()
+    /// <summary>
+    /// Tears the provider down and — crucially — actually closes the GATT connection.
+    /// Sealed on purpose: this used to be virtual and defaulted to doing nothing, so
+    /// every provider that didn't override it (Aranet, Airvalent) left the link open,
+    /// and the stale handle then obstructed the next connect. Subclasses hook
+    /// <see cref="OnTearDownAsync"/> instead.
+    /// </summary>
+    public async ValueTask DisposeAsync()
     {
-        // Some implementations might need cleanup (e.g., notifications)
-        return ValueTask.CompletedTask;
+        // Capture before teardown — some implementations null ActiveDevice on the way out.
+        var device = ActiveDevice;
+
+        try
+        {
+            await OnTearDownAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteToLog($"{GetType().Name}|OnTearDownAsync failed: {ex.Message}");
+        }
+
+        if (device != null)
+        {
+            try
+            {
+                await BLEDeviceManager.Instance._adapter.DisconnectDeviceAsync(device);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteToLog($"{GetType().Name}|DisconnectDeviceAsync failed: {ex.Message}", LogMode.Verbose);
+            }
+        }
+
+        ActiveDevice = null;
     }
+
+    /// <summary>
+    /// Provider-specific cleanup (notifications, cached handles, pending reads).
+    /// The base class handles the disconnect afterwards.
+    /// </summary>
+    protected virtual Task OnTearDownAsync() => Task.CompletedTask;
 }
 

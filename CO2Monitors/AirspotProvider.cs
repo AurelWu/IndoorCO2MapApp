@@ -672,7 +672,9 @@ internal sealed class AirspotProvider : BaseCO2MonitorProvider
 
     // ================= DISPOSE =================
 
-    public override async ValueTask DisposeAsync()
+    // Disconnect is handled by the base class, which captures ActiveDevice before
+    // calling this — TearDownBleAsync(clearHistory: true) nulls it.
+    protected override async Task OnTearDownAsync()
     {
         await _initLock.WaitAsync();
         try

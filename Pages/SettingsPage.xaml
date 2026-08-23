@@ -69,6 +69,10 @@
             <VerticalStackLayout Spacing="10">
                 <Label Text="Recording" Style="{StaticResource SectionLabelStyle}" />
                 <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+                <!-- Android only: iOS has no equivalent foreground service. -->
+                <c:LabeledSwitch Text="Keep recording when app is in background (shows a notification)"
+                                 IsToggled="{Binding KeepRecordingInBackground}"
+                                 IsVisible="{OnPlatform Default=False, Android=True}" />
             </VerticalStackLayout>
         </Border>
 

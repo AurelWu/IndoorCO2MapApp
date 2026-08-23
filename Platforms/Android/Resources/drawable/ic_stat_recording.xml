@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status bar icon for the recording foreground service: the app icon's
+     buildings, reduced to what survives a 24dp alpha mask.
+
+     The earlier attempt was plain rectangles on a shared baseline, which is
+     exactly the visual grammar of a bar chart. Three things pull it back to
+     "building", all borrowed from appicon.svg: punched-out windows, the
+     slanted roofline of the left tower (polygon54 slants up to the right),
+     and the rooftop mast (polygon64).
+
+     Windows are holes, not strokes, so they survive the alpha mask. They are
+     1.8 units in a 24 viewport: ~5px at xxhdpi, ~7px at xxxhdpi, crisp. On a
+     (now very rare) mdpi screen they degrade to near-solid blocks.
+
+     Holes rely on opposite winding, NOT android:fillType="evenOdd" - fillType
+     is API 24+ and this app supports 21. Outer shapes run clockwise, windows
+     counter-clockwise. Keep that winding if you edit the coordinates. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="
+            M3,12.2 L10.5,11.5 L10.5,21 L3,21 Z
+            M4.4,13.3 L4.4,15.1 L6.2,15.1 L6.2,13.3 Z
+            M7.3,13.3 L7.3,15.1 L9.1,15.1 L9.1,13.3 Z
+            M4.4,16.3 L4.4,18.1 L6.2,18.1 L6.2,16.3 Z
+            M7.3,16.3 L7.3,18.1 L9.1,18.1 L9.1,16.3 Z
+
+            M13,6.5 L21,6.5 L21,21 L13,21 Z
+            M16.6,3.5 L17.4,3.5 L17.4,6.5 L16.6,6.5 Z
+            M14.6,8.5 L14.6,10.3 L16.4,10.3 L16.4,8.5 Z
+            M17.6,8.5 L17.6,10.3 L19.4,10.3 L19.4,8.5 Z
+            M14.6,11.5 L14.6,13.3 L16.4,13.3 L16.4,11.5 Z
+            M17.6,11.5 L17.6,13.3 L19.4,13.3 L19.4,11.5 Z
+            M14.6,14.5 L14.6,16.3 L16.4,16.3 L16.4,14.5 Z
+            M17.6,14.5 L17.6,16.3 L19.4,16.3 L19.4,14.5 Z" />
+</vector>

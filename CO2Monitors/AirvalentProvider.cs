@@ -1,4 +1,6 @@
-﻿using Plugin.BLE.Abstractions.Contracts;
+﻿using IndoorCO2MapAppV2.DebugTools;
+using IndoorCO2MapAppV2.Enumerations;
+using Plugin.BLE.Abstractions.Contracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -49,6 +51,20 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
 
             return await DiscoverCharacteristicsAsync(_service);
+        }
+
+        // Drop the cached GATT handles; the base class disconnects afterwards. Keeping
+        // stale handles across a reconnect is what caused silent read failures.
+        protected override Task OnTearDownAsync()
+        {
+            _service = null;
+            _airValentUpdateInterval = null;
+            _airValentHistory = null;
+            _airValentHistoryPointer = null;
+            _airValentChunkCounter = null;
+            _latestCO2FromHistory = -1;
+            Logger.WriteToLog("Airvalent disposed", LogMode.Verbose);
+            return Task.CompletedTask;
         }
 
         protected override async Task<int> DoReadCurrentCO2Async()
