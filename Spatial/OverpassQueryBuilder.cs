@@ -138,6 +138,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[leisure=bowling_alley];" +
                 "nwr[leisure=sports_centre];" +
                 "nwr[leisure=sports_hall];" +
+                "nwr[leisure=indoor_play];" +
                 "nwr[sport=swimming];" +
                 "nwr[leisure=swimming_pool];" +
                 "nwr[leisure=sauna];" +
@@ -152,6 +153,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[amenity=conference_centre];" +
                 "nwr[amenity=congress_centre];" +
                 "nwr[amenity=events_centre];" +
+                "nwr[amenity=exhibition_centre];" +
                 "nwr[amenity=bar];" +
                 "nwr[amenity=place_of_worship];" +
                 "nwr[amenity=pub];" +
