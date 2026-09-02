@@ -490,6 +490,13 @@
                     HorizontalOptions="Fill"
                     IsVisible="{Binding Settings.ShowManualButton}" />
 
+            <Button Text="{x:Static t:Localisation.MainMenuDiscordButton}"
+                    Clicked="OnOpenUrlClicked"
+                    CommandParameter="https://indoorco2map.com/discord"
+                    Style="{StaticResource TonalButtonStyle}"
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding Settings.ShowDiscordButton}"/>
+
             <Button Text="{x:Static t:Localisation.MainMenuDataProtectionImprint}"
                     Clicked="OnOpenUrlClicked"
                     CommandParameter="https://indoorco2map.com/impressum.html"

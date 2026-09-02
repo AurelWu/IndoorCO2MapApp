@@ -170,6 +170,18 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.ShowNewsNotification = value; OnPropertyChanged(); }
         }
 
+        public bool ShowDiscordButton
+        {
+            get => UserSettings.Instance.ShowDiscordButton;
+            set { UserSettings.Instance.ShowDiscordButton = value; OnPropertyChanged(); }
+        }
+
+        public bool AllowStartWithoutSensorData
+        {
+            get => UserSettings.Instance.AllowStartWithoutSensorData;
+            set { UserSettings.Instance.AllowStartWithoutSensorData = value; OnPropertyChanged(); }
+        }
+
         public bool ShowChangeRouteInRecording
         {
             get => UserSettings.Instance.ShowChangeRouteInRecording;

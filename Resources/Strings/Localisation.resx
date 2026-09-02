@@ -300,6 +300,9 @@
   <data name="MainMenuManualButton" xml:space="preserve">
     <value>📖  Manual</value>
   </data>
+  <data name="MainMenuDiscordButton" xml:space="preserve">
+    <value>💬  Join our Discord</value>
+  </data>
   <data name="MainMenuDataProtectionImprint" xml:space="preserve">
     <value>🔗  Data Protection Info and Imprint</value>
   </data>

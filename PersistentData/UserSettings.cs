@@ -153,6 +153,22 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _showManualButton, value);
         }
 
+        private bool _showDiscordButton = true;
+        public bool ShowDiscordButton
+        {
+            get => _showDiscordButton;
+            set => SetProperty(ref _showDiscordButton, value);
+        }
+
+        // Expert option: normally a recording can only start once the sensor has produced
+        // its first reading, which confirms it is actually working. Off by default.
+        private bool _allowStartWithoutSensorData = false;
+        public bool AllowStartWithoutSensorData
+        {
+            get => _allowStartWithoutSensorData;
+            set => SetProperty(ref _allowStartWithoutSensorData, value);
+        }
+
         private bool _showNewsNotification = true;
         public bool ShowNewsNotification
         {

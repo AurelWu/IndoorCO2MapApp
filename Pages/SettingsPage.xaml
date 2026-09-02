@@ -52,6 +52,7 @@
                 <c:LabeledSwitch Text="Show 'Data Protection Info and Imprint' Button" IsToggled="{Binding ShowImprintButton}" />
                 <c:LabeledSwitch Text="Show 'Manual' Button" IsToggled="{Binding ShowManualButton}" />
                 <c:LabeledSwitch Text="Show news notification badge" IsToggled="{Binding ShowNewsNotification}" />
+                <c:LabeledSwitch Text="Show 'Join our Discord' Button" IsToggled="{Binding ShowDiscordButton}" />
             </VerticalStackLayout>
         </Border>
 
@@ -69,6 +70,8 @@
             <VerticalStackLayout Spacing="10">
                 <Label Text="Recording" Style="{StaticResource SectionLabelStyle}" />
                 <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+                <c:LabeledSwitch Text="Allow starting a recording before the first sensor reading"
+                                 IsToggled="{Binding AllowStartWithoutSensorData}" />
                 <!-- Android only: iOS has no equivalent foreground service. -->
                 <c:LabeledSwitch Text="Keep recording when app is in background (shows a notification)"
                                  IsToggled="{Binding KeepRecordingInBackground}"

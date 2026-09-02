@@ -241,6 +241,9 @@
   <data name="MainMenuManualButton" xml:space="preserve">
     <value>&#128214;  Anleitung</value>
   </data>
+  <data name="MainMenuDiscordButton" xml:space="preserve">
+    <value>&#128172;  Discord beitreten</value>
+  </data>
   <data name="MainMenuDataProtectionImprint" xml:space="preserve">
     <value>&#128279;  Datenschutz und Impressum</value>
   </data>
