@@ -847,7 +847,7 @@ namespace IndoorCO2MapAppV2.Pages
             map.Navigator.RotationLock = true;
             map.Navigator.PanLock = true;
             map.Navigator.ZoomLock = true;
-            map.Layers.Add(OpenStreetMap.CreateTileLayer());
+            map.Layers.Add(OsmTileSource.Create());
 
             var routeColor = Mapsui.Styles.Color.FromArgb(255, 81, 43, 212);
             if (!string.IsNullOrEmpty(geometry.Color))

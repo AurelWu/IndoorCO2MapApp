@@ -1,16 +1,12 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.ViewModels;
 #if !WINDOWS
-using BruTile;
-using BruTile.Cache;
-using BruTile.Predefined;
-using BruTile.Web;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Projections;
-using Mapsui.Tiling.Layers;
 #endif
 
 namespace IndoorCO2MapAppV2.Pages
@@ -147,7 +143,7 @@ namespace IndoorCO2MapAppV2.Pages
             var map = new Mapsui.Map();
             map.Widgets.Clear();
             map.Navigator.RotationLock = true;
-            map.Layers.Add(CreateCachedOsmTileLayer());
+            map.Layers.Add(OsmTileSource.Create());
 
             MemoryLayer? pinLayer = null;
             if (groups.Count > 0)
@@ -254,39 +250,6 @@ namespace IndoorCO2MapAppV2.Pages
                 if (group == null) return;
                 MainThread.BeginInvokeOnMainThread(() => ShowDetailPanel(group));
             };
-        }
-
-        private static TileLayer CreateCachedOsmTileLayer()
-        {
-            var cacheDir = Path.Combine(FileSystem.CacheDirectory, "osmtiles");
-            Directory.CreateDirectory(cacheDir);
-            TrimTileCache(cacheDir, maxBytes: 50L * 1024 * 1024);
-            var tileSource = new HttpTileSource(
-                new GlobalSphericalMercator(YAxis.OSM),
-                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                new[] { "a", "b", "c" },
-                name: "OpenStreetMap",
-                persistentCache: new FileCache(cacheDir, "png", TimeSpan.FromDays(14)));
-            return new TileLayer(tileSource) { Name = "OpenStreetMap" };
-        }
-
-        private static void TrimTileCache(string cacheDir, long maxBytes)
-        {
-            try
-            {
-                var files = new DirectoryInfo(cacheDir)
-                    .GetFiles("*.png", SearchOption.AllDirectories)
-                    .OrderBy(f => f.LastWriteTimeUtc)
-                    .ToList();
-                long total = files.Sum(f => f.Length);
-                foreach (var file in files)
-                {
-                    if (total <= maxBytes) break;
-                    total -= file.Length;
-                    file.Delete();
-                }
-            }
-            catch { }
         }
 
         private void ShowDetailPanel(LocationGroupItem group)

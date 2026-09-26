@@ -205,6 +205,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[tourism=gallery];" +
                 "nwr[tourism=hotel];" +
                 "nwr[tourism][building];" +
+                "nwr[tourism=information];" +
                 ");out center qt;";
         }
     }

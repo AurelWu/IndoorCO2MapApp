@@ -39,8 +39,9 @@
             </Border>
         </Grid>
 
-        <!-- Map area -->
-        <Grid Grid.Row="1">
+        <!-- Map area. Row 1 is a dedicated attribution strip rather than an overlay,
+             so DetailPanel can never cover the credit. -->
+        <Grid Grid.Row="1" RowDefinitions="*, Auto">
             <ContentView x:Name="MapContainer" />
 
             <!-- Label toggle — top-right, standard layer-control position -->
@@ -88,6 +89,14 @@
             <ActivityIndicator x:Name="LoadingIndicator"
                                IsRunning="True" IsVisible="True"
                                VerticalOptions="Center" HorizontalOptions="Center" />
+
+            <!-- Required by ODbL and the OSM tile policy; Mapsui renders no attribution itself. -->
+            <Label Grid.Row="1"
+                   Text="© OpenStreetMap contributors"
+                   HorizontalOptions="End"
+                   Padding="6,2"
+                   FontSize="10"
+                   Style="{StaticResource MicroLabelStyle}" />
         </Grid>
 
     </Grid>

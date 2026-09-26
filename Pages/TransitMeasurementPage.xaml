@@ -142,7 +142,17 @@
                             Stroke="{AppThemeBinding Light={StaticResource DividerColor}, Dark={StaticResource DividerColorDark}}"
                             StrokeThickness="1">
                         <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                        <controls:MapContainerView x:Name="ChangeRoutePreviewContainer" />
+                        <Grid>
+                            <controls:MapContainerView x:Name="ChangeRoutePreviewContainer" />
+                            <!-- Required by ODbL and the OSM tile policy; Mapsui renders no attribution itself.
+                                 Fixed light colours because OSM raster tiles are light in either app theme. -->
+                            <Label Text="© OpenStreetMap contributors"
+                                   HorizontalOptions="End" VerticalOptions="End"
+                                   Margin="3" Padding="4,1"
+                                   FontSize="9"
+                                   TextColor="#333333"
+                                   BackgroundColor="#CCFFFFFF" />
+                        </Grid>
                     </Border>
 
                     <!-- Confirm button -->

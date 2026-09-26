@@ -35,9 +35,7 @@ namespace IndoorCO2MapAppV2.Spatial
             _httpClient = httpClient ?? new HttpClient();
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
 
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-                "IndoorCO2DataRecorder/1.0 (https://indoorco2Map.com; contact: aurelwuensch@proton.me)"
-            );
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(AppIdentity.UserAgent);
         }
 
         /// <summary>
