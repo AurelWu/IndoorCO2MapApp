@@ -141,6 +141,19 @@ namespace IndoorCO2MapAppV2.CO2Monitors
         {
             CurrentCO2 = 0;
             UpdateInterval = 0;
+            ClearHistory();
+        }
+
+        /// <summary>
+        /// Drops the cached history without touching <see cref="UpdateInterval"/>.
+        /// This buffer outlives any single recording and is only overwritten on a
+        /// *successful* read, so a new recording must clear it explicitly — otherwise
+        /// a failed first read leaves the previous recording's curve in place and the
+        /// new recording adopts it. Do not use ZeroOutCO2Values for that: it also
+        /// resets UpdateInterval, which the recording loop needs to space samples.
+        /// </summary>
+        public void ClearHistory()
+        {
             Co2History = [];
         }
 
@@ -166,16 +179,31 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
         }
 
-        public async Task RefreshUpdateIntervalAsync()
+        /// <summary>
+        /// Re-reads the sensor's measurement interval. Returns false if it could not be
+        /// read, in which case the previous value is kept: the providers report failure
+        /// as -1 (connection lost) or 0 (Aranet read error), and storing either would
+        /// make the recording loop fall through to its 1-minute default and mis-space
+        /// every submitted sample.
+        /// </summary>
+        public async Task<bool> RefreshUpdateIntervalAsync()
         {
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null)
-                return;
+                return false;
 
             await _opLock.WaitAsync();
             try
             {
-                if (ActiveCO2MonitorProvider == null) return;
-                UpdateInterval = await ActiveCO2MonitorProvider.ReadUpdateIntervalSafeAsync();
+                if (ActiveCO2MonitorProvider == null) return false;
+                int interval = await ActiveCO2MonitorProvider.ReadUpdateIntervalSafeAsync();
+                if (interval <= 0)
+                {
+                    Logger.WriteToLog($"CO2MonitorManager|RefreshUpdateIntervalAsync: read failed ({interval}), keeping {UpdateInterval}s");
+                    return false;
+                }
+
+                UpdateInterval = interval;
+                return true;
             }
             finally
             {
@@ -183,24 +211,31 @@ namespace IndoorCO2MapAppV2.CO2Monitors
             }
         }
 
-        public async Task RefreshHistoryAsync(ushort minutes)
+        /// <summary>
+        /// Returns false when the history could not be read (no provider, or the
+        /// connection could not be revalidated). Callers must not treat
+        /// <see cref="Co2History"/> as current in that case — it still holds the last
+        /// successful read, which may belong to an earlier recording.
+        /// </summary>
+        public async Task<bool> RefreshHistoryAsync(ushort minutes)
         {
             if (ActiveCO2MonitorProvider == null || SelectedDevice?.Device == null)
-                return;
+                return false;
 
             await _opLock.WaitAsync();
             try
             {
-                if (ActiveCO2MonitorProvider == null) return;
+                if (ActiveCO2MonitorProvider == null) return false;
                 var hist = await ActiveCO2MonitorProvider.ReadHistorySafeAsync(
                     minutes,
                     CO2MonitorManager.Instance.UpdateInterval);
-                if (hist != null)
-                {
-                    Co2History = [.. hist];
-                    if (hist.Length > 0)
-                        CurrentCO2 = hist[hist.Length - 1];
-                }
+                if (hist == null)
+                    return false;
+
+                Co2History = [.. hist];
+                if (hist.Length > 0)
+                    CurrentCO2 = hist[hist.Length - 1];
+                return true;
             }
             finally
             {

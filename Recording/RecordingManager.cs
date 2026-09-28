@@ -80,6 +80,11 @@ namespace IndoorCO2MapAppV2.Recording
 
             _snapshotGeneration++;
             NeedsTrimRestore = false;
+            inkBirdRecoveryDone = false;
+            // The history buffer is shared across recordings and survives a stop, so a
+            // fresh recording must start from nothing — otherwise a failed first read
+            // leaves the previous recording's curve in place for this one to adopt.
+            _monitor.ClearHistory();
             ActiveRecording = rec;
             SaveRecoverySnapshot(rec, deviceID);
             _cts?.Cancel();
@@ -87,6 +92,12 @@ namespace IndoorCO2MapAppV2.Recording
             _timer?.Dispose();
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30)); //updates every 30 seconds.
+
+            // Re-read the interval for every recording: it is otherwise only read when
+            // the sensor is selected, so changing it on the device mid-session left us
+            // spacing samples by the stale value. Awaited so the first history read
+            // below already uses the fresh one. Keeps the old value if the read fails.
+            await _monitor.RefreshUpdateIntervalAsync();
 
             _ = RunLoopAsync(_cts.Token);
 #if ANDROID
@@ -166,12 +177,21 @@ namespace IndoorCO2MapAppV2.Recording
             if (minutes < 1)
                 return;
 
-            await _monitor.RefreshHistoryAsync((ushort)Math.Min(minutes, 480));
-
-            // Re-check after the await — recording could have been stopped
-            if (ActiveRecording == null)
+            // On failure Co2History keeps its previous contents, which may belong to an
+            // earlier recording. Skipping the tick leaves the data collected so far
+            // untouched; rebuilding from a stale buffer is what made the chart freeze.
+            if (!await _monitor.RefreshHistoryAsync((ushort)Math.Min(minutes, 480)))
             {
-                Logger.WriteToLog("ReadAndStoreLatestAsync| ActiveRecording is null after RefreshHistory - returning", LogMode.Verbose);
+                Logger.WriteToLog("ReadAndStoreLatestAsync| history read failed - keeping last good data");
+                return;
+            }
+
+            // Re-check after the await. Identity, not just null: a read started under a
+            // previous recording can land here after a new one began, and would then
+            // overwrite the new recording's data and recovery snapshot with old values.
+            if (!ReferenceEquals(recording, ActiveRecording))
+            {
+                Logger.WriteToLog("ReadAndStoreLatestAsync| recording changed during read - discarding result", LogMode.Verbose);
                 return;
             }
 
@@ -184,15 +204,20 @@ namespace IndoorCO2MapAppV2.Recording
                 //=> needs to handle Inkbird Recovery setup
                 if(recording.CO2MonitorType == CO2MonitorType.InkbirdIAMT1.ToString() && !inkBirdRecoveryDone)
                 {
-                    var m = _monitor.ActiveCO2MonitorProvider as InkbirdProvider;
-                    var recData = recording.MeasurementData;
-                    m.assembledCO2History = new List<ushort>();
-                    foreach(var r in recData)
+                    // Guarded: the provider may have been swapped or torn down while this
+                    // read was in flight, and the dereference below used to throw inside
+                    // the recording loop.
+                    if (_monitor.ActiveCO2MonitorProvider is InkbirdProvider m)
                     {
-                        m.assembledCO2History.Add(r.Ppm);
+                        var recData = recording.MeasurementData;
+                        m.assembledCO2History = new List<ushort>();
+                        foreach(var r in recData)
+                        {
+                            m.assembledCO2History.Add(r.Ppm);
+                        }
+                        inkBirdRecoveryDone = true;
+                        hist = m.assembledCO2History;
                     }
-                    inkBirdRecoveryDone = true;
-                    hist = m.assembledCO2History;
                 }
                 recording.MeasurementData.Clear();
                 Logger.WriteToLog("ReadAndStoreLatestAsync| clearing MeasurementData", LogMode.Verbose);
@@ -268,6 +293,12 @@ namespace IndoorCO2MapAppV2.Recording
 
             string effectiveDeviceId = forceDeviceId ? deviceId : snapshot.MonitorDeviceId;
 
+            inkBirdRecoveryDone = false;
+            // Same reason as in StartRecordingAsync. Safe here too: if the first read
+            // after recovery fails, MeasurementData keeps what the snapshot restored
+            // rather than adopting whatever the buffer happened to hold.
+            _monitor.ClearHistory();
+
             // Restore active recording
             ActiveRecording = new BuildingRecording
             {
@@ -307,6 +338,11 @@ namespace IndoorCO2MapAppV2.Recording
             _timer?.Dispose();
             _cts = new CancellationTokenSource();
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+
+            // As in StartRecordingAsync — the interval may have changed on the sensor
+            // while the app was gone, and this recording resumes with whatever it reads.
+            await _monitor.RefreshUpdateIntervalAsync();
+
             _ = RunLoopAsync(_cts.Token);
 #if ANDROID
             // Deliberately no permission prompt here — recovery runs behind the resume
