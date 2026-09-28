@@ -381,4 +381,251 @@
   <data name="NotificationRecordingTapToReturn" xml:space="preserve">
     <value>Tippen, um zur App zur&#252;ckzukehren</value>
   </data>
+  <data name="CommonMainMenuButton" xml:space="preserve">
+    <value>Hauptmenü</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>Wird geladen...</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="DialogCancelMeasurementTitle" xml:space="preserve">
+    <value>Messung abbrechen</value>
+  </data>
+  <data name="DialogCancelMeasurementMessage" xml:space="preserve">
+    <value>Möchten Sie die Messung wirklich abbrechen und zum Hauptmenü zurückkehren?</value>
+  </data>
+  <data name="DialogSubmitMeasurementTitle" xml:space="preserve">
+    <value>Messung übermitteln</value>
+  </data>
+  <data name="DialogSubmitMeasurementMessage" xml:space="preserve">
+    <value>Möchten Sie die Messung wirklich übermitteln?</value>
+  </data>
+  <data name="DialogUploadFailedTitle" xml:space="preserve">
+    <value>Übermittlung fehlgeschlagen</value>
+  </data>
+  <data name="DialogUploadFailedMessage" xml:space="preserve">
+    <value>Ihre Daten konnten nicht übermittelt werden und wurden NICHT gespeichert. Bitte versuchen Sie es erneut.
+
+Details: {0}</value>
+  </data>
+  <data name="DialogUploadErrorMessage" xml:space="preserve">
+    <value>Beim Übermitteln Ihrer Daten ist ein Fehler aufgetreten.
+
+Details: {0}</value>
+  </data>
+  <data name="SubmittingDataButton" xml:space="preserve">
+    <value>Daten werden übermittelt...</value>
+  </data>
+  <data name="DialogNoSensorTitle" xml:space="preserve">
+    <value>Kein Sensor</value>
+  </data>
+  <data name="DialogNoSensorMessage" xml:space="preserve">
+    <value>Bitte wählen Sie zuerst einen Sensor aus.</value>
+  </data>
+  <data name="DialogSensorNotReadyTitle" xml:space="preserve">
+    <value>Sensor nicht bereit</value>
+  </data>
+  <data name="DialogSensorNotReadyMessage" xml:space="preserve">
+    <value>Verbindung zum Sensor fehlgeschlagen. Bitte versuchen Sie es erneut.</value>
+  </data>
+  <data name="DialogDeleteHistoryTitle" xml:space="preserve">
+    <value>Verlauf löschen</value>
+  </data>
+  <data name="DialogDeleteHistoryMessage" xml:space="preserve">
+    <value>Möchten Sie Ihren gesamten lokalen Aufnahmeverlauf wirklich löschen?</value>
+  </data>
+  <data name="DialogDeleteLocationCacheMessage" xml:space="preserve">
+    <value>Möchten Sie den Standort-Cache wirklich löschen?</value>
+  </data>
+  <data name="DialogPrivacyWarningTitle" xml:space="preserve">
+    <value>Datenschutzhinweis</value>
+  </data>
+  <data name="DialogPrivacyWarningMessage" xml:space="preserve">
+    <value>Wenn Sie die GPS-Rundung deaktivieren, kann Ihr genauer Standort beim Teilen dieses Protokolls sichtbar werden. Sind Sie sicher?</value>
+  </data>
+  <data name="DialogDisableRoundingConfirm" xml:space="preserve">
+    <value>Ja, Rundung deaktivieren</value>
+  </data>
+  <data name="SettingsSectionLanguage" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="SettingsAppLanguage" xml:space="preserve">
+    <value>App-Sprache</value>
+  </data>
+  <data name="SettingsSectionSensorFilter" xml:space="preserve">
+    <value>Sensorfilter</value>
+  </data>
+  <data name="SettingsSensorFilterPlaceholder" xml:space="preserve">
+    <value>Nur Sensoren anzeigen, die diesen Text enthalten.</value>
+  </data>
+  <data name="SettingsSectionDisplay" xml:space="preserve">
+    <value>Anzeige</value>
+  </data>
+  <data name="SettingsShowSortingToggle" xml:space="preserve">
+    <value>Sortierschalter für Gebäude anzeigen</value>
+  </data>
+  <data name="SettingsShowBuildingFilter" xml:space="preserve">
+    <value>Gebäudesuchfilter anzeigen</value>
+  </data>
+  <data name="SettingsDefaultSortMode" xml:space="preserve">
+    <value>Standard-Sortierung</value>
+  </data>
+  <data name="SettingsShowWebsiteButton" xml:space="preserve">
+    <value>Button „Karte im Browser öffnen“ anzeigen</value>
+  </data>
+  <data name="SettingsShowImprintButton" xml:space="preserve">
+    <value>Button „Datenschutz und Impressum“ anzeigen</value>
+  </data>
+  <data name="SettingsShowManualButton" xml:space="preserve">
+    <value>Button „Anleitung“ anzeigen</value>
+  </data>
+  <data name="SettingsShowDiscordButton" xml:space="preserve">
+    <value>Button „Discord beitreten“ anzeigen</value>
+  </data>
+  <data name="SettingsShowRoutePreview" xml:space="preserve">
+    <value>Linienvorschau-Karte anzeigen</value>
+  </data>
+  <data name="SettingsShowChangeRoute" xml:space="preserve">
+    <value>Option „Linie wechseln“ während der Transitaufnahme anzeigen</value>
+  </data>
+  <data name="SettingsSectionRecording" xml:space="preserve">
+    <value>Aufnahme</value>
+  </data>
+  <data name="SettingsConfirmBeforeSubmit" xml:space="preserve">
+    <value>Bestätigung vor dem Übermitteln der Aufnahme</value>
+  </data>
+  <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
+    <value>Aufnahme vor der ersten Sensormessung starten erlauben</value>
+  </data>
+  <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
+    <value>Aufnahme im Hintergrund fortsetzen (zeigt eine Benachrichtigung)</value>
+  </data>
+  <data name="SettingsSectionData" xml:space="preserve">
+    <value>Daten</value>
+  </data>
+  <data name="SettingsUseLiveLocationService" xml:space="preserve">
+    <value>Live-Standortdienst verwenden (unzuverlässig, aber minütlich statt täglich aktualisiert)</value>
+  </data>
+  <data name="SettingsEnableLocationCaching" xml:space="preserve">
+    <value>Standort-Cache aktivieren</value>
+  </data>
+  <data name="SettingsCacheRangeOverride" xml:space="preserve">
+    <value>Cache-Suchradius überschreiben</value>
+  </data>
+  <data name="SettingsEnableHistory" xml:space="preserve">
+    <value>Lokalen Aufnahmeverlauf aktivieren</value>
+  </data>
+  <data name="SettingsDeleteLocationCache" xml:space="preserve">
+    <value>Standort-Cache löschen</value>
+  </data>
+  <data name="SettingsDeleteHistory" xml:space="preserve">
+    <value>Lokalen Aufnahmeverlauf löschen</value>
+  </data>
+  <data name="SettingsSectionDebug" xml:space="preserve">
+    <value>Debug</value>
+  </data>
+  <data name="SettingsRoundGps" xml:space="preserve">
+    <value>GPS-Position auf 0,5° runden</value>
+  </data>
+  <data name="SettingsCopyDebugLog" xml:space="preserve">
+    <value>Debug-Protokoll in Zwischenablage kopieren</value>
+  </data>
+  <data name="MainMenuTitle" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="MainMenuFetchingData" xml:space="preserve">
+    <value>Daten werden abgerufen...</value>
+  </data>
+  <data name="MainMenuSmartHomeNotEnabled" xml:space="preserve">
+    <value>⚠ Smart Home Integration nicht aktiviert</value>
+  </data>
+  <data name="TransitSelectRoute" xml:space="preserve">
+    <value>Linie auswählen...</value>
+  </data>
+  <data name="TransitMeasurementTitle" xml:space="preserve">
+    <value>Transitmessung</value>
+  </data>
+  <data name="TransitLineLabel" xml:space="preserve">
+    <value>Linie</value>
+  </data>
+  <data name="TransitSearchRoutesNearMe" xml:space="preserve">
+    <value>Linien in der Nähe suchen</value>
+  </data>
+  <data name="TransitApplyRouteChange" xml:space="preserve">
+    <value>Linienwechsel übernehmen</value>
+  </data>
+  <data name="TransitNoGpsPosition" xml:space="preserve">
+    <value>GPS-Position konnte nicht ermittelt werden.</value>
+  </data>
+  <data name="TransitNoStopsNearby" xml:space="preserve">
+    <value>Keine Haltestellen in der Nähe gefunden.</value>
+  </data>
+  <data name="TransitSearchFailed" xml:space="preserve">
+    <value>Suche fehlgeschlagen.</value>
+  </data>
+  <data name="TransitNoCachedStopsNearby" xml:space="preserve">
+    <value>Keine gespeicherten Haltestellen in der Nähe gefunden.</value>
+  </data>
+  <data name="TransitCacheLoadFailed" xml:space="preserve">
+    <value>Laden des Caches fehlgeschlagen.</value>
+  </data>
+  <data name="MapPageTitle" xml:space="preserve">
+    <value>Karte</value>
+  </data>
+  <data name="MapBackToHistory" xml:space="preserve">
+    <value>← Historie</value>
+  </data>
+  <data name="MapReloadTiles" xml:space="preserve">
+    <value>Kartenkacheln neu laden</value>
+  </data>
+  <data name="MapFilterBuildings" xml:space="preserve">
+    <value>Gebäude</value>
+  </data>
+  <data name="MapShowLabels" xml:space="preserve">
+    <value>Beschriftungen</value>
+  </data>
+  <data name="MapNotAvailableWindows" xml:space="preserve">
+    <value>Kartenansicht unter Windows nicht verfügbar</value>
+  </data>
+  <data name="HistoryExportData" xml:space="preserve">
+    <value>Daten exportieren</value>
+  </data>
+  <data name="HistoryImportData" xml:space="preserve">
+    <value>Daten importieren</value>
+  </data>
+  <data name="StatisticsCommunityStats" xml:space="preserve">
+    <value>Community-Statistiken</value>
+  </data>
+  <data name="StatisticsMeasurementsByCountry" xml:space="preserve">
+    <value>Messungen nach Land</value>
+  </data>
+  <data name="StatisticsColumnCountry" xml:space="preserve">
+    <value>Land</value>
+  </data>
+  <data name="StatisticsColumnCount" xml:space="preserve">
+    <value>Anzahl</value>
+  </data>
+  <data name="StatusGpsStatus" xml:space="preserve">
+    <value>GPS-Status</value>
+  </data>
+  <data name="StatusGpsPermissions" xml:space="preserve">
+    <value>GPS-Berechtigungen</value>
+  </data>
+  <data name="StatusBtStatus" xml:space="preserve">
+    <value>BT-Status</value>
+  </data>
+  <data name="StatusBtPermissions" xml:space="preserve">
+    <value>BT-Berechtigungen</value>
+  </data>
+  <data name="StatusAllReady" xml:space="preserve">
+    <value>✓ GPS &amp; Bluetooth bereit</value>
+  </data>
 </root>

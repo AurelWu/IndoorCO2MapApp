@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
               x:Class="IndoorCO2MapAppV2.Pages.StatisticsPage"
-              Title="Statistics">
+              Title="{x:Static t:Localisation.MainMenuStatisticsButton}">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -18,11 +19,11 @@
         <!-- Fixed top section -->
         <VerticalStackLayout Grid.Row="0" Spacing="12">
 
-            <Label Text="Community Stats"
+            <Label Text="{x:Static t:Localisation.StatisticsCommunityStats}"
                    Style="{StaticResource PageTitleStyle}"
                    HorizontalOptions="Center" />
 
-            <Button Text="Main Menu"
+            <Button Text="{x:Static t:Localisation.CommonMainMenuButton}"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///home"
                     HorizontalOptions="Fill" />
@@ -30,7 +31,7 @@
             <!-- Total count row (hidden while loading) -->
             <Grid ColumnDefinitions="*, Auto"
                   IsVisible="{Binding IsLoading, Converter={StaticResource InvertBooleanConverter}}">
-                <Label Text="Measurements by Country"
+                <Label Text="{x:Static t:Localisation.StatisticsMeasurementsByCountry}"
                        Style="{StaticResource CaptionLabelStyle}"
                        VerticalOptions="Center" />
                 <Label Grid.Column="1"
@@ -47,7 +48,7 @@
                                    VerticalOptions="Center"
                                    WidthRequest="20"
                                    HeightRequest="20" />
-                <Label Text="Loading..."
+                <Label Text="{x:Static t:Localisation.CommonLoading}"
                        FontSize="14"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
@@ -71,8 +72,8 @@
                       ColumnDefinitions="30,*,60,*"
                       ColumnSpacing="8">
                     <Label Text="#"       Grid.Column="0" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold"/>
-                    <Label Text="Country" Grid.Column="1" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold"/>
-                    <Label Text="Count"   Grid.Column="2" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                    <Label Text="{x:Static t:Localisation.StatisticsColumnCountry}" Grid.Column="1" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold"/>
+                    <Label Text="{x:Static t:Localisation.StatisticsColumnCount}"   Grid.Column="2" Style="{StaticResource CaptionLabelStyle}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
                 </Grid>
             </CollectionView.Header>
 

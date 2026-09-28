@@ -381,4 +381,251 @@
   <data name="NotificationRecordingTapToReturn" xml:space="preserve">
     <value>Appuyez pour revenir &#224; l'application</value>
   </data>
+  <data name="CommonMainMenuButton" xml:space="preserve">
+    <value>Menu principal</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>Chargement...</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>Oui</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>Non</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="DialogCancelMeasurementTitle" xml:space="preserve">
+    <value>Annuler la mesure</value>
+  </data>
+  <data name="DialogCancelMeasurementMessage" xml:space="preserve">
+    <value>Voulez-vous vraiment annuler et revenir à l'accueil ?</value>
+  </data>
+  <data name="DialogSubmitMeasurementTitle" xml:space="preserve">
+    <value>Envoyer la mesure</value>
+  </data>
+  <data name="DialogSubmitMeasurementMessage" xml:space="preserve">
+    <value>Voulez-vous vraiment envoyer cette mesure ?</value>
+  </data>
+  <data name="DialogUploadFailedTitle" xml:space="preserve">
+    <value>Échec de l'envoi</value>
+  </data>
+  <data name="DialogUploadFailedMessage" xml:space="preserve">
+    <value>Vos données n'ont pas pu être envoyées et n'ont PAS été enregistrées. Veuillez réessayer.
+
+Détails : {0}</value>
+  </data>
+  <data name="DialogUploadErrorMessage" xml:space="preserve">
+    <value>Une erreur s'est produite lors de l'envoi de vos données.
+
+Détails : {0}</value>
+  </data>
+  <data name="SubmittingDataButton" xml:space="preserve">
+    <value>Envoi des données...</value>
+  </data>
+  <data name="DialogNoSensorTitle" xml:space="preserve">
+    <value>Aucun capteur</value>
+  </data>
+  <data name="DialogNoSensorMessage" xml:space="preserve">
+    <value>Veuillez d'abord sélectionner un capteur.</value>
+  </data>
+  <data name="DialogSensorNotReadyTitle" xml:space="preserve">
+    <value>Capteur non prêt</value>
+  </data>
+  <data name="DialogSensorNotReadyMessage" xml:space="preserve">
+    <value>Impossible de se connecter au capteur. Veuillez réessayer.</value>
+  </data>
+  <data name="DialogDeleteHistoryTitle" xml:space="preserve">
+    <value>Supprimer l'historique</value>
+  </data>
+  <data name="DialogDeleteHistoryMessage" xml:space="preserve">
+    <value>Voulez-vous vraiment supprimer tout votre historique local d'enregistrements ?</value>
+  </data>
+  <data name="DialogDeleteLocationCacheMessage" xml:space="preserve">
+    <value>Voulez-vous vraiment supprimer le cache de localisation ?</value>
+  </data>
+  <data name="DialogPrivacyWarningTitle" xml:space="preserve">
+    <value>Avertissement de confidentialité</value>
+  </data>
+  <data name="DialogPrivacyWarningMessage" xml:space="preserve">
+    <value>La désactivation de l'arrondi GPS peut révéler votre position exacte lors du partage de ce journal. Êtes-vous sûr ?</value>
+  </data>
+  <data name="DialogDisableRoundingConfirm" xml:space="preserve">
+    <value>Oui, désactiver l'arrondi</value>
+  </data>
+  <data name="SettingsSectionLanguage" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="SettingsAppLanguage" xml:space="preserve">
+    <value>Langue de l'application</value>
+  </data>
+  <data name="SettingsSectionSensorFilter" xml:space="preserve">
+    <value>Filtre de capteurs</value>
+  </data>
+  <data name="SettingsSensorFilterPlaceholder" xml:space="preserve">
+    <value>N'afficher que les capteurs contenant ce texte.</value>
+  </data>
+  <data name="SettingsSectionDisplay" xml:space="preserve">
+    <value>Affichage</value>
+  </data>
+  <data name="SettingsShowSortingToggle" xml:space="preserve">
+    <value>Afficher le bouton de tri des bâtiments</value>
+  </data>
+  <data name="SettingsShowBuildingFilter" xml:space="preserve">
+    <value>Afficher le filtre de recherche de bâtiments</value>
+  </data>
+  <data name="SettingsDefaultSortMode" xml:space="preserve">
+    <value>Tri par défaut</value>
+  </data>
+  <data name="SettingsShowWebsiteButton" xml:space="preserve">
+    <value>Afficher le bouton « Ouvrir la carte dans le navigateur »</value>
+  </data>
+  <data name="SettingsShowImprintButton" xml:space="preserve">
+    <value>Afficher le bouton « Protection des données et mentions légales »</value>
+  </data>
+  <data name="SettingsShowManualButton" xml:space="preserve">
+    <value>Afficher le bouton « Manuel »</value>
+  </data>
+  <data name="SettingsShowDiscordButton" xml:space="preserve">
+    <value>Afficher le bouton « Rejoindre notre Discord »</value>
+  </data>
+  <data name="SettingsShowRoutePreview" xml:space="preserve">
+    <value>Afficher l'aperçu de la ligne</value>
+  </data>
+  <data name="SettingsShowChangeRoute" xml:space="preserve">
+    <value>Afficher l'option « Changer de ligne » pendant l'enregistrement</value>
+  </data>
+  <data name="SettingsSectionRecording" xml:space="preserve">
+    <value>Enregistrement</value>
+  </data>
+  <data name="SettingsConfirmBeforeSubmit" xml:space="preserve">
+    <value>Confirmation avant l'envoi de l'enregistrement</value>
+  </data>
+  <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
+    <value>Autoriser le démarrage avant la première mesure du capteur</value>
+  </data>
+  <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
+    <value>Continuer l'enregistrement en arrière-plan (affiche une notification)</value>
+  </data>
+  <data name="SettingsSectionData" xml:space="preserve">
+    <value>Données</value>
+  </data>
+  <data name="SettingsUseLiveLocationService" xml:space="preserve">
+    <value>Utiliser le service de localisation en direct (peu fiable, mis à jour chaque minute au lieu de chaque jour)</value>
+  </data>
+  <data name="SettingsEnableLocationCaching" xml:space="preserve">
+    <value>Activer la mise en cache des positions</value>
+  </data>
+  <data name="SettingsCacheRangeOverride" xml:space="preserve">
+    <value>Remplacer le rayon de recherche du cache</value>
+  </data>
+  <data name="SettingsEnableHistory" xml:space="preserve">
+    <value>Activer l'historique local des enregistrements</value>
+  </data>
+  <data name="SettingsDeleteLocationCache" xml:space="preserve">
+    <value>Supprimer le cache de localisation</value>
+  </data>
+  <data name="SettingsDeleteHistory" xml:space="preserve">
+    <value>Supprimer l'historique local des enregistrements</value>
+  </data>
+  <data name="SettingsSectionDebug" xml:space="preserve">
+    <value>Débogage</value>
+  </data>
+  <data name="SettingsRoundGps" xml:space="preserve">
+    <value>Arrondir la position GPS à 0,5°</value>
+  </data>
+  <data name="SettingsCopyDebugLog" xml:space="preserve">
+    <value>Copier le journal de débogage dans le presse-papiers</value>
+  </data>
+  <data name="MainMenuTitle" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="MainMenuFetchingData" xml:space="preserve">
+    <value>Récupération des données...</value>
+  </data>
+  <data name="MainMenuSmartHomeNotEnabled" xml:space="preserve">
+    <value>⚠ Intégration Smart Home non activée</value>
+  </data>
+  <data name="TransitSelectRoute" xml:space="preserve">
+    <value>Sélectionner une ligne...</value>
+  </data>
+  <data name="TransitMeasurementTitle" xml:space="preserve">
+    <value>Mesure en transport</value>
+  </data>
+  <data name="TransitLineLabel" xml:space="preserve">
+    <value>Ligne</value>
+  </data>
+  <data name="TransitSearchRoutesNearMe" xml:space="preserve">
+    <value>Rechercher des lignes à proximité</value>
+  </data>
+  <data name="TransitApplyRouteChange" xml:space="preserve">
+    <value>Appliquer le changement de ligne</value>
+  </data>
+  <data name="TransitNoGpsPosition" xml:space="preserve">
+    <value>Impossible d'obtenir la position GPS.</value>
+  </data>
+  <data name="TransitNoStopsNearby" xml:space="preserve">
+    <value>Aucun arrêt trouvé à proximité.</value>
+  </data>
+  <data name="TransitSearchFailed" xml:space="preserve">
+    <value>Échec de la recherche.</value>
+  </data>
+  <data name="TransitNoCachedStopsNearby" xml:space="preserve">
+    <value>Aucun arrêt en cache à proximité.</value>
+  </data>
+  <data name="TransitCacheLoadFailed" xml:space="preserve">
+    <value>Échec du chargement du cache.</value>
+  </data>
+  <data name="MapPageTitle" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="MapBackToHistory" xml:space="preserve">
+    <value>← Historique</value>
+  </data>
+  <data name="MapReloadTiles" xml:space="preserve">
+    <value>Recharger les tuiles de la carte</value>
+  </data>
+  <data name="MapFilterBuildings" xml:space="preserve">
+    <value>Bâtiments</value>
+  </data>
+  <data name="MapShowLabels" xml:space="preserve">
+    <value>Étiquettes</value>
+  </data>
+  <data name="MapNotAvailableWindows" xml:space="preserve">
+    <value>Vue carte non disponible sous Windows</value>
+  </data>
+  <data name="HistoryExportData" xml:space="preserve">
+    <value>Exporter les données</value>
+  </data>
+  <data name="HistoryImportData" xml:space="preserve">
+    <value>Importer les données</value>
+  </data>
+  <data name="StatisticsCommunityStats" xml:space="preserve">
+    <value>Statistiques de la communauté</value>
+  </data>
+  <data name="StatisticsMeasurementsByCountry" xml:space="preserve">
+    <value>Mesures par pays</value>
+  </data>
+  <data name="StatisticsColumnCountry" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="StatisticsColumnCount" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="StatusGpsStatus" xml:space="preserve">
+    <value>État GPS</value>
+  </data>
+  <data name="StatusGpsPermissions" xml:space="preserve">
+    <value>Autorisations GPS</value>
+  </data>
+  <data name="StatusBtStatus" xml:space="preserve">
+    <value>État BT</value>
+  </data>
+  <data name="StatusBtPermissions" xml:space="preserve">
+    <value>Autorisations BT</value>
+  </data>
+  <data name="StatusAllReady" xml:space="preserve">
+    <value>✓ GPS et Bluetooth prêts</value>
+  </data>
 </root>

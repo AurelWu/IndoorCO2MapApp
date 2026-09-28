@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
               xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
               x:Class="IndoorCO2MapAppV2.Pages.NewsPage"
-              Title="News">
+              Title="{x:Static t:Localisation.MainMenuNewsButton}">
 
     <Grid RowDefinitions="Auto, *" Padding="30" RowSpacing="12">
 
         <!-- Fixed top -->
         <VerticalStackLayout Grid.Row="0" Spacing="12">
 
-            <Label Text="News"
+            <Label Text="{x:Static t:Localisation.MainMenuNewsButton}"
                    FontSize="24"
                    HorizontalOptions="Center" />
 
-            <Button Text="Main Menu"
+            <Button Text="{x:Static t:Localisation.CommonMainMenuButton}"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///home"
                     HorizontalOptions="Fill" />
@@ -26,7 +27,7 @@
                                    VerticalOptions="Center"
                                    WidthRequest="20"
                                    HeightRequest="20" />
-                <Label Text="Loading..."
+                <Label Text="{x:Static t:Localisation.CommonLoading}"
                        FontSize="14"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>

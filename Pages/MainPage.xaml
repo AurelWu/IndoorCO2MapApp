@@ -7,7 +7,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:c="clr-namespace:IndoorCO2MapAppV2.Controls"
              x:Class="IndoorCO2MapAppV2.Pages.MainPage"
-             Title="Home">
+             Title="{x:Static t:Localisation.MainMenuTitle}">
 
    <local:AppPage.Resources>
        <ResourceDictionary>
@@ -16,8 +16,8 @@
            <ui:LocationDisplayConverter x:Key="LocationDisplayConverter" />
            <ui:TransitRouteDisplayConverter x:Key="TransitRouteDisplayConverter" />
            <ui:BooleanToTextConverter x:Key="FetchButtonTextConverter"
-                      TrueText="Fetching Data..."
-                      FalseText="Search Buildings"/>
+                      TrueText="{x:Static t:Localisation.MainMenuFetchingData}"
+                      FalseText="{x:Static t:Localisation.SearchBuildingButtonLabel_Ready}"/>
        </ResourceDictionary>
    </local:AppPage.Resources>
 
@@ -134,7 +134,7 @@
                         <HorizontalStackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnSmartHomeInfoTapped"/>
                         </HorizontalStackLayout.GestureRecognizers>
-                        <Label Text="⚠ Smart Home Integration not enabled"
+                        <Label Text="{x:Static t:Localisation.MainMenuSmartHomeNotEnabled}"
                                TextColor="#E65100" FontSize="13" VerticalOptions="Center"/>
                         <Label Text="ⓘ" TextColor="#512BD4" FontSize="15"
                                FontAttributes="Bold" VerticalOptions="Center"/>
@@ -343,7 +343,7 @@
                                 <Picker ItemsSource="{Binding Transit.FilteredRoutes}"
                                         SelectedItem="{Binding Transit.SelectedRoute}"
                                         ItemDisplayBinding="{Binding Converter={StaticResource TransitRouteDisplayConverter}}"
-                                        Title="Select route..." />
+                                        Title="{x:Static t:Localisation.TransitSelectRoute}" />
                             </Border>
                             <Label Grid.Column="1"
                                    Text="★"

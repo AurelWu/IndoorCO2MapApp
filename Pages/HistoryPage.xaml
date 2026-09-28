@@ -6,7 +6,7 @@
               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
               xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
               x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
-              Title="History">
+              Title="{x:Static t:Localisation.MainMenuHistoryButtonText}">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -255,22 +255,22 @@
         <!-- Top UI (fixed area) -->
         <VerticalStackLayout Grid.Row="0" Spacing="12">
 
-            <Button Text="Main Menu"
+            <Button Text="{x:Static t:Localisation.CommonMainMenuButton}"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///home"
                     HorizontalOptions="Fill" />
 
             <!-- Backup + Import + Map -->
             <HorizontalStackLayout Spacing="15">
-                <Button Text="Export Data"
+                <Button Text="{x:Static t:Localisation.HistoryExportData}"
                         Command="{Binding ExportCommand}"
                         Style="{StaticResource TonalButtonStyle}" />
 
-                <Button Text="Import Data"
+                <Button Text="{x:Static t:Localisation.HistoryImportData}"
                         Command="{Binding ImportCommand}"
                         Style="{StaticResource TonalButtonStyle}" />
 
-                <Button Text="Map"
+                <Button Text="{x:Static t:Localisation.MapPageTitle}"
                         Clicked="OnNavigateClicked"
                         CommandParameter="///map"
                         Style="{StaticResource TonalButtonStyle}" />

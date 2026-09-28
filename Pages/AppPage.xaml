@@ -3,6 +3,7 @@
     x:Class="IndoorCO2MapAppV2.Pages.AppPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
     xmlns:util="clr-namespace:IndoorCO2MapAppV2.UIUtility"
     xmlns:vm="clr-namespace:IndoorCO2MapAppV2.ViewModels">
 
@@ -40,7 +41,7 @@
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="gps_icon_v2.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-                            <Label Text="GPS Status" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{x:Static t:Localisation.StatusGpsStatus}" FontSize="11" VerticalOptions="Center"/>
                             <Label Text="{Binding GpsStatusSymbol}"
                                    TextColor="{Binding GpsStatusColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
@@ -59,7 +60,7 @@
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="gps_icon_permission.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-                            <Label Text="GPS Permissions" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{x:Static t:Localisation.StatusGpsPermissions}" FontSize="11" VerticalOptions="Center"/>
                             <Label Text="{Binding GpsPermissionSymbol}"
                                    TextColor="{Binding GpsPermissionColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
@@ -78,7 +79,7 @@
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="bluetoothstatus.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-                            <Label Text="BT Status" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{x:Static t:Localisation.StatusBtStatus}" FontSize="11" VerticalOptions="Center"/>
                             <Label Text="{Binding BtStatusSymbol}"
                                    TextColor="{Binding BtStatusColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
@@ -97,7 +98,7 @@
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
                             <Image Source="bluetoothscan.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-                            <Label Text="BT Permissions" FontSize="11" VerticalOptions="Center"/>
+                            <Label Text="{x:Static t:Localisation.StatusBtPermissions}" FontSize="11" VerticalOptions="Center"/>
                             <Label Text="{Binding BtPermissionSymbol}"
                                    TextColor="{Binding BtPermissionColor}"
                                    FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
@@ -113,7 +114,7 @@
                             HorizontalOptions="Center"
                             Padding="14,5">
                         <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
-                        <Label Text="✓ GPS &amp; Bluetooth ready"
+                        <Label Text="{x:Static t:Localisation.StatusAllReady}"
                                TextColor="White"
                                FontSize="12"
                                VerticalOptions="Center" />

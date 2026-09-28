@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
                xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
                xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
                x:Class="IndoorCO2MapAppV2.Pages.MapPage"
-               Title="Map">
+               Title="{x:Static t:Localisation.MapPageTitle}">
 
     <Grid RowDefinitions="Auto, *">
 
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto" Padding="10,10,10,4" ColumnSpacing="10">
             <Button Grid.Column="0"
-                    Text="← History"
+                    Text="{x:Static t:Localisation.MapBackToHistory}"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///history"
                     Style="{StaticResource TonalButtonStyle}" />
@@ -21,17 +22,17 @@
                     Clicked="OnReloadTilesClicked"
                     Style="{StaticResource SecondaryButtonStyle}"
                     HeightRequest="36" WidthRequest="44" Padding="0"
-                    ToolTipProperties.Text="Reload map tiles" />
+                    ToolTipProperties.Text="{x:Static t:Localisation.MapReloadTiles}" />
             <Border Grid.Column="3"
                     StrokeShape="RoundRectangle 8"
                     BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
                     Stroke="Transparent" Padding="3">
                 <HorizontalStackLayout Spacing="2">
-                    <Button x:Name="BuildingsToggleBtn" Text="Buildings"
+                    <Button x:Name="BuildingsToggleBtn" Text="{x:Static t:Localisation.MapFilterBuildings}"
                             Clicked="OnBuildingsToggleClicked"
                             FontSize="12" Padding="10,4"
                             HeightRequest="32" CornerRadius="6" />
-                    <Button x:Name="TransitToggleBtn" Text="Transit"
+                    <Button x:Name="TransitToggleBtn" Text="{x:Static t:Localisation.MainMenuModeTransit}"
                             Clicked="OnTransitToggleClicked"
                             FontSize="12" Padding="10,4"
                             HeightRequest="32" CornerRadius="6" />
@@ -49,7 +50,7 @@
                     BackgroundColor="{AppThemeBinding Light=#CCFFFFFF, Dark=#CC1C1C1C}"
                     StrokeShape="RoundRectangle 6" Padding="8,4">
                 <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
-                    <Label Text="Labels" FontSize="12" VerticalOptions="Center" />
+                    <Label Text="{x:Static t:Localisation.MapShowLabels}" FontSize="12" VerticalOptions="Center" />
                     <CheckBox x:Name="ShowLabelsCheckBox" IsChecked="True"
                               CheckedChanged="OnShowLabelsChanged" />
                 </HorizontalStackLayout>
@@ -83,7 +84,7 @@
             </Border>
 
             <Label x:Name="NoMapLabel"
-                   Text="Map view not available on Windows"
+                   Text="{x:Static t:Localisation.MapNotAvailableWindows}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    IsVisible="False" />
             <ActivityIndicator x:Name="LoadingIndicator"

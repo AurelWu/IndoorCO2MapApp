@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:AppPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
              xmlns:local="clr-namespace:IndoorCO2MapAppV2.Pages"
              xmlns:c="clr-namespace:IndoorCO2MapAppV2.Controls"
              x:Class="IndoorCO2MapAppV2.Pages.SettingsPage"
-             Title="Settings">
+             Title="{x:Static t:Localisation.MainMenuSettingsButtonText}">
 
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="14">
 
-        <Button Text="Main Menu" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
+        <Button Text="{x:Static t:Localisation.CommonMainMenuButton}" Clicked="OnNavigateClicked" CommandParameter="///home" HorizontalOptions="Fill"/>
 
         <!--
         <Button Text="Sensor Debug" Clicked="OnNavigateClicked" CommandParameter="///sensorDebug" HorizontalOptions="Fill"/>
@@ -20,8 +21,8 @@
         <!-- ===== Language ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Language" Style="{StaticResource SectionLabelStyle}" />
-                <c:LabeledSegmentedControl Label="App Language"
+                <Label Text="{x:Static t:Localisation.SettingsSectionLanguage}" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSegmentedControl Label="{x:Static t:Localisation.SettingsAppLanguage}"
                     Items="{Binding LanguageOptions}"
                     SelectedItem="{Binding SelectedLanguage}" />
                 <Label Text="{Binding LanguageRestartHint}"
@@ -33,10 +34,10 @@
         <!-- ===== Sensor ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Sensor Filter" Style="{StaticResource SectionLabelStyle}" />
+                <Label Text="{x:Static t:Localisation.SettingsSectionSensorFilter}" Style="{StaticResource SectionLabelStyle}" />
                 <Entry
                     Text="{Binding SensorFilter}"
-                    Placeholder="Only show sensors containing this string."
+                    Placeholder="{x:Static t:Localisation.SettingsSensorFilterPlaceholder}"
                     ClearButtonVisibility="WhileEditing" />
             </VerticalStackLayout>
         </Border>
@@ -44,36 +45,36 @@
         <!-- ===== Display ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Display" Style="{StaticResource SectionLabelStyle}" />
-                <c:LabeledSwitch Text="Show Building Sorting Toggle" IsToggled="{Binding DisplaySortingModeToggle}" />
-                <c:LabeledSwitch Text="Show Building Search Filter" IsToggled="{Binding DisplayBuildingFilterInputField}" />
-                <c:LabeledSegmentedControl Label="Default Sort Mode" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
-                <c:LabeledSwitch Text="Show 'Open Map in Browser' Button" IsToggled="{Binding ShowWebsiteButton}" />
-                <c:LabeledSwitch Text="Show 'Data Protection Info and Imprint' Button" IsToggled="{Binding ShowImprintButton}" />
-                <c:LabeledSwitch Text="Show 'Manual' Button" IsToggled="{Binding ShowManualButton}" />
-                <c:LabeledSwitch Text="Show news notification badge" IsToggled="{Binding ShowNewsNotification}" />
-                <c:LabeledSwitch Text="Show 'Join our Discord' Button" IsToggled="{Binding ShowDiscordButton}" />
+                <Label Text="{x:Static t:Localisation.SettingsSectionDisplay}" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowSortingToggle}" IsToggled="{Binding DisplaySortingModeToggle}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowBuildingFilter}" IsToggled="{Binding DisplayBuildingFilterInputField}" />
+                <c:LabeledSegmentedControl Label="{x:Static t:Localisation.SettingsDefaultSortMode}" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowWebsiteButton}" IsToggled="{Binding ShowWebsiteButton}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowImprintButton}" IsToggled="{Binding ShowImprintButton}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowManualButton}" IsToggled="{Binding ShowManualButton}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowNewsNotification}" IsToggled="{Binding ShowNewsNotification}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowDiscordButton}" IsToggled="{Binding ShowDiscordButton}" />
             </VerticalStackLayout>
         </Border>
 
         <!-- ===== Transit ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Transit" Style="{StaticResource SectionLabelStyle}" />
-                <c:LabeledSwitch Text="Show Route Preview Map" IsToggled="{Binding ShowRoutePreview}" />
-                <c:LabeledSwitch Text="Show 'Change Route' option during transit recording" IsToggled="{Binding ShowChangeRouteInRecording}" />
+                <Label Text="{x:Static t:Localisation.MainMenuModeTransit}" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowRoutePreview}" IsToggled="{Binding ShowRoutePreview}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowChangeRoute}" IsToggled="{Binding ShowChangeRouteInRecording}" />
             </VerticalStackLayout>
         </Border>
 
         <!-- ===== Recording ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Recording" Style="{StaticResource SectionLabelStyle}" />
-                <c:LabeledSwitch Text="Confirmation before Submitting Recording" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
-                <c:LabeledSwitch Text="Allow starting a recording before the first sensor reading"
+                <Label Text="{x:Static t:Localisation.SettingsSectionRecording}" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsConfirmBeforeSubmit}" IsToggled="{Binding ConfirmationBeforeRecordingUpload}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsAllowStartWithoutSensorData}"
                                  IsToggled="{Binding AllowStartWithoutSensorData}" />
                 <!-- Android only: iOS has no equivalent foreground service. -->
-                <c:LabeledSwitch Text="Keep recording when app is in background (shows a notification)"
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsKeepRecordingInBackground}"
                                  IsToggled="{Binding KeepRecordingInBackground}"
                                  IsVisible="{OnPlatform Default=False, Android=True}" />
             </VerticalStackLayout>
@@ -82,20 +83,20 @@
         <!-- ===== Data ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Data" Style="{StaticResource SectionLabelStyle}" />
-                <c:LabeledSwitch Text="Use live location service (unreliable but updated every minute instead of daily)" IsToggled="{Binding UseLiveLocationService}" />
-                <c:LabeledSwitch Text="Enable Location Caching" IsToggled="{Binding EnableLocationCaching}" />
-                <c:LabeledSegmentedControl Label="Cache Search Range Override"
+                <Label Text="{x:Static t:Localisation.SettingsSectionData}" Style="{StaticResource SectionLabelStyle}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsUseLiveLocationService}" IsToggled="{Binding UseLiveLocationService}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsEnableLocationCaching}" IsToggled="{Binding EnableLocationCaching}" />
+                <c:LabeledSegmentedControl Label="{x:Static t:Localisation.SettingsCacheRangeOverride}"
                     Items="{Binding CacheRangeOverrideOptions}"
                     SelectedItem="{Binding CacheRangeOverride}" />
-                <c:LabeledSwitch Text="Enable Local Recording History" IsToggled="{Binding EnableHistory}" />
-                <Button Text="Delete Location Cache"
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsEnableHistory}" IsToggled="{Binding EnableHistory}" />
+                <Button Text="{x:Static t:Localisation.SettingsDeleteLocationCache}"
                         Clicked="OnDeleteLocationCacheClicked"
                         Style="{StaticResource SecondaryButtonStyle}"
                         TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
                         BorderColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
                         HorizontalOptions="Fill"/>
-                <Button Text="Delete Local Recording History"
+                <Button Text="{x:Static t:Localisation.SettingsDeleteHistory}"
                         Clicked="OnDeleteRecordingHistoryClicked"
                         Style="{StaticResource SecondaryButtonStyle}"
                         TextColor="{AppThemeBinding Light={StaticResource ErrorColor}, Dark={StaticResource ErrorColorDark}}"
@@ -107,9 +108,9 @@
         <!-- ===== Debug ===== -->
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
-                <Label Text="Debug" Style="{StaticResource SectionLabelStyle}" />
+                <Label Text="{x:Static t:Localisation.SettingsSectionDebug}" Style="{StaticResource SectionLabelStyle}" />
                 <Grid ColumnDefinitions="*, Auto">
-                    <Label Text="Round GPS Position to 0.5°"
+                    <Label Text="{x:Static t:Localisation.SettingsRoundGps}"
                            Grid.Column="0"
                            VerticalOptions="Center" />
                     <Switch x:Name="RoundGpsSwitch"
@@ -117,7 +118,7 @@
                             Grid.Column="1"
                             Toggled="OnRoundGpsToggled" />
                 </Grid>
-                <Button Text="Copy Debug Log to Clipboard"
+                <Button Text="{x:Static t:Localisation.SettingsCopyDebugLog}"
                         Clicked="OnCopyDebugLogClicked"
                         Style="{StaticResource SecondaryButtonStyle}"
                         HorizontalOptions="Fill"/>

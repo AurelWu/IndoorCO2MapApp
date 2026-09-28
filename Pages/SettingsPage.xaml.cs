@@ -32,10 +32,10 @@ namespace IndoorCO2MapAppV2.Pages
         private async Task DeleteRecordingHistory()
         {
             bool answer = await DisplayAlertAsync(
-               "Delete History",
-               "Are you sure you want to delete your entire  local Recording History?",
-               "Yes",
-               "No"
+               Localisation.DialogDeleteHistoryTitle,
+               Localisation.DialogDeleteHistoryMessage,
+               Localisation.DialogYes,
+               Localisation.DialogNo
                );
 
             if (!answer)
@@ -57,10 +57,10 @@ namespace IndoorCO2MapAppV2.Pages
         private async Task DeleteLocationCache()
         {
             bool answer = await DisplayAlertAsync(
-               "Delete Location Cache",
-               "Are you sure you want to delete the location cache?",
-               "Yes",
-               "No"
+               Localisation.SettingsDeleteLocationCache,
+               Localisation.DialogDeleteLocationCacheMessage,
+               Localisation.DialogYes,
+               Localisation.DialogNo
                );
 
             if (!answer)
@@ -78,10 +78,10 @@ namespace IndoorCO2MapAppV2.Pages
             if (!e.Value)
             {
                 bool confirmed = await DisplayAlertAsync(
-                    "Privacy Warning",
-                    "Disabling GPS rounding may expose your precise location when sharing this log. Are you sure?",
-                    "Yes, disable rounding",
-                    "Cancel"
+                    Localisation.DialogPrivacyWarningTitle,
+                    Localisation.DialogPrivacyWarningMessage,
+                    Localisation.DialogDisableRoundingConfirm,
+                    Localisation.DialogCancel
                 );
                 if (!confirmed)
                 {

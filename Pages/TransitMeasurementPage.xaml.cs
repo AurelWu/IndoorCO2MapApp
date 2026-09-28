@@ -482,7 +482,7 @@ namespace IndoorCO2MapAppV2.Pages
                 {
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        EndpointStatusLabel.Text = "Could not get GPS position.";
+                        EndpointStatusLabel.Text = Localisation.TransitNoGpsPosition;
                         EndpointStatusLabel.IsVisible = true;
                     });
                     return;
@@ -503,7 +503,7 @@ namespace IndoorCO2MapAppV2.Pages
                         EndpointPicker.SelectedIndex = 0;
                     else
                     {
-                        EndpointStatusLabel.Text = "No stops found nearby.";
+                        EndpointStatusLabel.Text = Localisation.TransitNoStopsNearby;
                         EndpointStatusLabel.IsVisible = true;
                     }
                 });
@@ -513,7 +513,7 @@ namespace IndoorCO2MapAppV2.Pages
                 Logger.WriteToLog("TransitMeasurementPage|SearchEndpointAsync failed: " + ex.Message);
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    EndpointStatusLabel.Text = "Search failed.";
+                    EndpointStatusLabel.Text = Localisation.TransitSearchFailed;
                     EndpointStatusLabel.IsVisible = true;
                 });
             }
@@ -542,7 +542,7 @@ namespace IndoorCO2MapAppV2.Pages
                 var loc = await locationService.GetCurrentLocationAsync();
                 if (loc == null)
                 {
-                    EndpointStatusLabel.Text = "Could not get GPS position.";
+                    EndpointStatusLabel.Text = Localisation.TransitNoGpsPosition;
                     EndpointStatusLabel.IsVisible = true;
                     return;
                 }
@@ -558,14 +558,14 @@ namespace IndoorCO2MapAppV2.Pages
                     EndpointPicker.SelectedIndex = 0;
                 else
                 {
-                    EndpointStatusLabel.Text = "No cached stops found nearby.";
+                    EndpointStatusLabel.Text = Localisation.TransitNoCachedStopsNearby;
                     EndpointStatusLabel.IsVisible = true;
                 }
             }
             catch (Exception ex)
             {
                 Logger.WriteToLog("TransitMeasurementPage|LoadEndpointFromCacheAsync failed: " + ex.Message);
-                EndpointStatusLabel.Text = "Cache load failed.";
+                EndpointStatusLabel.Text = Localisation.TransitCacheLoadFailed;
                 EndpointStatusLabel.IsVisible = true;
             }
         }
@@ -587,10 +587,10 @@ namespace IndoorCO2MapAppV2.Pages
         private async Task CancelMeasurementAsync()
         {
             bool answer = await DisplayAlertAsync(
-                "Cancel Measurement",
-                "Are you sure you want to cancel and return to Home?",
-                "Yes",
-                "No"
+                Localisation.DialogCancelMeasurementTitle,
+                Localisation.DialogCancelMeasurementMessage,
+                Localisation.DialogYes,
+                Localisation.DialogNo
             );
 
             if (answer)
@@ -617,9 +617,9 @@ namespace IndoorCO2MapAppV2.Pages
             if (UserSettings.Instance.ConfirmUpload)
             {
                 bool answer = await DisplayAlertAsync(
-                    "Submit Measurement",
-                    "Are you sure you want to submit the measurement?",
-                    "Yes", "No");
+                    Localisation.DialogSubmitMeasurementTitle,
+                    Localisation.DialogSubmitMeasurementMessage,
+                    Localisation.DialogYes, Localisation.DialogNo);
                 if (!answer) return;
             }
 
@@ -627,7 +627,7 @@ namespace IndoorCO2MapAppV2.Pages
             string originalButtonText = SubmitButton.Text;
             string customNote = NoteEditor.Text?.Trim() ?? "";
 
-            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = "Submitting data...");
+            await MainThread.InvokeOnMainThreadAsync(() => SubmitButton.Text = Localisation.SubmittingDataButton);
 
             try
             {
@@ -653,8 +653,8 @@ namespace IndoorCO2MapAppV2.Pages
                     // Upload failed — keep the recording active so the user can retry,
                     // do NOT save history or show the success banner.
                     await DisplayAlertAsync(
-                        "Upload Failed",
-                        $"Your data could not be submitted and was NOT saved. Please try again.\n\nDetails: {response.ErrorMessage}",
+                        Localisation.DialogUploadFailedTitle,
+                        string.Format(Localisation.DialogUploadFailedMessage, response.ErrorMessage),
                         "OK"
                     );
                     return;
@@ -714,8 +714,8 @@ namespace IndoorCO2MapAppV2.Pages
             catch (Exception ex)
             {
                 await DisplayAlertAsync(
-                    "Upload Failed",
-                    $"Something went wrong while submitting your data.\n\nDetails: {ex.Message}",
+                    Localisation.DialogUploadFailedTitle,
+                    string.Format(Localisation.DialogUploadErrorMessage, ex.Message),
                     "OK");
             }
             finally

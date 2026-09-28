@@ -717,7 +717,7 @@ namespace IndoorCO2MapAppV2.Pages
                 var selectedDevice = _mainPageViewModel.Sensor.SelectedDevice;
                 if (selectedDevice == null)
                 {
-                    await DisplayAlertAsync("No Sensor", "Please select a sensor first.", "OK");
+                    await DisplayAlertAsync(Localisation.DialogNoSensorTitle, Localisation.DialogNoSensorMessage, "OK");
                     return;
                 }
 
@@ -727,7 +727,7 @@ namespace IndoorCO2MapAppV2.Pages
                 // loop with a null provider which would crash on the first RefreshHistoryAsync.
                 if (CO2Monitors.CO2MonitorManager.Instance.ActiveCO2MonitorProvider == null)
                 {
-                    await DisplayAlertAsync("Sensor Not Ready", "Could not connect to the sensor. Please try again.", "OK");
+                    await DisplayAlertAsync(Localisation.DialogSensorNotReadyTitle, Localisation.DialogSensorNotReadyMessage, "OK");
                     return;
                 }
 

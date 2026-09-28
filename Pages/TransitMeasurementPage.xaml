@@ -7,7 +7,7 @@
                xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
                xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
                x:Class="IndoorCO2MapAppV2.Pages.TransitMeasurementPage"
-               Title="Transit Measurement">
+               Title="{x:Static t:Localisation.TransitMeasurementTitle}">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -77,7 +77,7 @@
                 <!-- Header row: current route label + expand toggle -->
                 <Grid ColumnDefinitions="*,Auto">
                     <VerticalStackLayout Grid.Column="0" Spacing="2">
-                        <Label Text="Transit Line" Style="{StaticResource SectionLabelStyle}" />
+                        <Label Text="{x:Static t:Localisation.TransitLineLabel}" Style="{StaticResource SectionLabelStyle}" />
                         <Label x:Name="CurrentRouteLabel" FontSize="13" />
                     </VerticalStackLayout>
                     <Button Grid.Column="1"
@@ -95,7 +95,7 @@
                     <!-- Search button + spinner -->
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                         <Button x:Name="RouteSearchButton" Grid.Column="0"
-                                Text="Search routes near me"
+                                Text="{x:Static t:Localisation.TransitSearchRoutesNearMe}"
                                 Clicked="OnSearchRoutesClicked"
                                 HorizontalOptions="Fill" />
                         <ActivityIndicator x:Name="RouteSearchIndicator" Grid.Column="1"
@@ -117,7 +117,7 @@
                             <Picker x:Name="ChangeRoutePicker"
                                     ItemDisplayBinding="{Binding Converter={StaticResource TransitRouteDisplayConverter}}"
                                     SelectedIndexChanged="OnChangeRoutePickerChanged"
-                                    Title="Select route..." />
+                                    Title="{x:Static t:Localisation.TransitSelectRoute}" />
                         </Border>
                         <Label x:Name="ChangeRouteStarLabel"
                                Grid.Column="1" Text="★" FontSize="30"
@@ -157,7 +157,7 @@
 
                     <!-- Confirm button -->
                     <Button x:Name="ConfirmRouteButton"
-                            Text="Apply Route Change"
+                            Text="{x:Static t:Localisation.TransitApplyRouteChange}"
                             Clicked="OnConfirmRouteChangeClicked"
                             HorizontalOptions="Fill" />
 
