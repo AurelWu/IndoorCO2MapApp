@@ -36,6 +36,14 @@ namespace IndoorCO2MapAppV2.Pages
         private bool _trimUiReady;
         private bool _suppressStatePersist;
 
+        /// <summary>
+        /// Fixed range for every search started from this page — destination stops and
+        /// the mid-journey route change. Unlike the start-station search on the main
+        /// menu this is deliberately not user-selectable: you are already aboard, so the
+        /// relevant stops are the ones ahead of you rather than a radius you chose.
+        /// </summary>
+        private const int TransitSearchRangeMeters = 500;
+
         private readonly TransitSearchViewModel _changeRouteVm = new();
         private bool _changeRouteExpanded;
 #if !WINDOWS
@@ -489,7 +497,7 @@ namespace IndoorCO2MapAppV2.Pages
                 }
                 double lat = loc.Latitude, lon = loc.Longitude;
 #endif
-                var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, 250);
+                var (stations, _) = await PMTilesTransitService.Instance.SearchAsync(lat, lon, TransitSearchRangeMeters);
                 if (UserSettings.Instance.EnableLocationCaching)
                 {
                     foreach (var s in stations)
@@ -549,8 +557,9 @@ namespace IndoorCO2MapAppV2.Pages
                 lat = loc.Latitude;
                 lon = loc.Longitude;
 #endif
-                int range = UserSettings.Instance.CacheRangeOverrideMeters > 0
-                    ? UserSettings.Instance.CacheRangeOverrideMeters : 250;
+                // 500m floor, but a user who widened the cache range override keeps it —
+                // Max also covers the unset case, where the override is 0.
+                int range = Math.Max(TransitSearchRangeMeters, UserSettings.Instance.CacheRangeOverrideMeters);
                 var all = await App.TransitStationCacheDb.GetAllAsync(lat, lon);
                 var stations = all.Where(s => s.Distance <= range).ToList();
                 SetEndpointPickerSource(stations);
@@ -802,7 +811,7 @@ namespace IndoorCO2MapAppV2.Pages
                 if (loc == null) return;
                 double lat = loc.Latitude, lon = loc.Longitude;
 #endif
-                await _changeRouteVm.SearchTransitAsync(lat, lon, 250);
+                await _changeRouteVm.SearchTransitAsync(lat, lon, TransitSearchRangeMeters);
                 RefreshChangeRoutePickerItems();
             }
             finally
