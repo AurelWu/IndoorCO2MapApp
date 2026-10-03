@@ -46,6 +46,10 @@ namespace IndoorCO2MapAppV2
             window.Destroying += async (s, e) =>
             {
                 ViewModels.StatusViewModel.Instance.Stop();
+                // Same rule as Stopped below. Swiping the app away destroys the window, but
+                // the foreground service keeps the process — and the recording — alive, so
+                // dropping the sensor here left it recording with no sensor attached.
+                if (Recording.RecordingManager.Instance.IsRecording) return;
                 await CO2MonitorManager.Instance.DisconnectAsync();
             };
 

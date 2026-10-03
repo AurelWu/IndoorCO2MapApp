@@ -49,6 +49,9 @@ namespace IndoorCO2MapAppV2.Pages
         private CancellationTokenSource? _gpsCts;
         private CancellationTokenSource? _recoveryCts;
         private List<BluetoothDeviceModel> _filteredDevices = [];
+        // Set while code rather than the user moves the picker, so SelectedIndexChanged
+        // doesn't turn a resync into another connect.
+        private bool _programmaticPickerChange;
 
         private bool pageActive = true;
         private int _transitSearchRange = 250;
@@ -64,8 +67,16 @@ namespace IndoorCO2MapAppV2.Pages
             _mainPageViewModel = new MainPageViewModel();
             BindingContext = _mainPageViewModel;
 
-            CO2MonitorPicker.ItemsSource = _mainPageViewModel.Sensor.Devices.Select(d => d.DisplayName).ToList();
+            RebuildDevicePicker();
             CO2MonitorPicker.SelectedIndexChanged += DevicePicker_SelectedIndexChanged;
+            // Whatever connects a sensor — the picker, recovery, resume, the reconnect timer —
+            // the picker follows it. Only a scan used to move it, so it could show one sensor
+            // while another was in use.
+            _mainPageViewModel.Sensor.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(SensorViewModel.SelectedDevice))
+                    MainThread.BeginInvokeOnMainThread(RebuildDevicePicker);
+            };
 
             sortAlphabetical = UserSettings.Instance.SortBuildingsAlphabetical;
 
@@ -225,6 +236,21 @@ namespace IndoorCO2MapAppV2.Pages
                 // Immediately attempt GPS now that permission has been granted/confirmed,
                 // rather than waiting for the first loop iteration (up to 15 seconds).
                 try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
+            }
+
+            // A recording still running in this process is not one to recover. Its snapshot
+            // exists for as long as any recording runs, so after the app was closed and
+            // reopened (the foreground service keeps the process alive, but the window and
+            // this page are rebuilt) recovery used to rescan, reselect and reconnect the
+            // sensor under the live loop, then replace the live recording with one rebuilt
+            // from the snapshot. Return to it instead.
+            if (RecordingManager.Instance.IsRecording)
+            {
+                bool isTransit = RecordingManager.Instance.ActiveRecording?
+                    .AdditionalDataByParameter.ContainsKey("routeID") == true;
+                Logger.WriteToLog($"OnAppearing: recording already active, returning to it ({(isTransit ? "transit" : "building")})");
+                await NavigateAsync(isTransit ? "///transit" : "///building");
+                return;
             }
 
             bool recovered = false;
@@ -559,6 +585,8 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void DevicePicker_SelectedIndexChanged(object? sender, EventArgs e)
         {
+            if (_programmaticPickerChange) return;
+
             int index = CO2MonitorPicker.SelectedIndex;
 
             if (index >= 0 && index < _filteredDevices.Count)
@@ -597,18 +625,74 @@ namespace IndoorCO2MapAppV2.Pages
                     clearBeforeScan: false);
             }
 
+            RebuildDevicePicker();
+            if (_filteredDevices.Count == 0) return;
+
+            // Keep the sensor in use if this scan found it again; otherwise take the first one
+            // found. This used to force index 0 after every scan — with two sensors in range
+            // that is discovery order, a coin flip that silently dropped the one in use — and
+            // selected it twice, the second time via the picker event.
+            if (IndexOfCurrentSensor() >= 0)
+            {
+                // StartScanAsync zeroed the live values; re-read them for the sensor we kept.
+                await _mainPageViewModel.Sensor.RefreshLiveCO2Async();
+                await _mainPageViewModel.Sensor.RefreshUpdateIntervalAsync();
+                return;
+            }
+
+            SetPickerIndex(0);
+            _mainPageViewModel.Sensor.SelectDeviceAsync(_filteredDevices[0]).SafeFireAndForget("RefreshSensorListAsync|_mainPageViewModel.Sensor.SelectDeviceAsync");
+        }
+
+        /// <summary>
+        /// Rebuilds the sensor picker and points it at the sensor in use. The picker isn't
+        /// bound to the manager, so this is what keeps the two in step: the items and
+        /// <see cref="_filteredDevices"/> are always built together — the constructor used to
+        /// fill only the items, so on a page rebuilt after the app was reopened every pick was
+        /// silently ignored — and the selection follows the connection.
+        /// </summary>
+        private void RebuildDevicePicker()
+        {
             var sf = UserSettings.Instance.SensorFilter?.Trim() ?? "";
             _filteredDevices = _mainPageViewModel.Sensor.Devices
                 .Where(d => string.IsNullOrEmpty(sf) ||
                             d.Name.Contains(sf, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            CO2MonitorPicker.ItemsSource = _filteredDevices.Select(d => d.DisplayName).ToList();
 
-            if (_filteredDevices.Count > 0)
+            // The sensor in use always gets a row, even when it isn't in this scan's results:
+            // recovery can connect a paired sensor that never advertised, and the picker must
+            // be able to show what is actually connected.
+            var current = _mainPageViewModel.Sensor.SelectedDevice;
+            if (current != null && IndexOfCurrentSensor() < 0)
+                _filteredDevices.Add(current);
+
+            _programmaticPickerChange = true;
+            try
             {
-                CO2MonitorPicker.SelectedIndex = 0;
-                _mainPageViewModel.Sensor.SelectDeviceAsync(_filteredDevices[0]).SafeFireAndForget("RefreshSensorListAsync|_mainPageViewModel.Sensor.SelectDeviceAsync");
+                CO2MonitorPicker.ItemsSource = _filteredDevices.Select(d => d.DisplayName).ToList();
+                CO2MonitorPicker.SelectedIndex = IndexOfCurrentSensor();
             }
+            finally
+            {
+                _programmaticPickerChange = false;
+            }
+        }
+
+        private void SetPickerIndex(int index)
+        {
+            _programmaticPickerChange = true;
+            try { CO2MonitorPicker.SelectedIndex = index; }
+            finally { _programmaticPickerChange = false; }
+        }
+
+        /// <summary>
+        /// Picker index of the sensor the manager is bound to, or -1. Matched by Id: a rescan
+        /// wraps the same sensor in a new device object.
+        /// </summary>
+        private int IndexOfCurrentSensor()
+        {
+            var id = _mainPageViewModel.Sensor.SelectedDevice?.Id;
+            return id == null ? -1 : _filteredDevices.FindIndex(d => d.Id == id);
         }
 
         private void OnSearchBuildingsClicked(object sender, EventArgs e)

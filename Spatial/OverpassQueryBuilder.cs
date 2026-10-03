@@ -130,6 +130,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[government=register_office];" +
                 "nwr[shop];" +
                 "nwr[craft];" +
+                "nwr[club];" +
                 "nwr[aeroway=aerodrome];" +
                 "nwr[aeroway=terminal];" +
                 "nwr[railway=station];" +
@@ -189,6 +190,7 @@ namespace IndoorCO2MapAppV2.Spatial
                 "nwr[amenity=university];" +
                 "nwr[building=university];" +
                 "nwr[building=college];" +
+                "nwr[building=hospital];" +
                 "nwr[amenity=hospital];" +
                 "nwr[amenity=clinic];" +
                 "nwr[amenity=dentist];" +

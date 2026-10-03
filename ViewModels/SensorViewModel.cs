@@ -24,6 +24,16 @@ namespace IndoorCO2MapAppV2.ViewModels
             MonitorOptions = _monitorManager._monitorTypes;
             SelectedMonitorType = MonitorOptions.FirstOrDefault();
 
+            // Start from the manager's current state rather than empty. The manager outlives
+            // the page: after the app is closed and reopened while the process lives on, a new
+            // page builds a new view model that otherwise believes no sensor is selected while
+            // one is still connected — so the picker couldn't show it and recording couldn't start.
+            SelectedDevice = _monitorManager.SelectedDevice;
+            CurrentCO2 = _monitorManager.CurrentCO2;
+            MeasurementInterval = _monitorManager.UpdateInterval;
+            Co2History = _monitorManager.Co2History;
+            IsScanning = _monitorManager.IsScanning;
+
             _monitorManager.PropertyChanged += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -107,9 +117,17 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
         {
-            _monitorManager.ZeroOutCO2Values();
-            IsSmartHomeWarningVisible = false;
             if (device == null) return;
+
+            // Only a genuine switch invalidates the cached readings. Reselecting the current
+            // sensor (timer reconnect, recovery) used to zero UpdateInterval regardless, and a
+            // recording tick landing in that window read 5-minute history as 1-minute data.
+            // Compared by Id: a rescan can wrap the same sensor in a new device object.
+            if (_monitorManager.SelectedDevice?.Id != device.Id)
+            {
+                _monitorManager.ZeroOutCO2Values();
+                IsSmartHomeWarningVisible = false;
+            }
             await _monitorManager.SelectDeviceAsync(device);
             await RefreshLiveCO2Async();
             await RefreshUpdateIntervalAsync();
