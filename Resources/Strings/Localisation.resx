@@ -564,6 +564,9 @@ Details: {0}</value>
   <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
     <value>Allow starting a recording before the first sensor reading</value>
   </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>Stop sensor search once the first sensor is found (faster start if you only use one sensor)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Keep recording when app is in background (shows a notification)</value>
   </data>

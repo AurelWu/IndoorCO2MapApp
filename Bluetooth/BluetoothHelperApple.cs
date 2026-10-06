@@ -2,6 +2,8 @@
 using CoreBluetooth;
 using CoreLocation;
 using Foundation;
+using Plugin.BLE;
+using Plugin.BLE.Abstractions.Contracts;
 using UIKit;
 using System;
 using System.Collections.Generic;
@@ -93,8 +95,12 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
         public bool CheckIfBTEnabled()
         {
-            // Check if Bluetooth is enabled
-            return bluetoothManager.State == CBManagerState.PoweredOn;
+            // Either manager reporting "on" counts. This helper's own CBCentralManager and
+            // Plugin.BLE's settle independently after launch. The status bar now refreshes on
+            // Plugin.BLE's state change, and the scan waits for Plugin.BLE's state — reading
+            // only ours could still say Unknown at that moment and skip the scan or show ✗.
+            return bluetoothManager.State == CBManagerState.PoweredOn
+                || CrossBluetoothLE.Current.State == BluetoothState.On;
         }
 
         public bool HasPermissionInManifest()

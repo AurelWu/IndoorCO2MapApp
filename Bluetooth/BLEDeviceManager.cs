@@ -46,7 +46,11 @@ namespace IndoorCO2MapAppV2.Bluetooth
             _adapter = CrossBluetoothLE.Current.Adapter;
         }
 
-        internal async Task StartScanningAsync(int scanDurationMs = 20000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None)
+        /// <param name="cancellationToken">
+        /// Ends the scan early. Note the scan never runs longer than Plugin.BLE's own
+        /// <c>ScanTimeout</c> (10 s by default), whatever <paramref name="scanDurationMs"/> says.
+        /// </param>
+        internal async Task StartScanningAsync(int scanDurationMs = 20000, bool clearBeforeScan = true, CO2MonitorType filter = CO2MonitorType.None, CancellationToken cancellationToken = default)
         {
             //TODO: if we have a deviceNameFilter set we can probably cancel once we find it
             if (clearBeforeScan)
@@ -69,7 +73,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
 
             IsScanning = true;
 
-            using var cts = new CancellationTokenSource(scanDurationMs);
+            // Linked so a caller can stop the scan early; the guard in the handler below then
+            // also drops additions that arrive after an early stop.
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(scanDurationMs);
 
             async void Handler(object? sender, DeviceEventArgs e)
             {
@@ -118,6 +125,11 @@ namespace IndoorCO2MapAppV2.Bluetooth
             {
                 await _adapter.StartScanningForDevicesAsync(cts.Token);
             }
+            catch (OperationCanceledException)
+            {
+                // A deliberate stop (caller token or our duration), not an error.
+                Logger.WriteToLog("BLEDeviceManager|Scan: stopped by cancellation", LogMode.Verbose);
+            }
             catch (Exception e)
             {
                 Logger.WriteToLog("Error when calling _adapter.StartScanningForDevicesAsync:" + e.ToString());
@@ -145,7 +157,9 @@ namespace IndoorCO2MapAppV2.Bluetooth
                     Logger.WriteToLog("BLEDeviceManager|WaitForBT: BT is off/unavailable, stopping early");
                     return;
                 }
-                await Task.Delay(500);
+                // Short interval: this is a cheap property read, and on iOS the state usually
+                // settles within a second — 500 ms polls could waste most of that again.
+                await Task.Delay(100);
             }
             Logger.WriteToLog("BLEDeviceManager|WaitForBT: timed out");
         }

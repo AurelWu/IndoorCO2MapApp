@@ -505,6 +505,9 @@ Détails : {0}</value>
   <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
     <value>Autoriser le démarrage avant la première mesure du capteur</value>
   </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>Arrêter la recherche dès le premier capteur trouvé (démarrage plus rapide si vous n'utilisez qu'un capteur)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Continuer l'enregistrement en arrière-plan (affiche une notification)</value>
   </data>

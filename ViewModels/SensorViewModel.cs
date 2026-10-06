@@ -107,10 +107,10 @@ namespace IndoorCO2MapAppV2.ViewModels
             IsScanning             ? Color.FromArgb("#512BD4") :
                                      Color.FromArgb("#9E9E9E");
 
-        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true, int scanDurationMs = 20000)
+        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true, int scanDurationMs = 20000, CancellationToken cancellationToken = default)
         {
             _monitorManager.ZeroOutCO2Values();
-            await _monitorManager.StartScanAsync(filter, clearBeforeScan, scanDurationMs);
+            await _monitorManager.StartScanAsync(filter, clearBeforeScan, scanDurationMs, cancellationToken);
         }
 
         [ObservableProperty] private bool isSmartHomeWarningVisible;

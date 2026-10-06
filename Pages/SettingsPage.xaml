@@ -39,6 +39,8 @@
                     Text="{Binding SensorFilter}"
                     Placeholder="{x:Static t:Localisation.SettingsSensorFilterPlaceholder}"
                     ClearButtonVisibility="WhileEditing" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsStopScanAtFirstSensor}"
+                                 IsToggled="{Binding StopScanAtFirstSensor}" />
             </VerticalStackLayout>
         </Border>
 

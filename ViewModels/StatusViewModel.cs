@@ -3,6 +3,7 @@ using IndoorCO2MapAppV2.DebugTools;
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Enumerations;
+using Plugin.BLE;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -184,7 +185,28 @@ namespace IndoorCO2MapAppV2.ViewModels
             _statusTimer.Start();
         }
 
-        public Task RefreshNowAsync() => UpdateStatusAsync();
+        public Task RefreshNowAsync()
+        {
+            HookBluetoothStateChanges();
+            return UpdateStatusAsync();
+        }
+
+        private bool _btStateHooked;
+
+        /// <summary>
+        /// Re-check the moment Bluetooth reports a state change instead of waiting for the next
+        /// 5 s tick. On iOS the radio state arrives asynchronously after launch, so the first
+        /// check always saw "Unknown" and the BT chip stayed red for 5–10 s although Bluetooth
+        /// was fine. Hooked on the first RefreshNowAsync (from MainPage) rather than in the
+        /// constructor, which runs during App startup — so Plugin.BLE isn't initialised any
+        /// earlier than before. The timer stays: GPS has no equivalent event.
+        /// </summary>
+        private void HookBluetoothStateChanges()
+        {
+            if (_btStateHooked) return;
+            _btStateHooked = true;
+            CrossBluetoothLE.Current.StateChanged += (_, _) => _ = UpdateStatusAsync();
+        }
 
         private void StatusTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {

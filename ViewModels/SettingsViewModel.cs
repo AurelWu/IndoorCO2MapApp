@@ -182,6 +182,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.AllowStartWithoutSensorData = value; OnPropertyChanged(); }
         }
 
+        public bool StopScanAtFirstSensor
+        {
+            get => UserSettings.Instance.StopScanAtFirstSensor;
+            set { UserSettings.Instance.StopScanAtFirstSensor = value; OnPropertyChanged(); }
+        }
+
         public bool ShowChangeRouteInRecording
         {
             get => UserSettings.Instance.ShowChangeRouteInRecording;

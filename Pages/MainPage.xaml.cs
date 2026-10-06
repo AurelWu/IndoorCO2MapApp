@@ -11,6 +11,7 @@ using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
 using IndoorCO2MapAppV2.ViewModels;
 using Microsoft.Maui.Controls;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Threading.Tasks;
 using CommunityToolkit.Maui.Extensions;
@@ -233,9 +234,10 @@ namespace IndoorCO2MapAppV2.Pages
 
                 await StatusViewModel.Instance.RefreshNowAsync();
 
-                // Immediately attempt GPS now that permission has been granted/confirmed,
-                // rather than waiting for the first loop iteration (up to 15 seconds).
-                try { await _mainPageViewModel.BuildingSearch.GetGpsAsync(); } catch { }
+                // No GPS fix here. Awaiting one (Best accuracy, 10 s timeout) held up the
+                // sensor scan below by several seconds on every cold start. GpsRefreshLoopAsync,
+                // started at the end of this method, requests the first fix immediately on its
+                // first iteration, so GPS still starts straight away — alongside the scan.
             }
 
             // A recording still running in this process is not one to recover. Its snapshot
@@ -611,18 +613,67 @@ namespace IndoorCO2MapAppV2.Pages
         //TODO: add filter from settings (not just type but also explicit string)
         private async Task RefreshSensorListAsync()
         {
-            await _mainPageViewModel.Sensor.StartScanAsync(_mainPageViewModel.Sensor.SelectedMonitorType);
+            var sensor = _mainPageViewModel.Sensor;
 
-            // Auto-retry once if nothing found — sensor may not have been advertising.
-            // Wait 3 s before retrying to avoid Android BLE scan throttle (5 starts / 30 s).
-            if (_mainPageViewModel.Sensor.Devices.Count == 0)
+            // React to each sensor as it is heard, rather than only after the scan — which
+            // always runs Plugin.BLE's full 10 s:
+            // - "stop at first sensor" setting (any platform): end the scan. The end-of-scan
+            //   logic below then connects, so scanning and connecting never overlap.
+            // - otherwise, on iOS: connect to the first sensor straight away. It is the same one
+            //   the end-of-scan logic would pick (it takes the first discovered), and the scan
+            //   keeps running so people with several sensors still get all of them listed.
+            //   Not on Android: connecting during an active scan causes GATT 133 failures on
+            //   some phones.
+            bool stopAtFirst = UserSettings.Instance.StopScanAtFirstSensor;
+            bool connectEarly = !stopAtFirst && DeviceInfo.Platform == DevicePlatform.iOS;
+            bool connectedEarly = false;
+            using var scanCts = new CancellationTokenSource();
+
+            void OnDeviceAdded(object? s, NotifyCollectionChangedEventArgs e)
             {
-                Logger.WriteToLog("RefreshSensorListAsync: no devices found, retrying scan...");
-                await CommunityToolkit.Maui.Alerts.Toast.Make("No sensors found, retrying scan…").Show();
-                await Task.Delay(3000);
-                await _mainPageViewModel.Sensor.StartScanAsync(
-                    _mainPageViewModel.Sensor.SelectedMonitorType,
-                    clearBeforeScan: false);
+                if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null) return;
+                var found = e.NewItems.OfType<BluetoothDeviceModel>().FirstOrDefault(PassesSensorFilter);
+                if (found == null) return;
+
+                if (stopAtFirst)
+                {
+                    Logger.WriteToLog($"RefreshSensorListAsync: '{found.Name}' found, stopping scan (StopScanAtFirstSensor)");
+                    scanCts.Cancel();
+                    return;
+                }
+                if (!connectEarly) return;
+
+                // Let the list fill in live, so a second sensor can be picked mid-scan.
+                RebuildDevicePicker();
+                if (connectedEarly || sensor.SelectedDevice != null) return;
+
+                connectedEarly = true;
+                Logger.WriteToLog($"RefreshSensorListAsync: connecting to '{found.Name}' while the scan continues");
+                SetPickerIndex(_filteredDevices.FindIndex(d => d.Id == found.Id));
+                sensor.SelectDeviceAsync(found).SafeFireAndForget("RefreshSensorListAsync|early SelectDeviceAsync");
+            }
+
+            sensor.Devices.CollectionChanged += OnDeviceAdded;
+            try
+            {
+                await sensor.StartScanAsync(sensor.SelectedMonitorType, cancellationToken: scanCts.Token);
+
+                // Auto-retry once if nothing found — sensor may not have been advertising.
+                // Wait 3 s before retrying to avoid Android BLE scan throttle (5 starts / 30 s).
+                if (sensor.Devices.Count == 0)
+                {
+                    Logger.WriteToLog("RefreshSensorListAsync: no devices found, retrying scan...");
+                    await CommunityToolkit.Maui.Alerts.Toast.Make("No sensors found, retrying scan…").Show();
+                    await Task.Delay(3000);
+                    await sensor.StartScanAsync(
+                        sensor.SelectedMonitorType,
+                        clearBeforeScan: false,
+                        cancellationToken: scanCts.Token);
+                }
+            }
+            finally
+            {
+                sensor.Devices.CollectionChanged -= OnDeviceAdded;
             }
 
             RebuildDevicePicker();
@@ -653,10 +704,8 @@ namespace IndoorCO2MapAppV2.Pages
         /// </summary>
         private void RebuildDevicePicker()
         {
-            var sf = UserSettings.Instance.SensorFilter?.Trim() ?? "";
             _filteredDevices = _mainPageViewModel.Sensor.Devices
-                .Where(d => string.IsNullOrEmpty(sf) ||
-                            d.Name.Contains(sf, StringComparison.OrdinalIgnoreCase))
+                .Where(PassesSensorFilter)
                 .ToList();
 
             // The sensor in use always gets a row, even when it isn't in this scan's results:
@@ -676,6 +725,14 @@ namespace IndoorCO2MapAppV2.Pages
             {
                 _programmaticPickerChange = false;
             }
+        }
+
+        /// <summary>The sensor-name filter from Settings; an empty filter passes everything.</summary>
+        private static bool PassesSensorFilter(BluetoothDeviceModel device)
+        {
+            var sf = UserSettings.Instance.SensorFilter?.Trim() ?? "";
+            return string.IsNullOrEmpty(sf) ||
+                   device.Name.Contains(sf, StringComparison.OrdinalIgnoreCase);
         }
 
         private void SetPickerIndex(int index)

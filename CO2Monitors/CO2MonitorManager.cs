@@ -54,12 +54,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
         public ObservableCollection<BluetoothDeviceModel> Devices { get; }
 
-        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true, int scanDurationMs = 20000)
+        public async Task StartScanAsync(CO2MonitorType filter, bool clearBeforeScan = true, int scanDurationMs = 20000, CancellationToken cancellationToken = default)
         {
             await _ble.StartScanningAsync(
                 scanDurationMs: scanDurationMs,
                 clearBeforeScan: clearBeforeScan,
-                filter: filter);
+                filter: filter,
+                cancellationToken: cancellationToken);
         }
 
         public async Task SelectDeviceAsync(BluetoothDeviceModel device)
@@ -92,9 +93,13 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                 if (!connected)
                     return;
 
+#if ANDROID
                 // Give the Android GATT stack time to settle after connection —
                 // without this, GetServiceAsync fails immediately on the first attempt.
+                // Not needed on iOS: CoreBluetooth service discovery is event-driven, and
+                // TryGetServiceAsync retries anyway if the stack isn't ready.
                 await Task.Delay(500);
+#endif
 
                 // Use type already set during scan — avoids any post-connection GATT check
                 var type = device.DetectedType

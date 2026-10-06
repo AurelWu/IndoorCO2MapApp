@@ -505,6 +505,9 @@ Details: {0}</value>
   <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
     <value>Aufnahme vor der ersten Sensormessung starten erlauben</value>
   </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>Sensorsuche nach dem ersten gefundenen Sensor beenden (schnellerer Start, wenn Sie nur einen Sensor nutzen)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Aufnahme im Hintergrund fortsetzen (zeigt eine Benachrichtigung)</value>
   </data>

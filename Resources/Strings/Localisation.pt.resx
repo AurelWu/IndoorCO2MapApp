@@ -505,6 +505,9 @@ Detalhes: {0}</value>
   <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
     <value>Permitir iniciar a gravação antes da primeira leitura do sensor</value>
   </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>Parar a pesquisa ao encontrar o primeiro sensor (arranque mais rápido se usar apenas um sensor)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Continuar a gravar em segundo plano (mostra uma notificação)</value>
   </data>

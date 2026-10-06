@@ -508,6 +508,7 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string SettingsSectionRecording { get { return ResourceManager.GetString("SettingsSectionRecording", resourceCulture); } }
         internal static string SettingsConfirmBeforeSubmit { get { return ResourceManager.GetString("SettingsConfirmBeforeSubmit", resourceCulture); } }
         internal static string SettingsAllowStartWithoutSensorData { get { return ResourceManager.GetString("SettingsAllowStartWithoutSensorData", resourceCulture); } }
+        internal static string SettingsStopScanAtFirstSensor { get { return ResourceManager.GetString("SettingsStopScanAtFirstSensor", resourceCulture); } }
         internal static string SettingsKeepRecordingInBackground { get { return ResourceManager.GetString("SettingsKeepRecordingInBackground", resourceCulture); } }
         internal static string SettingsSectionData { get { return ResourceManager.GetString("SettingsSectionData", resourceCulture); } }
         internal static string SettingsUseLiveLocationService { get { return ResourceManager.GetString("SettingsUseLiveLocationService", resourceCulture); } }

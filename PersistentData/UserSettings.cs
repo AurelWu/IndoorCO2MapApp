@@ -169,6 +169,16 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _allowStartWithoutSensorData, value);
         }
 
+        // For people with one sensor: the sensor list search (startup and refresh button)
+        // stops at the first sensor heard instead of running the full scan. Off by default,
+        // since with several sensors around the others would be missed. Recovery scans ignore it.
+        private bool _stopScanAtFirstSensor = false;
+        public bool StopScanAtFirstSensor
+        {
+            get => _stopScanAtFirstSensor;
+            set => SetProperty(ref _stopScanAtFirstSensor, value);
+        }
+
         private bool _showNewsNotification = true;
         public bool ShowNewsNotification
         {
