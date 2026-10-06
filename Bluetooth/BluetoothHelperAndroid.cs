@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.Content;
+using IndoorCO2MapAppV2.Resources.Strings;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
 using Application = Android.App.Application;
@@ -101,10 +102,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
                 return;
 
             bool result = await Shell.Current.DisplayAlertAsync(
-                "Enable Bluetooth",
-                "Bluetooth is currently disabled. Would you like to enable it?",
-                "Yes",
-                "No");
+                Localisation.DialogEnableBluetoothTitle,
+                Localisation.DialogEnableBluetoothMessage,
+                Localisation.DialogYes,
+                Localisation.DialogNo);
 
             if (result)
             {

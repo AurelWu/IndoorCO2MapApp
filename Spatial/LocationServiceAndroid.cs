@@ -2,6 +2,7 @@
 using Android.Content;
 using AndLoc = Android.Locations ;
 using Android.Provider;
+using IndoorCO2MapAppV2.Resources.Strings;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices.Sensors;
 using System.Threading.Tasks;
@@ -46,9 +47,9 @@ namespace IndoorCO2MapAppV2.Spatial
                 return false; // should not happen, but safe fallback
 
             bool result = await page.DisplayAlertAsync(
-                "Enable GPS",
-                "GPS is currently disabled. Would you like to enable it?",
-                "Yes", "No");
+                Localisation.DialogEnableGpsTitle,
+                Localisation.DialogEnableGpsMessage,
+                Localisation.DialogYes, Localisation.DialogNo);
 
             if (result)
             {

@@ -263,14 +263,14 @@ namespace IndoorCO2MapAppV2.Recording
             get
             {
                 if (ActiveRecording == null)
-                    return "[No Recording]";
+                    return Localisation.RecordingNoActive;
 
                 // Prefer user-friendly name if available
                 if (!string.IsNullOrWhiteSpace(ActiveRecording.LocationName))
                     return $"{Localisation.RecordingLocationLabel}{ActiveRecording.LocationName}";
 
                 // Otherwise fall back to OSM type + ID
-                return $"Location ID: {ActiveRecording.NwrType} {ActiveRecording.NwrId}";
+                return $"{Localisation.RecordingLocationLabel}{ActiveRecording.NwrType} {ActiveRecording.NwrId}";
             }
         }
 

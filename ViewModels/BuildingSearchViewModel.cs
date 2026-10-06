@@ -117,12 +117,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             return;
 #endif
 
-            Status = "Acquiring GPS...";
+            Status = Localisation.GpsAcquiring;
 
             var loc = await _locationService.GetCurrentLocationAsync();
             if (loc == null)
             {
-                Status = "Unable to get GPS.";
+                Status = Localisation.TransitNoGpsPosition;
                 return;
             }
 
@@ -143,7 +143,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task SearchBuildingsAsync()
         {
-            Status = "Acquiring GPS...";
+            Status = Localisation.GpsAcquiring;
             FetchState.IsFetching = true;
             FetchState.LastFailed = false;
             FetchState.LastError = null;
@@ -154,7 +154,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                 {
                     FetchState.LastError = "Unable to get GPS position.";
                     FetchState.LastFailed = true;
-                    Status = "No valid GPS data yet.";
+                    Status = Localisation.GpsNoValidDataYet;
                     return;
                 }
 
@@ -178,17 +178,17 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         private async Task SearchBuildingsOverpassAsync(double lat, double lon)
         {
-            Status = "Fetching buildings...";
+            Status = Localisation.BuildingsFetching;
 
             string query = OverpassQueryBuilder.CreateBuildingOverpassQuery(lat, lon, Range);
             string? json = await _fetcher.FetchOverpassDataAsync(query);
             if (json == null)
             {
-                Status = $"Fetch failed: {FetchState.LastError}";
+                Status = string.Format(Localisation.BuildingsFetchFailed, FetchState.LastError);
                 return;
             }
 
-            Status = "Fetch OK, parsing...";
+            Status = Localisation.BuildingsParsing;
 
             var result = OverpassDataParser.ParseBuildingLocationOverpassResponse(
                 json, lat, lon);
@@ -204,12 +204,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             }
 
             RefreshBuildings();
-            Status = $"Parsed {Buildings.Count} buildings.";
+            Status = string.Format(Localisation.BuildingsFound, Buildings.Count);
         }
 
         private async Task SearchBuildingsPMTilesAsync(double lat, double lon)
         {
-            Status = "Searching buildings...";
+            Status = Localisation.BuildingsSearching;
             try
             {
                 var results = await PMTilesLocationService.Instance.SearchAsync(lat, lon, Range);
@@ -226,14 +226,14 @@ namespace IndoorCO2MapAppV2.ViewModels
 
                 LocationStore.Instance.SetBuildingLocations(results.ToHashSet());
                 RefreshBuildings();
-                Status = $"Found {Buildings.Count} buildings.";
+                Status = string.Format(Localisation.BuildingsFound, Buildings.Count);
             }
             catch (Exception ex)
             {
                 Logger.WriteToLog($"PMTiles search failed: {ex.Message}");
                 FetchState.LastFailed = true;
                 FetchState.LastError = ex.Message;
-                Status = $"Search failed: {ex.Message}";
+                Status = string.Format(Localisation.BuildingsSearchFailed, ex.Message);
             }
         }
 

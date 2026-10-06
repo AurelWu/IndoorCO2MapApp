@@ -631,4 +631,67 @@ Detalhes: {0}</value>
   <data name="StatusAllReady" xml:space="preserve">
     <value>✓ GPS e Bluetooth prontos</value>
   </data>
+  <data name="GpsAcquiring" xml:space="preserve">
+    <value>A obter posição GPS...</value>
+  </data>
+  <data name="GpsNoValidDataYet" xml:space="preserve">
+    <value>Ainda sem dados GPS válidos.</value>
+  </data>
+  <data name="BuildingsFetching" xml:space="preserve">
+    <value>A obter edifícios...</value>
+  </data>
+  <data name="BuildingsFetchFailed" xml:space="preserve">
+    <value>Falha ao obter: {0}</value>
+  </data>
+  <data name="BuildingsParsing" xml:space="preserve">
+    <value>Obtido com sucesso, a processar...</value>
+  </data>
+  <data name="BuildingsSearching" xml:space="preserve">
+    <value>A procurar edifícios...</value>
+  </data>
+  <data name="BuildingsFound" xml:space="preserve">
+    <value>{0} edifícios encontrados.</value>
+  </data>
+  <data name="BuildingsSearchFailed" xml:space="preserve">
+    <value>A pesquisa falhou: {0}</value>
+  </data>
+  <data name="StatisticsLoadFailed" xml:space="preserve">
+    <value>Falha ao carregar os dados: {0}</value>
+  </data>
+  <data name="StatisticsTotal" xml:space="preserve">
+    <value>Total: {0:N0}</value>
+  </data>
+  <data name="HistoryLatest" xml:space="preserve">
+    <value>último: {0}</value>
+  </data>
+  <data name="RecordingNoActive" xml:space="preserve">
+    <value>[Sem gravação]</value>
+  </data>
+  <data name="DialogEnableBluetoothTitle" xml:space="preserve">
+    <value>Ativar Bluetooth</value>
+  </data>
+  <data name="DialogEnableBluetoothMessage" xml:space="preserve">
+    <value>O Bluetooth está desativado. Pretende ativá-lo?</value>
+  </data>
+  <data name="DialogEnableGpsTitle" xml:space="preserve">
+    <value>Ativar GPS</value>
+  </data>
+  <data name="DialogEnableGpsMessage" xml:space="preserve">
+    <value>O GPS está desativado. Pretende ativá-lo?</value>
+  </data>
+  <data name="DialogEnableGpsMessageIos" xml:space="preserve">
+    <value>Os serviços de localização estão desativados. Ative o GPS nas Definições.</value>
+  </data>
+  <data name="DialogOpenSettings" xml:space="preserve">
+    <value>Abrir Definições</value>
+  </data>
+  <data name="ToastNoSensorsRetrying" xml:space="preserve">
+    <value>Nenhum sensor encontrado, a tentar novamente…</value>
+  </data>
+  <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
+    <value>Registo de depuração copiado</value>
+  </data>
+  <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
+    <value>O registo de depuração foi copiado para a área de transferência.</value>
+  </data>
 </root>

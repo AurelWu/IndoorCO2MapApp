@@ -1,5 +1,6 @@
 using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
+using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.ViewModels;
 #if !WINDOWS
@@ -256,7 +257,7 @@ namespace IndoorCO2MapAppV2.Pages
         {
             DetailLocationName.Text = group.LocationName;
             DetailStats.Text = $"{group.TotalCount} recordings · {group.AvgCO2Range}";
-            DetailLastSeen.Text = $"latest: {group.LastSeenAgo}";
+            DetailLastSeen.Text = string.Format(Localisation.HistoryLatest, group.LastSeenAgo);
             DetailChart.MultiSeriesReadings = group.PageReadings;
             DetailPanel.IsVisible = true;
         }

@@ -1,6 +1,7 @@
 ﻿#if IOS
 using CoreLocation;
 using Foundation;
+using IndoorCO2MapAppV2.Resources.Strings;
 using Microsoft.Maui.Devices.Sensors;
 using UIKit;
 using System;
@@ -45,10 +46,10 @@ namespace IndoorCO2MapAppV2.Spatial
                 var page = Application.Current!.Windows[0]!.Page!;
 
                 bool result = await page.DisplayAlertAsync(
-                    "Enable GPS",
-                    "Location services are disabled. Please enable GPS in Settings.",
-                    "Open Settings",
-                    "Cancel");
+                    Localisation.DialogEnableGpsTitle,
+                    Localisation.DialogEnableGpsMessageIos,
+                    Localisation.DialogOpenSettings,
+                    Localisation.DialogCancel);
 
                 if (result)
                 {

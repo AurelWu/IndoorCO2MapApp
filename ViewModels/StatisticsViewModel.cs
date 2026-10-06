@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using IndoorCO2MapAppV2.Resources.Strings;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -63,7 +64,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Failed to load data: " + ex.Message;
+                ErrorMessage = string.Format(Localisation.StatisticsLoadFailed, ex.Message);
             }
             finally
             {

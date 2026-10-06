@@ -550,5 +550,26 @@ namespace IndoorCO2MapAppV2.Resources.Strings {
         internal static string StatusBtStatus { get { return ResourceManager.GetString("StatusBtStatus", resourceCulture); } }
         internal static string StatusBtPermissions { get { return ResourceManager.GetString("StatusBtPermissions", resourceCulture); } }
         internal static string StatusAllReady { get { return ResourceManager.GetString("StatusAllReady", resourceCulture); } }
+        internal static string GpsAcquiring { get { return ResourceManager.GetString("GpsAcquiring", resourceCulture); } }
+        internal static string GpsNoValidDataYet { get { return ResourceManager.GetString("GpsNoValidDataYet", resourceCulture); } }
+        internal static string BuildingsFetching { get { return ResourceManager.GetString("BuildingsFetching", resourceCulture); } }
+        internal static string BuildingsFetchFailed { get { return ResourceManager.GetString("BuildingsFetchFailed", resourceCulture); } }
+        internal static string BuildingsParsing { get { return ResourceManager.GetString("BuildingsParsing", resourceCulture); } }
+        internal static string BuildingsSearching { get { return ResourceManager.GetString("BuildingsSearching", resourceCulture); } }
+        internal static string BuildingsFound { get { return ResourceManager.GetString("BuildingsFound", resourceCulture); } }
+        internal static string BuildingsSearchFailed { get { return ResourceManager.GetString("BuildingsSearchFailed", resourceCulture); } }
+        internal static string StatisticsLoadFailed { get { return ResourceManager.GetString("StatisticsLoadFailed", resourceCulture); } }
+        internal static string StatisticsTotal { get { return ResourceManager.GetString("StatisticsTotal", resourceCulture); } }
+        internal static string HistoryLatest { get { return ResourceManager.GetString("HistoryLatest", resourceCulture); } }
+        internal static string RecordingNoActive { get { return ResourceManager.GetString("RecordingNoActive", resourceCulture); } }
+        internal static string DialogEnableBluetoothTitle { get { return ResourceManager.GetString("DialogEnableBluetoothTitle", resourceCulture); } }
+        internal static string DialogEnableBluetoothMessage { get { return ResourceManager.GetString("DialogEnableBluetoothMessage", resourceCulture); } }
+        internal static string DialogEnableGpsTitle { get { return ResourceManager.GetString("DialogEnableGpsTitle", resourceCulture); } }
+        internal static string DialogEnableGpsMessage { get { return ResourceManager.GetString("DialogEnableGpsMessage", resourceCulture); } }
+        internal static string DialogEnableGpsMessageIos { get { return ResourceManager.GetString("DialogEnableGpsMessageIos", resourceCulture); } }
+        internal static string DialogOpenSettings { get { return ResourceManager.GetString("DialogOpenSettings", resourceCulture); } }
+        internal static string ToastNoSensorsRetrying { get { return ResourceManager.GetString("ToastNoSensorsRetrying", resourceCulture); } }
+        internal static string DialogDebugLogCopiedTitle { get { return ResourceManager.GetString("DialogDebugLogCopiedTitle", resourceCulture); } }
+        internal static string DialogDebugLogCopiedMessage { get { return ResourceManager.GetString("DialogDebugLogCopiedMessage", resourceCulture); } }
     }
 }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using IndoorCO2MapAppV2.CO2Monitors;
+using IndoorCO2MapAppV2.Resources.Strings;
 
 namespace IndoorCO2MapAppV2.Controls
 {
@@ -152,7 +153,7 @@ namespace IndoorCO2MapAppV2.Controls
                     canvas.DrawLine(paddingLeft, height - paddingBottom, width - paddingRight, height - paddingBottom);
                     canvas.FontColor = LineColor;
                     canvas.FontSize = 13;
-                    canvas.DrawString("Waiting for data…", paddingLeft, 0, usableWidth, height, HorizontalAlignment.Center, VerticalAlignment.Center);
+                    canvas.DrawString(Localisation.SensorWaitingForData,paddingLeft, 0, usableWidth, height, HorizontalAlignment.Center, VerticalAlignment.Center);
                     return;
                 }
 

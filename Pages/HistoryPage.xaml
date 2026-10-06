@@ -155,7 +155,7 @@
                                        Style="{StaticResource MicroLabelStyle}"
                                        HorizontalOptions="End"
                                        IsVisible="{Binding HasStdDev}" />
-                                <Label Text="{Binding LastSeenAgo, StringFormat='latest: {0}'}"
+                                <Label Text="{Binding LastSeenAgo, StringFormat={x:Static t:Localisation.HistoryLatest}}"
                                        Style="{StaticResource MicroLabelStyle}"
                                        HorizontalOptions="End" />
                             </VerticalStackLayout>

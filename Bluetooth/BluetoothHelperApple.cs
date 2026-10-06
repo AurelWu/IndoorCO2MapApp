@@ -4,6 +4,7 @@ using CoreLocation;
 using Foundation;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
+using IndoorCO2MapAppV2.Resources.Strings;
 using UIKit;
 using System;
 using System.Collections.Generic;
@@ -73,10 +74,10 @@ namespace IndoorCO2MapAppV2.Bluetooth
         public async Task RequestBluetoothEnableAsync()
         {
             bool result = await Shell.Current.DisplayAlertAsync(
-                "Enable Bluetooth",
-                "Bluetooth is currently disabled. Would you like to enable it?",
-                "Yes",
-                "No");
+                Localisation.DialogEnableBluetoothTitle,
+                Localisation.DialogEnableBluetoothMessage,
+                Localisation.DialogYes,
+                Localisation.DialogNo);
 
             if (result)
             {

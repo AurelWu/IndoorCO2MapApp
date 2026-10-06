@@ -35,7 +35,7 @@
                        Style="{StaticResource CaptionLabelStyle}"
                        VerticalOptions="Center" />
                 <Label Grid.Column="1"
-                       Text="{Binding TotalMeasurements, StringFormat='Total: {0:N0}'}"
+                       Text="{Binding TotalMeasurements, StringFormat={x:Static t:Localisation.StatisticsTotal}}"
                        FontSize="14"
                        VerticalOptions="Center" />
             </Grid>

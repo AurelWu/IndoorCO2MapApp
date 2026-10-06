@@ -112,7 +112,7 @@ namespace IndoorCO2MapAppV2.Pages
                 });
 
             await Clipboard.SetTextAsync(log);
-            await DisplayAlertAsync("Debug Log Copied", "The debug log has been copied to your clipboard.", "OK");
+            await DisplayAlertAsync(Localisation.DialogDebugLogCopiedTitle, Localisation.DialogDebugLogCopiedMessage, "OK");
         }
 
         protected override bool OnBackButtonPressed()

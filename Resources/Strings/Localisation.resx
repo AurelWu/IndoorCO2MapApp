@@ -690,4 +690,67 @@ Details: {0}</value>
   <data name="StatusAllReady" xml:space="preserve">
     <value>✓ GPS &amp; Bluetooth ready</value>
   </data>
+  <data name="GpsAcquiring" xml:space="preserve">
+    <value>Acquiring GPS...</value>
+  </data>
+  <data name="GpsNoValidDataYet" xml:space="preserve">
+    <value>No valid GPS data yet.</value>
+  </data>
+  <data name="BuildingsFetching" xml:space="preserve">
+    <value>Fetching buildings...</value>
+  </data>
+  <data name="BuildingsFetchFailed" xml:space="preserve">
+    <value>Fetch failed: {0}</value>
+  </data>
+  <data name="BuildingsParsing" xml:space="preserve">
+    <value>Fetch OK, parsing...</value>
+  </data>
+  <data name="BuildingsSearching" xml:space="preserve">
+    <value>Searching buildings...</value>
+  </data>
+  <data name="BuildingsFound" xml:space="preserve">
+    <value>Found {0} buildings.</value>
+  </data>
+  <data name="BuildingsSearchFailed" xml:space="preserve">
+    <value>Search failed: {0}</value>
+  </data>
+  <data name="StatisticsLoadFailed" xml:space="preserve">
+    <value>Failed to load data: {0}</value>
+  </data>
+  <data name="StatisticsTotal" xml:space="preserve">
+    <value>Total: {0:N0}</value>
+  </data>
+  <data name="HistoryLatest" xml:space="preserve">
+    <value>latest: {0}</value>
+  </data>
+  <data name="RecordingNoActive" xml:space="preserve">
+    <value>[No recording]</value>
+  </data>
+  <data name="DialogEnableBluetoothTitle" xml:space="preserve">
+    <value>Enable Bluetooth</value>
+  </data>
+  <data name="DialogEnableBluetoothMessage" xml:space="preserve">
+    <value>Bluetooth is currently disabled. Would you like to enable it?</value>
+  </data>
+  <data name="DialogEnableGpsTitle" xml:space="preserve">
+    <value>Enable GPS</value>
+  </data>
+  <data name="DialogEnableGpsMessage" xml:space="preserve">
+    <value>GPS is currently disabled. Would you like to enable it?</value>
+  </data>
+  <data name="DialogEnableGpsMessageIos" xml:space="preserve">
+    <value>Location services are disabled. Please enable GPS in Settings.</value>
+  </data>
+  <data name="DialogOpenSettings" xml:space="preserve">
+    <value>Open Settings</value>
+  </data>
+  <data name="ToastNoSensorsRetrying" xml:space="preserve">
+    <value>No sensors found, retrying scan…</value>
+  </data>
+  <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
+    <value>Debug Log Copied</value>
+  </data>
+  <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
+    <value>The debug log has been copied to your clipboard.</value>
+  </data>
 </root>

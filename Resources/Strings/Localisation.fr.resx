@@ -631,4 +631,67 @@ Détails : {0}</value>
   <data name="StatusAllReady" xml:space="preserve">
     <value>✓ GPS et Bluetooth prêts</value>
   </data>
+  <data name="GpsAcquiring" xml:space="preserve">
+    <value>Acquisition de la position GPS...</value>
+  </data>
+  <data name="GpsNoValidDataYet" xml:space="preserve">
+    <value>Pas encore de données GPS valides.</value>
+  </data>
+  <data name="BuildingsFetching" xml:space="preserve">
+    <value>Récupération des bâtiments...</value>
+  </data>
+  <data name="BuildingsFetchFailed" xml:space="preserve">
+    <value>Échec de la récupération : {0}</value>
+  </data>
+  <data name="BuildingsParsing" xml:space="preserve">
+    <value>Récupération réussie, traitement...</value>
+  </data>
+  <data name="BuildingsSearching" xml:space="preserve">
+    <value>Recherche des bâtiments...</value>
+  </data>
+  <data name="BuildingsFound" xml:space="preserve">
+    <value>{0} bâtiments trouvés.</value>
+  </data>
+  <data name="BuildingsSearchFailed" xml:space="preserve">
+    <value>Échec de la recherche : {0}</value>
+  </data>
+  <data name="StatisticsLoadFailed" xml:space="preserve">
+    <value>Échec du chargement des données : {0}</value>
+  </data>
+  <data name="StatisticsTotal" xml:space="preserve">
+    <value>Total : {0:N0}</value>
+  </data>
+  <data name="HistoryLatest" xml:space="preserve">
+    <value>dernier : {0}</value>
+  </data>
+  <data name="RecordingNoActive" xml:space="preserve">
+    <value>[Aucun enregistrement]</value>
+  </data>
+  <data name="DialogEnableBluetoothTitle" xml:space="preserve">
+    <value>Activer le Bluetooth</value>
+  </data>
+  <data name="DialogEnableBluetoothMessage" xml:space="preserve">
+    <value>Le Bluetooth est actuellement désactivé. Voulez-vous l'activer ?</value>
+  </data>
+  <data name="DialogEnableGpsTitle" xml:space="preserve">
+    <value>Activer le GPS</value>
+  </data>
+  <data name="DialogEnableGpsMessage" xml:space="preserve">
+    <value>Le GPS est actuellement désactivé. Voulez-vous l'activer ?</value>
+  </data>
+  <data name="DialogEnableGpsMessageIos" xml:space="preserve">
+    <value>Les services de localisation sont désactivés. Veuillez activer le GPS dans les Réglages.</value>
+  </data>
+  <data name="DialogOpenSettings" xml:space="preserve">
+    <value>Ouvrir les Réglages</value>
+  </data>
+  <data name="ToastNoSensorsRetrying" xml:space="preserve">
+    <value>Aucun capteur trouvé, nouvelle recherche…</value>
+  </data>
+  <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
+    <value>Journal de débogage copié</value>
+  </data>
+  <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
+    <value>Le journal de débogage a été copié dans le presse-papiers.</value>
+  </data>
 </root>

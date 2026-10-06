@@ -663,7 +663,7 @@ namespace IndoorCO2MapAppV2.Pages
                 if (sensor.Devices.Count == 0)
                 {
                     Logger.WriteToLog("RefreshSensorListAsync: no devices found, retrying scan...");
-                    await CommunityToolkit.Maui.Alerts.Toast.Make("No sensors found, retrying scan…").Show();
+                    await CommunityToolkit.Maui.Alerts.Toast.Make(Localisation.ToastNoSensorsRetrying).Show();
                     await Task.Delay(3000);
                     await sensor.StartScanAsync(
                         sensor.SelectedMonitorType,
@@ -767,7 +767,7 @@ namespace IndoorCO2MapAppV2.Pages
             await _mainPageViewModel.BuildingSearch.GetGpsAsync();
             if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
             {
-                _mainPageViewModel.Transit.Status = "No valid GPS data yet.";
+                _mainPageViewModel.Transit.Status = Localisation.GpsNoValidDataYet;
                 return;
             }
             double lat = _mainPageViewModel.BuildingSearch.Latitude!.Value;
@@ -786,7 +786,7 @@ namespace IndoorCO2MapAppV2.Pages
             // Make sure we have user location for distance calculation
             if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
             {
-                _mainPageViewModel.BuildingSearch.Status = "No valid GPS data yet.";
+                _mainPageViewModel.BuildingSearch.Status = Localisation.GpsNoValidDataYet;
                 return;
             }
 
@@ -818,7 +818,7 @@ namespace IndoorCO2MapAppV2.Pages
             await _mainPageViewModel.BuildingSearch.GetGpsAsync();
             if (!_mainPageViewModel.BuildingSearch.HasValidGPS)
             {
-                _mainPageViewModel.Transit.Status = "No valid GPS data yet.";
+                _mainPageViewModel.Transit.Status = Localisation.GpsNoValidDataYet;
                 return;
             }
 
