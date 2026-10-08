@@ -56,6 +56,12 @@ namespace IndoorCO2MapAppV2.ViewModels
                     case nameof(CO2MonitorManager.SelectedDevice):
                         SelectedDevice = _monitorManager.SelectedDevice;
                         break;
+                    case nameof(CO2MonitorManager.ActiveCO2MonitorProvider):
+                        // IsDeviceConnected is computed from the manager, so announce it here —
+                        // the start buttons and status line depend on it.
+                        OnPropertyChanged(nameof(IsDeviceConnected));
+                        OnPropertyChanged(nameof(SelectedDeviceStatusText));
+                        break;
                     case nameof(CO2MonitorManager.SelectedMonitorType):
                         SelectedMonitorType = _monitorManager.SelectedMonitorType;
                         break;
@@ -93,7 +99,9 @@ namespace IndoorCO2MapAppV2.ViewModels
 
                 if (SelectedDevice != null)
                 {
-                    if (CurrentCO2 == 0 && MeasurementInterval == 0)
+                    // Not connected (yet, or the connect failed): don't show numbers that look
+                    // live. A failed reconnect used to leave the last CO2 value on screen.
+                    if (!IsDeviceConnected || (CurrentCO2 == 0 && MeasurementInterval == 0))
                         return Localisation.SensorWaitingForData;
                     return Localisation.CO2LevelsLabel + CurrentCO2 + " | " + Localisation.UpdateInterval + MeasurementInterval + "s";
                 }

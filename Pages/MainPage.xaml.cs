@@ -38,6 +38,7 @@ namespace IndoorCO2MapAppV2.Pages
 
         private bool sortAlphabetical = false;
         private bool _recoveryInProgress = false;
+        private bool _returningToRecording;
 
         // Auto-recovery keeps looking for this long before falling back to manual resume.
         // Duty-cycled scanning: RecoveryScanMs on, RecoveryPauseMs off, repeat.
@@ -248,10 +249,38 @@ namespace IndoorCO2MapAppV2.Pages
             // from the snapshot. Return to it instead.
             if (RecordingManager.Instance.IsRecording)
             {
+                if (_returningToRecording) return;
+                _returningToRecording = true;
+
                 bool isTransit = RecordingManager.Instance.ActiveRecording?
                     .AdditionalDataByParameter.ContainsKey("routeID") == true;
                 Logger.WriteToLog($"OnAppearing: recording already active, returning to it ({(isTransit ? "transit" : "building")})");
-                await NavigateAsync(isTransit ? "///transit" : "///building");
+
+                // Navigate once OnAppearing has returned rather than from inside it: in a field
+                // log this branch ran twice for one reopen, and the page then missed its next
+                // OnAppearing. The overlay put up above (a running recording always has a
+                // snapshot) is cleared afterwards — this isn't a recovery, and it used to stay
+                // up and greet the user as "Resuming recording…" after the recording ended.
+                // Cleared after a short delay, not at once, so the hand-off doesn't flash a
+                // bare main menu (GoToAsync returns before the destination page is drawn).
+                Dispatcher.Dispatch(async () =>
+                {
+                    try
+                    {
+                        await NavigateAsync(isTransit ? "///transit" : "///building");
+                        await Task.Delay(500);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteToLog($"OnAppearing: returning to the recording failed: {ex.Message}");
+                    }
+                    finally
+                    {
+                        RecoveryOverlay.IsVisible = false;
+                        MainScrollView.IsEnabled = true;
+                        _returningToRecording = false;
+                    }
+                });
                 return;
             }
 

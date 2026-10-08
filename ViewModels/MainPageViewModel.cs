@@ -61,7 +61,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             Sensor.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(Sensor.SelectedDevice) ||
-                    e.PropertyName == nameof(Sensor.CurrentCO2))
+                    e.PropertyName == nameof(Sensor.CurrentCO2) ||
+                    e.PropertyName == nameof(Sensor.IsDeviceConnected))
                 {
                     OnPropertyChanged(nameof(CanStartBuildingRecording));
                     OnPropertyChanged(nameof(IsStartRecordingBlocked));
@@ -98,6 +99,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             if (BuildingSearch.SelectedBuilding == null ||
                 Sensor.SelectedDevice == null ||
+                !Sensor.IsDeviceConnected ||
                 Sensor.CurrentCO2 <= 0)
                 return;
 
@@ -121,7 +123,7 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             var station = Transit.SelectedStation;
             var route = Transit.SelectedRoute;
-            if (station == null || route == null || Sensor.SelectedDevice == null) return;
+            if (station == null || route == null || Sensor.SelectedDevice == null || !Sensor.IsDeviceConnected) return;
 
             var monitorType = Sensor.SelectedDevice.DetectedType
                 ?? CO2MonitorProviderFactory.DetectFromName(Sensor.SelectedDevice.Name);
@@ -153,9 +155,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             await AppPage.NavigateAsync("///transit");
         }
 
+        // A live connection is required, not just a selected sensor: a failed reconnect leaves
+        // SelectedDevice set, and starting then produced a recording that never got data.
         public bool CanStartBuildingRecording =>
             BuildingSearch.SelectedBuilding != null &&
             Sensor.SelectedDevice != null &&
+            Sensor.IsDeviceConnected &&
             Sensor.CurrentCO2 > 0;
 
         public bool IsStartRecordingBlocked => !CanStartBuildingRecording;
@@ -165,7 +170,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             get
             {
                 if (BuildingSearch.SelectedBuilding == null) return Localisation.MainMenuBlockedNoBuilding;
-                if (Sensor.SelectedDevice == null)           return Localisation.MainMenuBlockedNoSensor;
+                if (Sensor.SelectedDevice == null || !Sensor.IsDeviceConnected)
+                                                             return Localisation.MainMenuBlockedNoSensor;
                 if (Sensor.CurrentCO2 == 0)                  return Localisation.MainMenuBlockedWaitingCO2;
                 return string.Empty;
             }
@@ -175,6 +181,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             Transit.SelectedStation != null &&
             Transit.SelectedRoute != null &&
             Sensor.SelectedDevice != null &&
+            Sensor.IsDeviceConnected &&
             Sensor.CurrentCO2 > 0;
 
         public bool IsTransitRecordingBlocked => !CanStartTransitRecording;
@@ -185,7 +192,8 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 if (Transit.SelectedStation == null) return Localisation.MainMenuBlockedNoStation;
                 if (Transit.SelectedRoute == null)   return Localisation.MainMenuBlockedNoRoute;
-                if (Sensor.SelectedDevice == null)   return Localisation.MainMenuBlockedNoSensor;
+                if (Sensor.SelectedDevice == null || !Sensor.IsDeviceConnected)
+                                                     return Localisation.MainMenuBlockedNoSensor;
                 if (Sensor.CurrentCO2 == 0)          return Localisation.MainMenuBlockedWaitingCO2;
                 return string.Empty;
             }

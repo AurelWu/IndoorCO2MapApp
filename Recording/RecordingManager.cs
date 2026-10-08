@@ -177,6 +177,8 @@ namespace IndoorCO2MapAppV2.Recording
             if (minutes < 1)
                 return;
 
+            await EnsureSensorConnectedAsync(recording);
+
             // On failure Co2History keeps its previous contents, which may belong to an
             // earlier recording. Skipping the tick leaves the data collected so far
             // untouched; rebuilding from a stale buffer is what made the chart freeze.
@@ -253,6 +255,38 @@ namespace IndoorCO2MapAppV2.Recording
 #if ANDROID
             RecordingNotification.Update();
 #endif
+        }
+
+        /// <summary>
+        /// Reconnects the recording's sensor when there is no connection at all — e.g. the
+        /// reconnect after returning to the foreground failed with GATT 133. Nothing else
+        /// retries while a recording runs: the provider's own reconnect
+        /// (EnsureConnectionIsValidAsync) needs a provider to exist, and the main page's
+        /// reconnect timer only runs while that page is visible. Without this a recording
+        /// that started or lost its connection that way waited for data indefinitely.
+        /// Runs once per tick, so a sensor that is temporarily out of reach is retried
+        /// every 30 s rather than hammered.
+        /// </summary>
+        private async Task EnsureSensorConnectedAsync(BuildingRecording recording)
+        {
+            if (_monitor.ActiveCO2MonitorProvider != null) return;
+
+            var device = _monitor.SelectedDevice;
+            if (device == null)
+            {
+                Logger.WriteToLog("RecordingManager|no sensor connection and no sensor selected - cannot reconnect");
+                return;
+            }
+
+            // Never pull a different sensor into a running recording.
+            if (!string.IsNullOrEmpty(recording.MonitorID) && device.Id != recording.MonitorID)
+            {
+                Logger.WriteToLog($"RecordingManager|selected sensor {device.DisplayName} is not this recording's sensor - not reconnecting");
+                return;
+            }
+
+            Logger.WriteToLog($"RecordingManager|no sensor connection - reconnecting {device.DisplayName} for the running recording");
+            await _monitor.SelectDeviceAsync(device);
         }
 
         // ----------------------------------------------------------------------

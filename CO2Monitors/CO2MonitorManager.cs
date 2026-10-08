@@ -82,6 +82,11 @@ namespace IndoorCO2MapAppV2.CO2Monitors
                     ActiveCO2MonitorProvider = null;
                 }
 
+                // Whatever value we hold belongs to a connection that no longer exists; it is
+                // re-read below once this one succeeds. Left in place, a failed connect kept it
+                // on screen — and kept the start buttons enabled.
+                CurrentCO2 = 0;
+
                 if (device?.Device == null)
                     return;
 
@@ -280,6 +285,17 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
             Logger.WriteToLog($"CO2MonitorManager|ResumeConnectionAsync: reconnecting {device.DisplayName}");
             await SelectDeviceAsync(device);
+
+            // GATT error 133 straight after returning to the foreground is common on Android and
+            // usually transient; one retry after a short pause clears most of them. Only if the
+            // user hasn't picked another sensor meanwhile — retrying then would switch back.
+            if (ActiveCO2MonitorProvider == null && SelectedDevice?.Id == device.Id)
+            {
+                Logger.WriteToLog($"CO2MonitorManager|ResumeConnectionAsync: reconnect failed, retrying once");
+                await Task.Delay(1000);
+                if (ActiveCO2MonitorProvider == null && SelectedDevice?.Id == device.Id)
+                    await SelectDeviceAsync(device);
+            }
         }
 
         public async Task DisconnectAsync()
@@ -292,6 +308,7 @@ namespace IndoorCO2MapAppV2.CO2Monitors
 
                 ActiveCO2MonitorProvider = null;
                 SelectedDevice = null;
+                CurrentCO2 = 0;  // see SelectDeviceAsync — a value with no connection behind it
             }
             finally
             {
