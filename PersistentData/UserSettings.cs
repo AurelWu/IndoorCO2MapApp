@@ -179,6 +179,16 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _stopScanAtFirstSensor, value);
         }
 
+        // Android: by default Enter in the recording note closes the keyboard (users without
+        // a visible back button had no other way out). This restores Enter = line break for
+        // people who prefer closing the keyboard with back or by tapping outside.
+        private bool _noteEnterAddsLineBreak = false;
+        public bool NoteEnterAddsLineBreak
+        {
+            get => _noteEnterAddsLineBreak;
+            set => SetProperty(ref _noteEnterAddsLineBreak, value);
+        }
+
         private bool _showNewsNotification = true;
         public bool ShowNewsNotification
         {

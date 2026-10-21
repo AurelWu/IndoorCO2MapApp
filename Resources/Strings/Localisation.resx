@@ -567,6 +567,9 @@ Details: {0}</value>
   <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
     <value>Stop sensor search once the first sensor is found (faster start if you only use one sensor)</value>
   </data>
+  <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
+    <value>Enter key adds a line break in notes (close the keyboard with back or by tapping outside)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Keep recording when app is in background (shows a notification)</value>
   </data>

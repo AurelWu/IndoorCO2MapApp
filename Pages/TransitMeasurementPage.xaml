@@ -7,7 +7,8 @@
                xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
                xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
                x:Class="IndoorCO2MapAppV2.Pages.TransitMeasurementPage"
-               Title="{x:Static t:Localisation.TransitMeasurementTitle}">
+               Title="{x:Static t:Localisation.TransitMeasurementTitle}"
+               HideSoftInputOnTapped="True">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -282,7 +283,7 @@
             <VerticalStackLayout Spacing="10">
                 <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
                        Style="{StaticResource SectionLabelStyle}" />
-                <Editor
+                <controls:RecordingNoteEditor
                     x:Name="NoteEditor"
                     Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
                     AutoSize="TextChanges"

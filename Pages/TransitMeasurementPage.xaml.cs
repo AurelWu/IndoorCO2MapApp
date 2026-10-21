@@ -60,6 +60,9 @@ namespace IndoorCO2MapAppV2.Pages
         {
             base.OnAppearing();
 
+            // Re-apply the note's Enter-key behaviour in case the setting changed meanwhile.
+            NoteEditor.Handler?.UpdateValue(nameof(IEditor.Keyboard));
+
             RecordingManager.Instance.MeasurementDataUpdated -= OnMeasurementUpdated;
             RecordingManager.Instance.MeasurementDataUpdated += OnMeasurementUpdated;
 

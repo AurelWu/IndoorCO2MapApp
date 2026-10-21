@@ -508,6 +508,9 @@ Details: {0}</value>
   <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
     <value>Sensorsuche nach dem ersten gefundenen Sensor beenden (schnellerer Start, wenn Sie nur einen Sensor nutzen)</value>
   </data>
+  <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
+    <value>Eingabetaste fügt in Notizen einen Zeilenumbruch ein (Tastatur mit Zurück oder durch Tippen außerhalb schließen)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Aufnahme im Hintergrund fortsetzen (zeigt eine Benachrichtigung)</value>
   </data>

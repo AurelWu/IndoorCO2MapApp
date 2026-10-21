@@ -508,6 +508,9 @@ Détails : {0}</value>
   <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
     <value>Arrêter la recherche dès le premier capteur trouvé (démarrage plus rapide si vous n'utilisez qu'un capteur)</value>
   </data>
+  <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
+    <value>La touche Entrée insère un saut de ligne dans les notes (fermer le clavier avec Retour ou en touchant ailleurs)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Continuer l'enregistrement en arrière-plan (affiche une notification)</value>
   </data>

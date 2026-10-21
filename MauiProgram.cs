@@ -31,6 +31,7 @@ namespace IndoorCO2MapAppV2
                 .ConfigureMauiHandlers(handlers =>
                  {
                      handlers.AddHandler(typeof(RangeSlider), typeof(RangeSliderHandler));
+                     NoteEditorEnterKey.Register();
                  })
 #endif
 #if IOS

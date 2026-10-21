@@ -5,7 +5,8 @@
                xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
                xmlns:controls="clr-namespace:IndoorCO2MapAppV2.Controls"
                xmlns:enums="clr-namespace:IndoorCO2MapAppV2.Enumerations"
-               x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage">
+               x:Class="IndoorCO2MapAppV2.Pages.BuildingMeasurementPage"
+               HideSoftInputOnTapped="True">
 
     <ScrollView>
     <VerticalStackLayout Padding="30" Spacing="25">
@@ -137,7 +138,7 @@
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{x:Static t:Localisation.RecordingCustomNoteLabelText}"
                            Style="{StaticResource SectionLabelStyle}" />
-                    <Editor
+                    <controls:RecordingNoteEditor
                         x:Name="NoteEditor"
                         Placeholder="{x:Static t:Localisation.RecordingCustomNotPlaceholderText}"
                         AutoSize="TextChanges"

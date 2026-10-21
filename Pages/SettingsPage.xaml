@@ -79,6 +79,10 @@
                 <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsKeepRecordingInBackground}"
                                  IsToggled="{Binding KeepRecordingInBackground}"
                                  IsVisible="{OnPlatform Default=False, Android=True}" />
+                <!-- Android only: iOS already has Enter = line break plus a Done bar above the keyboard. -->
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsNoteEnterAddsLineBreak}"
+                                 IsToggled="{Binding NoteEnterAddsLineBreak}"
+                                 IsVisible="{OnPlatform Default=False, Android=True}" />
             </VerticalStackLayout>
         </Border>
 
