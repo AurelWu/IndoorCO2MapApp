@@ -22,9 +22,14 @@
         <Border Style="{StaticResource CardBorderStyle}">
             <VerticalStackLayout Spacing="10">
                 <Label Text="{x:Static t:Localisation.SettingsSectionLanguage}" Style="{StaticResource SectionLabelStyle}" />
+                <!-- Wraps into rows of equal-width buttons so every language stays visible at a
+                     glance as more are added — someone looking for their own language shouldn't
+                     have to scroll or open a list to find it. -->
                 <c:LabeledSegmentedControl Label="{x:Static t:Localisation.SettingsAppLanguage}"
                     Items="{Binding LanguageOptions}"
-                    SelectedItem="{Binding SelectedLanguage}" />
+                    SelectedItem="{Binding SelectedLanguage}"
+                    FillWidth="True"
+                    MaxItemsPerRow="3" />
                 <Label Text="{Binding LanguageRestartHint}"
                        FontSize="12"
                        Style="{StaticResource CaptionLabelStyle}" />

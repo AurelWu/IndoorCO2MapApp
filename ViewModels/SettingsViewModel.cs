@@ -227,17 +227,41 @@ namespace IndoorCO2MapAppV2.ViewModels
         public string AppVersion =>
             $"Version {AppInfo.VersionString} ({AppInfo.BuildString})";
 
-        public IReadOnlyList<string> LanguageOptions => ["EN", "DE", "FR", "PT"];
+        /// <summary>
+        /// App languages as (culture code, button label). Labels are fixed here and must never
+        /// come from the resource files: someone who switched to a language they can't read has
+        /// to recognise their own language to switch back. A language in a non-Latin script gets
+        /// its label in that script (e.g. ("ja", "日本語")); existing ones stay as their codes.
+        /// </summary>
+        /// <remarks>
+        /// A getter, not a static field: the static <see cref="Instance"/> at the top of the class
+        /// is constructed during type initialisation, and its constructor reads this table (via
+        /// <see cref="LanguageOptions"/>) before a field declared further down would be assigned.
+        /// </remarks>
+        private static (string Code, string Label)[] AppLanguages =>
+        [
+            ("en", "EN"),
+            ("de", "DE"),
+            ("fr", "FR"),
+            ("pt", "PT"),
+            ("es", "ES"),
+            ("ja", "日本語"),
+        ];
+
+        public IReadOnlyList<string> LanguageOptions { get; } = AppLanguages.Select(l => l.Label).ToList();
 
         public string LanguageRestartHint => Localisation.SettingsLanguageRestartHint;
 
+        // Mapped through the table rather than by upper/lower-casing the code, which only works
+        // while every label happens to be a Latin-script language code.
         public string SelectedLanguage
         {
-            get => UserSettings.Instance.Language.ToUpperInvariant();
+            get => AppLanguages.FirstOrDefault(l => l.Code == UserSettings.Instance.Language).Label
+                   ?? AppLanguages[0].Label;
             set
             {
-                string code = value.ToLowerInvariant();
-                if (UserSettings.Instance.Language == code) return;
+                var code = AppLanguages.FirstOrDefault(l => l.Label == value).Code;
+                if (code == null || UserSettings.Instance.Language == code) return;
                 UserSettings.Instance.Language = code;
                 OnPropertyChanged();
             }

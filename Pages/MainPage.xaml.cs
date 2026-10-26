@@ -958,10 +958,13 @@ namespace IndoorCO2MapAppV2.Pages
 
         private void OnOpenManualClicked(object sender, EventArgs e)
         {
-            string lang = UserSettings.Instance.Language;
-            string url = string.IsNullOrEmpty(lang) || lang.Equals("en", StringComparison.OrdinalIgnoreCase)
-                ? "https://indoorco2map.com/manual2.pdf"
-                : $"https://indoorco2map.com/manual2_{lang.ToLowerInvariant()}.pdf";
+            // Translated manuals exist only for these; any other app language (e.g. Spanish)
+            // gets the English one rather than a 404.
+            string[] manualLanguages = ["de", "fr", "pt"];
+            string lang = UserSettings.Instance.Language?.ToLowerInvariant() ?? "";
+            string url = manualLanguages.Contains(lang)
+                ? $"https://indoorco2map.com/manual2_{lang}.pdf"
+                : "https://indoorco2map.com/manual2.pdf";
             Launcher.OpenAsync(new Uri(url)).SafeFireAndForget("OnOpenManualClicked");
         }
 

@@ -449,7 +449,10 @@
 
 
             <!-- ===== Navigation ===== -->
-            <Button Text="{x:Static t:Localisation.MainMenuSettingsButtonText}"
+            <!-- The cogwheel lives here, not in the translated string: it is the way back to the
+                 language setting for someone who picked a language they can't read, so no
+                 translation may drop it. -->
+            <Button Text="{Binding Source={x:Static t:Localisation.MainMenuSettingsButtonText}, StringFormat='⚙️  {0}'}"
                     Clicked="OnNavigateClicked"
                     CommandParameter="///settings"
                     Style="{StaticResource TonalButtonStyle}"

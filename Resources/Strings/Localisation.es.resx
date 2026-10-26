@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MonitorSelectionLabel" xml:space="preserve">
+    <value>Selecciona tu medidor de CO2</value>
+  </data>
+  <data name="ScanningStatusLabel" xml:space="preserve">
+    <value>Buscando dispositivos...</value>
+  </data>
+  <data name="SearchRangeLabel" xml:space="preserve">
+    <value>Radio de búsqueda: </value>
+  </data>
+  <data name="CurrentCOLevelsLabel" xml:space="preserve">
+    <value>CO2 actual: </value>
+  </data>
+  <data name="CO2LevelsLabel" xml:space="preserve">
+    <value>CO2: </value>
+  </data>
+  <data name="NoSensorFoundStatusLabel" xml:space="preserve">
+    <value>No se encontró ningún sensor</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Ready" xml:space="preserve">
+    <value>Buscar edificios</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Searching" xml:space="preserve">
+    <value>Obteniendo datos de ubicación...</value>
+  </data>
+  <data name="Sort_Alphabetical" xml:space="preserve">
+    <value>Alfabético</value>
+  </data>
+  <data name="Sort_Distance" xml:space="preserve">
+    <value>Distancia</value>
+  </data>
+  <data name="RecordingLocationLabel" xml:space="preserve">
+    <value>Lugar: </value>
+  </data>
+  <data name="CancelRecordingButton" xml:space="preserve">
+    <value>Cancelar medición</value>
+  </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>próxima actualización en:</value>
+  </data>
+  <data name="RecoveryAbortButton" xml:space="preserve">
+    <value>Cancelar recuperación automática</value>
+  </data>
+  <data name="RecoveryWaitingForInit" xml:space="preserve">
+    <value>Esperando la inicialización...</value>
+  </data>
+  <data name="RecoveryOpeningRecording" xml:space="preserve">
+    <value>Abriendo la medición...</value>
+  </data>
+  <data name="RecoverySearchingWithTimeLeft" xml:space="preserve">
+    <value>Buscando el sensor... quedan {0}</value>
+  </data>
+  <data name="SubmitRecordingButton" xml:space="preserve">
+    <value>Enviar medición</value>
+  </data>
+  <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
+    <value>Se necesitan 5 puntos de datos para enviar</value>
+  </data>
+  <data name="UpdateInterval" xml:space="preserve">
+    <value>Intervalo: </value>
+  </data>
+  <data name="HistoryExportDatabaseTitle" xml:space="preserve">
+    <value>Exportar a archivo</value>
+  </data>
+  <data name="HistoryExportDatabaseSuccess" xml:space="preserve">
+    <value>Exportación completada</value>
+  </data>
+  <data name="HistoryExportDatabaseFailure" xml:space="preserve">
+    <value>Error al exportar</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulTitle" xml:space="preserve">
+    <value>Importación completada</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulDescription" xml:space="preserve">
+    <value>La base de datos se importó correctamente. Reinicia la app para cargar la nueva base de datos.</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureTitle" xml:space="preserve">
+    <value>Error al importar</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureDescription" xml:space="preserve">
+    <value>No se pudo importar la base de datos. Inténtalo de nuevo.</value>
+  </data>
+  <data name="RadioButtonLabelOpenDoorsWindows" xml:space="preserve">
+    <value>Puertas / ventanas abiertas</value>
+  </data>
+  <data name="RadioButtonLabelVentilationSystem" xml:space="preserve">
+    <value>Sistema de ventilación</value>
+  </data>
+  <data name="RecordingCustomNoteLabelText" xml:space="preserve">
+    <value>Nota</value>
+  </data>
+  <data name="RecordingCustomNotPlaceholderText" xml:space="preserve">
+    <value>Añade una nota sobre esta medición...</value>
+  </data>
+  <data name="MainMenuButtonStartBuildingRecording" xml:space="preserve">
+    <value>Iniciar medición en edificio</value>
+  </data>
+  <data name="MainMenuPrerecordingSwitchText" xml:space="preserve">
+    <value>Incluir los últimos 15 minutos</value>
+  </data>
+  <data name="MainMenuSettingsButtonText" xml:space="preserve">
+    <value>Ajustes</value>
+  </data>
+  <data name="MainMenuHistoryButtonText" xml:space="preserve">
+    <value>Historial</value>
+  </data>
+  <data name="MainMenuResultFilterPlaceholderText" xml:space="preserve">
+    <value>Buscar por nombre...</value>
+  </data>
+  <data name="SettingsLanguageRestartHint" xml:space="preserve">
+    <value>Es necesario reiniciar la app para aplicar el cambio.</value>
+  </data>
+  <data name="MainMenuModeBuilding" xml:space="preserve">
+    <value>Edificio</value>
+  </data>
+  <data name="MainMenuModeTransit" xml:space="preserve">
+    <value>Transporte</value>
+  </data>
+  <data name="MainMenuButtonStartTransitRecording" xml:space="preserve">
+    <value>Iniciar medición en transporte</value>
+  </data>
+  <data name="MainMenuBlockedNoBuilding" xml:space="preserve">
+    <value>Ningún edificio seleccionado</value>
+  </data>
+  <data name="MainMenuBlockedNoSensor" xml:space="preserve">
+    <value>Ningún sensor conectado</value>
+  </data>
+  <data name="MainMenuBlockedWaitingCO2" xml:space="preserve">
+    <value>Esperando lectura de CO2 (0 ppm)</value>
+  </data>
+  <data name="MainMenuBlockedNoStation" xml:space="preserve">
+    <value>Ninguna estación seleccionada</value>
+  </data>
+  <data name="MainMenuBlockedNoRoute" xml:space="preserve">
+    <value>Ninguna línea seleccionada</value>
+  </data>
+  <data name="RadioYes" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+  <data name="RadioNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="RadioNoData" xml:space="preserve">
+    <value>Sin especificar</value>
+  </data>
+  <data name="TransitDestinationLabel" xml:space="preserve">
+    <value>Destino (opcional)</value>
+  </data>
+  <data name="TransitSearchNearbyStops" xml:space="preserve">
+    <value>Buscar paradas cercanas</value>
+  </data>
+  <data name="TransitSelectDestination" xml:space="preserve">
+    <value>Selecciona la parada de destino...</value>
+  </data>
+  <data name="TransitRouteStationPlaceholder" xml:space="preserve">
+    <value>[Línea / Estación]</value>
+  </data>
+  <data name="MainMenuResumingRecording" xml:space="preserve">
+    <value>Reanudando la medición…</value>
+  </data>
+  <data name="MainMenuSubmissionSuccessful" xml:space="preserve">
+    <value>✓  Envío completado</value>
+  </data>
+  <data name="MainMenuResumeRecording" xml:space="preserve">
+    <value>Reanudar medición</value>
+  </data>
+  <data name="MainMenuRoutePreview" xml:space="preserve">
+    <value>Vista previa de la línea</value>
+  </data>
+  <data name="MainMenuNewsButton" xml:space="preserve">
+    <value>Novedades</value>
+  </data>
+  <data name="SettingsShowNewsNotification" xml:space="preserve">
+    <value>Mostrar indicador de novedades</value>
+  </data>
+  <data name="MainMenuStatisticsButton" xml:space="preserve">
+    <value>Estadísticas</value>
+  </data>
+  <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
+    <value>🔗  Abrir el mapa en el navegador</value>
+  </data>
+  <data name="MainMenuManualButton" xml:space="preserve">
+    <value>📖  Manual</value>
+  </data>
+  <data name="MainMenuDiscordButton" xml:space="preserve">
+    <value>💬  Únete a nuestro Discord</value>
+  </data>
+  <data name="MainMenuDataProtectionImprint" xml:space="preserve">
+    <value>🔗  Privacidad y aviso legal</value>
+  </data>
+  <data name="TransitSearchRoutesByName" xml:space="preserve">
+    <value>Buscar líneas por nombre...</value>
+  </data>
+  <data name="HistoryFilterPlaceholder" xml:space="preserve">
+    <value>Filtrar por lugar...</value>
+  </data>
+  <data name="HistoryGroupByLocation" xml:space="preserve">
+    <value>Agrupar por lugar</value>
+  </data>
+  <data name="HistorySortAZ" xml:space="preserve">
+    <value>Ordenar A–Z</value>
+  </data>
+  <data name="HistoryRecordingsCount" xml:space="preserve">
+    <value>{0} mediciones</value>
+  </data>
+  <data name="HistoryPpmAvg" xml:space="preserve">
+    <value>ppm prom.</value>
+  </data>
+  <data name="HistoryDeleteTitle" xml:space="preserve">
+    <value>Eliminar entrada</value>
+  </data>
+  <data name="HistoryDeleteConfirmOnline" xml:space="preserve">
+    <value>¿Quieres eliminar esta entrada de la base de datos en línea y del historial local?</value>
+  </data>
+  <data name="HistoryDeleteConfirmLocal" xml:space="preserve">
+    <value>¿Eliminar esta entrada del historial local? (Sin ID de envío: la entrada en línea no se puede eliminar.)</value>
+  </data>
+  <data name="HistoryDeleteButton" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="HistoryCancelButton" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="TimeAgoJustNow" xml:space="preserve">
+    <value>ahora mismo</value>
+  </data>
+  <data name="TimeAgoToday" xml:space="preserve">
+    <value>hoy</value>
+  </data>
+  <data name="TimeAgoYesterday" xml:space="preserve">
+    <value>ayer</value>
+  </data>
+  <data name="TimeAgoDaysAgo" xml:space="preserve">
+    <value>hace {0} días</value>
+  </data>
+  <data name="TimeAgoOneWeekAgo" xml:space="preserve">
+    <value>hace 1 semana</value>
+  </data>
+  <data name="TimeAgoWeeksAgo" xml:space="preserve">
+    <value>hace {0} semanas</value>
+  </data>
+  <data name="TimeAgoOneMonthAgo" xml:space="preserve">
+    <value>hace 1 mes</value>
+  </data>
+  <data name="TimeAgoMonthsAgo" xml:space="preserve">
+    <value>hace {0} meses</value>
+  </data>
+  <data name="TimeAgoOneYearAgo" xml:space="preserve">
+    <value>hace 1 año</value>
+  </data>
+  <data name="TimeAgoYearsAgo" xml:space="preserve">
+    <value>hace {0} años</value>
+  </data>
+  <data name="ContextWindowsOpen" xml:space="preserve">
+    <value>Ventanas abiertas</value>
+  </data>
+  <data name="ContextWindowsClosed" xml:space="preserve">
+    <value>Ventanas cerradas</value>
+  </data>
+  <data name="ContextVentilated" xml:space="preserve">
+    <value>Ventilado</value>
+  </data>
+  <data name="ContextNotVentilated" xml:space="preserve">
+    <value>Sin ventilar</value>
+  </data>
+  <data name="HistoryStatsLine" xml:space="preserve">
+    <value>Mín.: {0} · Máx.: {1} · {2} lecturas</value>
+  </data>
+  <data name="HistoryNoData" xml:space="preserve">
+    <value>Sin datos</value>
+  </data>
+  <data name="HistoryNoRecordingsYet" xml:space="preserve">
+    <value>Todavía no hay mediciones</value>
+  </data>
+  <data name="TransitSearchButton" xml:space="preserve">
+    <value>Buscar transporte</value>
+  </data>
+  <data name="TransitSearchingButton" xml:space="preserve">
+    <value>Buscando…</value>
+  </data>
+  <data name="TransitModeAll" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="TransitModeBus" xml:space="preserve">
+    <value>Bus</value>
+  </data>
+  <data name="TransitModeTram" xml:space="preserve">
+    <value>Tranvía</value>
+  </data>
+  <data name="TransitModeTrain" xml:space="preserve">
+    <value>Tren</value>
+  </data>
+  <data name="TransitModeLightRail" xml:space="preserve">
+    <value>Tren ligero</value>
+  </data>
+  <data name="TransitModeSubway" xml:space="preserve">
+    <value>Metro</value>
+  </data>
+  <data name="SensorWaitingForData" xml:space="preserve">
+    <value>Esperando datos del sensor…</value>
+  </data>
+  <data name="SmartHomeStep1" xml:space="preserve">
+    <value>Para leer los datos de tu Aranet4, la integración Smart Home tiene que estar activada.
+
+1) Abre la app oficial Aranet Home (instálala desde la tienda de aplicaciones si no la tienes)</value>
+  </data>
+  <data name="SmartHomeStep2" xml:space="preserve">
+    <value>2) Toca el icono del engranaje en la esquina superior derecha del sensor</value>
+  </data>
+  <data name="SmartHomeStep3" xml:space="preserve">
+    <value>3) Desliza el interruptor «Smart Home Integration» hacia la derecha</value>
+  </data>
+  <data name="SmartHomeClose" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="NotificationRecordingTitle" xml:space="preserve">
+    <value>Medición de CO2 en curso</value>
+  </data>
+  <data name="NotificationChannelDescription" xml:space="preserve">
+    <value>Mantiene la conexión con el sensor durante la medición</value>
+  </data>
+  <data name="NotificationRecordingTapToReturn" xml:space="preserve">
+    <value>Toca para volver a la app</value>
+  </data>
+  <data name="CommonMainMenuButton" xml:space="preserve">
+    <value>Menú principal</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>Cargando...</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="DialogCancelMeasurementTitle" xml:space="preserve">
+    <value>Cancelar medición</value>
+  </data>
+  <data name="DialogCancelMeasurementMessage" xml:space="preserve">
+    <value>¿Seguro que quieres cancelar y volver al inicio?</value>
+  </data>
+  <data name="DialogSubmitMeasurementTitle" xml:space="preserve">
+    <value>Enviar medición</value>
+  </data>
+  <data name="DialogSubmitMeasurementMessage" xml:space="preserve">
+    <value>¿Seguro que quieres enviar la medición?</value>
+  </data>
+  <data name="DialogUploadFailedTitle" xml:space="preserve">
+    <value>Error al enviar</value>
+  </data>
+  <data name="DialogUploadFailedMessage" xml:space="preserve">
+    <value>No se pudieron enviar tus datos y NO se han guardado. Inténtalo de nuevo.
+
+Detalles: {0}</value>
+  </data>
+  <data name="DialogUploadErrorMessage" xml:space="preserve">
+    <value>Se produjo un error al enviar tus datos.
+
+Detalles: {0}</value>
+  </data>
+  <data name="SubmittingDataButton" xml:space="preserve">
+    <value>Enviando datos...</value>
+  </data>
+  <data name="DialogNoSensorTitle" xml:space="preserve">
+    <value>Sin sensor</value>
+  </data>
+  <data name="DialogNoSensorMessage" xml:space="preserve">
+    <value>Selecciona primero un sensor.</value>
+  </data>
+  <data name="DialogSensorNotReadyTitle" xml:space="preserve">
+    <value>Sensor no disponible</value>
+  </data>
+  <data name="DialogSensorNotReadyMessage" xml:space="preserve">
+    <value>No se pudo conectar con el sensor. Inténtalo de nuevo.</value>
+  </data>
+  <data name="DialogDeleteHistoryTitle" xml:space="preserve">
+    <value>Eliminar historial</value>
+  </data>
+  <data name="DialogDeleteHistoryMessage" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar todo tu historial local de mediciones?</value>
+  </data>
+  <data name="DialogDeleteLocationCacheMessage" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar la caché de ubicaciones?</value>
+  </data>
+  <data name="DialogPrivacyWarningTitle" xml:space="preserve">
+    <value>Aviso de privacidad</value>
+  </data>
+  <data name="DialogPrivacyWarningMessage" xml:space="preserve">
+    <value>Si desactivas el redondeo del GPS, tu ubicación exacta podría quedar visible al compartir este registro. ¿Seguro que quieres continuar?</value>
+  </data>
+  <data name="DialogDisableRoundingConfirm" xml:space="preserve">
+    <value>Sí, desactivar el redondeo</value>
+  </data>
+  <data name="SettingsSectionLanguage" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="SettingsAppLanguage" xml:space="preserve">
+    <value>Idioma de la app</value>
+  </data>
+  <data name="SettingsSectionSensorFilter" xml:space="preserve">
+    <value>Filtro de sensores</value>
+  </data>
+  <data name="SettingsSensorFilterPlaceholder" xml:space="preserve">
+    <value>Mostrar solo los sensores que contengan este texto.</value>
+  </data>
+  <data name="SettingsSectionDisplay" xml:space="preserve">
+    <value>Visualización</value>
+  </data>
+  <data name="SettingsShowSortingToggle" xml:space="preserve">
+    <value>Mostrar el selector de orden de edificios</value>
+  </data>
+  <data name="SettingsShowBuildingFilter" xml:space="preserve">
+    <value>Mostrar el filtro de búsqueda de edificios</value>
+  </data>
+  <data name="SettingsDefaultSortMode" xml:space="preserve">
+    <value>Orden predeterminado</value>
+  </data>
+  <data name="SettingsShowWebsiteButton" xml:space="preserve">
+    <value>Mostrar el botón «Abrir el mapa en el navegador»</value>
+  </data>
+  <data name="SettingsShowImprintButton" xml:space="preserve">
+    <value>Mostrar el botón «Privacidad y aviso legal»</value>
+  </data>
+  <data name="SettingsShowManualButton" xml:space="preserve">
+    <value>Mostrar el botón «Manual»</value>
+  </data>
+  <data name="SettingsShowDiscordButton" xml:space="preserve">
+    <value>Mostrar el botón «Únete a nuestro Discord»</value>
+  </data>
+  <data name="SettingsShowRoutePreview" xml:space="preserve">
+    <value>Mostrar el mapa de vista previa de la línea</value>
+  </data>
+  <data name="SettingsShowChangeRoute" xml:space="preserve">
+    <value>Mostrar la opción «Cambiar de línea» durante la medición en transporte</value>
+  </data>
+  <data name="SettingsSectionRecording" xml:space="preserve">
+    <value>Medición</value>
+  </data>
+  <data name="SettingsConfirmBeforeSubmit" xml:space="preserve">
+    <value>Confirmar antes de enviar la medición</value>
+  </data>
+  <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
+    <value>Permitir iniciar la medición antes de la primera lectura del sensor</value>
+  </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>Detener la búsqueda al encontrar el primer sensor (inicio más rápido si solo usas un sensor)</value>
+  </data>
+  <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
+    <value>La tecla Enter añade un salto de línea en las notas (cierra el teclado con Atrás o tocando fuera)</value>
+  </data>
+  <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
+    <value>Seguir midiendo con la app en segundo plano (muestra una notificación)</value>
+  </data>
+  <data name="SettingsSectionData" xml:space="preserve">
+    <value>Datos</value>
+  </data>
+  <data name="SettingsUseLiveLocationService" xml:space="preserve">
+    <value>Usar el servicio de ubicación en tiempo real (poco fiable, pero se actualiza cada minuto en lugar de a diario)</value>
+  </data>
+  <data name="SettingsEnableLocationCaching" xml:space="preserve">
+    <value>Activar la caché de ubicaciones</value>
+  </data>
+  <data name="SettingsCacheRangeOverride" xml:space="preserve">
+    <value>Radio de búsqueda en caché (personalizado)</value>
+  </data>
+  <data name="SettingsEnableHistory" xml:space="preserve">
+    <value>Activar el historial local de mediciones</value>
+  </data>
+  <data name="SettingsDeleteLocationCache" xml:space="preserve">
+    <value>Eliminar la caché de ubicaciones</value>
+  </data>
+  <data name="SettingsDeleteHistory" xml:space="preserve">
+    <value>Eliminar el historial local de mediciones</value>
+  </data>
+  <data name="SettingsSectionDebug" xml:space="preserve">
+    <value>Depuración</value>
+  </data>
+  <data name="SettingsRoundGps" xml:space="preserve">
+    <value>Redondear la posición GPS a 0,5°</value>
+  </data>
+  <data name="SettingsCopyDebugLog" xml:space="preserve">
+    <value>Copiar el registro de depuración al portapapeles</value>
+  </data>
+  <data name="MainMenuTitle" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
+  <data name="MainMenuFetchingData" xml:space="preserve">
+    <value>Obteniendo datos...</value>
+  </data>
+  <data name="MainMenuSmartHomeNotEnabled" xml:space="preserve">
+    <value>⚠ Integración Smart Home no activada</value>
+  </data>
+  <data name="TransitSelectRoute" xml:space="preserve">
+    <value>Selecciona una línea...</value>
+  </data>
+  <data name="TransitMeasurementTitle" xml:space="preserve">
+    <value>Medición en transporte</value>
+  </data>
+  <data name="TransitLineLabel" xml:space="preserve">
+    <value>Línea</value>
+  </data>
+  <data name="TransitSearchRoutesNearMe" xml:space="preserve">
+    <value>Buscar líneas cercanas</value>
+  </data>
+  <data name="TransitApplyRouteChange" xml:space="preserve">
+    <value>Aplicar cambio de línea</value>
+  </data>
+  <data name="TransitNoGpsPosition" xml:space="preserve">
+    <value>No se pudo obtener la posición GPS.</value>
+  </data>
+  <data name="TransitNoStopsNearby" xml:space="preserve">
+    <value>No se encontraron paradas cercanas.</value>
+  </data>
+  <data name="TransitSearchFailed" xml:space="preserve">
+    <value>Error en la búsqueda.</value>
+  </data>
+  <data name="TransitNoCachedStopsNearby" xml:space="preserve">
+    <value>No hay paradas cercanas en la caché.</value>
+  </data>
+  <data name="TransitCacheLoadFailed" xml:space="preserve">
+    <value>Error al cargar la caché.</value>
+  </data>
+  <data name="MapPageTitle" xml:space="preserve">
+    <value>Mapa</value>
+  </data>
+  <data name="MapBackToHistory" xml:space="preserve">
+    <value>← Historial</value>
+  </data>
+  <data name="MapReloadTiles" xml:space="preserve">
+    <value>Recargar el mapa</value>
+  </data>
+  <data name="MapFilterBuildings" xml:space="preserve">
+    <value>Edificios</value>
+  </data>
+  <data name="MapShowLabels" xml:space="preserve">
+    <value>Etiquetas</value>
+  </data>
+  <data name="MapNotAvailableWindows" xml:space="preserve">
+    <value>Vista de mapa no disponible en Windows</value>
+  </data>
+  <data name="HistoryExportData" xml:space="preserve">
+    <value>Exportar datos</value>
+  </data>
+  <data name="HistoryImportData" xml:space="preserve">
+    <value>Importar datos</value>
+  </data>
+  <data name="StatisticsCommunityStats" xml:space="preserve">
+    <value>Estadísticas de la comunidad</value>
+  </data>
+  <data name="StatisticsMeasurementsByCountry" xml:space="preserve">
+    <value>Mediciones por país</value>
+  </data>
+  <data name="StatisticsColumnCountry" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="StatisticsColumnCount" xml:space="preserve">
+    <value>Cantidad</value>
+  </data>
+  <data name="StatusGpsStatus" xml:space="preserve">
+    <value>Estado GPS</value>
+  </data>
+  <data name="StatusGpsPermissions" xml:space="preserve">
+    <value>Permisos GPS</value>
+  </data>
+  <data name="StatusBtStatus" xml:space="preserve">
+    <value>Estado BT</value>
+  </data>
+  <data name="StatusBtPermissions" xml:space="preserve">
+    <value>Permisos BT</value>
+  </data>
+  <data name="StatusAllReady" xml:space="preserve">
+    <value>✓ GPS y Bluetooth listos</value>
+  </data>
+  <data name="GpsAcquiring" xml:space="preserve">
+    <value>Obteniendo la posición GPS...</value>
+  </data>
+  <data name="GpsNoValidDataYet" xml:space="preserve">
+    <value>Todavía no hay datos GPS válidos.</value>
+  </data>
+  <data name="BuildingsFetching" xml:space="preserve">
+    <value>Obteniendo edificios...</value>
+  </data>
+  <data name="BuildingsFetchFailed" xml:space="preserve">
+    <value>Error al obtener los datos: {0}</value>
+  </data>
+  <data name="BuildingsParsing" xml:space="preserve">
+    <value>Datos obtenidos, procesando...</value>
+  </data>
+  <data name="BuildingsSearching" xml:space="preserve">
+    <value>Buscando edificios...</value>
+  </data>
+  <data name="BuildingsFound" xml:space="preserve">
+    <value>Se encontraron {0} edificios.</value>
+  </data>
+  <data name="BuildingsSearchFailed" xml:space="preserve">
+    <value>Error en la búsqueda: {0}</value>
+  </data>
+  <data name="StatisticsLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar los datos: {0}</value>
+  </data>
+  <data name="StatisticsTotal" xml:space="preserve">
+    <value>Total: {0:N0}</value>
+  </data>
+  <data name="HistoryLatest" xml:space="preserve">
+    <value>última: {0}</value>
+  </data>
+  <data name="RecordingNoActive" xml:space="preserve">
+    <value>[Ninguna medición]</value>
+  </data>
+  <data name="DialogEnableBluetoothTitle" xml:space="preserve">
+    <value>Activar Bluetooth</value>
+  </data>
+  <data name="DialogEnableBluetoothMessage" xml:space="preserve">
+    <value>El Bluetooth está desactivado. ¿Quieres activarlo?</value>
+  </data>
+  <data name="DialogEnableGpsTitle" xml:space="preserve">
+    <value>Activar GPS</value>
+  </data>
+  <data name="DialogEnableGpsMessage" xml:space="preserve">
+    <value>El GPS está desactivado. ¿Quieres activarlo?</value>
+  </data>
+  <data name="DialogEnableGpsMessageIos" xml:space="preserve">
+    <value>Los servicios de ubicación están desactivados. Activa el GPS en Ajustes.</value>
+  </data>
+  <data name="DialogOpenSettings" xml:space="preserve">
+    <value>Abrir Ajustes</value>
+  </data>
+  <data name="ToastNoSensorsRetrying" xml:space="preserve">
+    <value>No se encontraron sensores, buscando de nuevo…</value>
+  </data>
+  <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
+    <value>Registro copiado</value>
+  </data>
+  <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
+    <value>El registro de depuración se copió al portapapeles.</value>
+  </data>
+</root>

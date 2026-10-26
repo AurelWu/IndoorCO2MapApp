@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MonitorSelectionLabel" xml:space="preserve">
+    <value>CO2モニターを選択</value>
+  </data>
+  <data name="ScanningStatusLabel" xml:space="preserve">
+    <value>デバイスを検索中…</value>
+  </data>
+  <data name="SearchRangeLabel" xml:space="preserve">
+    <value>検索範囲: </value>
+  </data>
+  <data name="CurrentCOLevelsLabel" xml:space="preserve">
+    <value>現在のCO2: </value>
+  </data>
+  <data name="CO2LevelsLabel" xml:space="preserve">
+    <value>CO2: </value>
+  </data>
+  <data name="NoSensorFoundStatusLabel" xml:space="preserve">
+    <value>センサーが見つかりません</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Ready" xml:space="preserve">
+    <value>建物を検索</value>
+  </data>
+  <data name="SearchBuildingButtonLabel_Searching" xml:space="preserve">
+    <value>位置情報を取得中…</value>
+  </data>
+  <data name="Sort_Alphabetical" xml:space="preserve">
+    <value>名前順</value>
+  </data>
+  <data name="Sort_Distance" xml:space="preserve">
+    <value>距離順</value>
+  </data>
+  <data name="RecordingLocationLabel" xml:space="preserve">
+    <value>場所: </value>
+  </data>
+  <data name="CancelRecordingButton" xml:space="preserve">
+    <value>測定をキャンセル</value>
+  </data>
+  <data name="RecordingNextUpdateLabel" xml:space="preserve">
+    <value>次の更新まで:</value>
+  </data>
+  <data name="RecoveryAbortButton" xml:space="preserve">
+    <value>自動復元を中止</value>
+  </data>
+  <data name="RecoveryWaitingForInit" xml:space="preserve">
+    <value>初期化を待っています…</value>
+  </data>
+  <data name="RecoveryOpeningRecording" xml:space="preserve">
+    <value>測定を開いています…</value>
+  </data>
+  <data name="RecoverySearchingWithTimeLeft" xml:space="preserve">
+    <value>センサーを検索中…残り {0}</value>
+  </data>
+  <data name="SubmitRecordingButton" xml:space="preserve">
+    <value>測定を送信</value>
+  </data>
+  <data name="SubmitRecordingButtonNeedData" xml:space="preserve">
+    <value>送信には5個のデータが必要です</value>
+  </data>
+  <data name="UpdateInterval" xml:space="preserve">
+    <value>間隔: </value>
+  </data>
+  <data name="HistoryExportDatabaseTitle" xml:space="preserve">
+    <value>ファイルにエクスポート</value>
+  </data>
+  <data name="HistoryExportDatabaseSuccess" xml:space="preserve">
+    <value>エクスポートが完了しました</value>
+  </data>
+  <data name="HistoryExportDatabaseFailure" xml:space="preserve">
+    <value>エクスポートに失敗しました</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulTitle" xml:space="preserve">
+    <value>インポート完了</value>
+  </data>
+  <data name="HistoryImportDatabaseSuccessfulDescription" xml:space="preserve">
+    <value>データベースをインポートしました。新しいデータベースを読み込むには、アプリを再起動してください。</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureTitle" xml:space="preserve">
+    <value>インポート失敗</value>
+  </data>
+  <data name="HistoryImportDatabaseFailureDescription" xml:space="preserve">
+    <value>データベースをインポートできませんでした。もう一度お試しください。</value>
+  </data>
+  <data name="RadioButtonLabelOpenDoorsWindows" xml:space="preserve">
+    <value>ドア・窓の開放</value>
+  </data>
+  <data name="RadioButtonLabelVentilationSystem" xml:space="preserve">
+    <value>換気システム</value>
+  </data>
+  <data name="RecordingCustomNoteLabelText" xml:space="preserve">
+    <value>メモ</value>
+  </data>
+  <data name="RecordingCustomNotPlaceholderText" xml:space="preserve">
+    <value>この測定についてのメモを追加…</value>
+  </data>
+  <data name="MainMenuButtonStartBuildingRecording" xml:space="preserve">
+    <value>建物の測定を開始</value>
+  </data>
+  <data name="MainMenuPrerecordingSwitchText" xml:space="preserve">
+    <value>直前15分間のデータを含める</value>
+  </data>
+  <data name="MainMenuSettingsButtonText" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="MainMenuHistoryButtonText" xml:space="preserve">
+    <value>履歴</value>
+  </data>
+  <data name="MainMenuResultFilterPlaceholderText" xml:space="preserve">
+    <value>名前で検索…</value>
+  </data>
+  <data name="SettingsLanguageRestartHint" xml:space="preserve">
+    <value>変更を反映するには、アプリの再起動が必要です。</value>
+  </data>
+  <data name="MainMenuModeBuilding" xml:space="preserve">
+    <value>建物</value>
+  </data>
+  <data name="MainMenuModeTransit" xml:space="preserve">
+    <value>交通機関</value>
+  </data>
+  <data name="MainMenuButtonStartTransitRecording" xml:space="preserve">
+    <value>交通機関の測定を開始</value>
+  </data>
+  <data name="MainMenuBlockedNoBuilding" xml:space="preserve">
+    <value>建物が選択されていません</value>
+  </data>
+  <data name="MainMenuBlockedNoSensor" xml:space="preserve">
+    <value>センサーが接続されていません</value>
+  </data>
+  <data name="MainMenuBlockedWaitingCO2" xml:space="preserve">
+    <value>CO2の測定値を待っています (0 ppm)</value>
+  </data>
+  <data name="MainMenuBlockedNoStation" xml:space="preserve">
+    <value>駅・停留所が選択されていません</value>
+  </data>
+  <data name="MainMenuBlockedNoRoute" xml:space="preserve">
+    <value>路線が選択されていません</value>
+  </data>
+  <data name="RadioYes" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="RadioNo" xml:space="preserve">
+    <value>いいえ</value>
+  </data>
+  <data name="RadioNoData" xml:space="preserve">
+    <value>不明</value>
+  </data>
+  <data name="TransitDestinationLabel" xml:space="preserve">
+    <value>目的地（任意）</value>
+  </data>
+  <data name="TransitSearchNearbyStops" xml:space="preserve">
+    <value>近くの駅・停留所を検索</value>
+  </data>
+  <data name="TransitSelectDestination" xml:space="preserve">
+    <value>降車する駅・停留所を選択…</value>
+  </data>
+  <data name="TransitRouteStationPlaceholder" xml:space="preserve">
+    <value>[路線 / 駅]</value>
+  </data>
+  <data name="MainMenuResumingRecording" xml:space="preserve">
+    <value>測定を再開しています…</value>
+  </data>
+  <data name="MainMenuSubmissionSuccessful" xml:space="preserve">
+    <value>✓  送信が完了しました</value>
+  </data>
+  <data name="MainMenuResumeRecording" xml:space="preserve">
+    <value>測定を再開</value>
+  </data>
+  <data name="MainMenuRoutePreview" xml:space="preserve">
+    <value>路線のプレビュー</value>
+  </data>
+  <data name="MainMenuNewsButton" xml:space="preserve">
+    <value>お知らせ</value>
+  </data>
+  <data name="SettingsShowNewsNotification" xml:space="preserve">
+    <value>お知らせのバッジを表示</value>
+  </data>
+  <data name="MainMenuStatisticsButton" xml:space="preserve">
+    <value>統計</value>
+  </data>
+  <data name="MainMenuOpenMapInBrowser" xml:space="preserve">
+    <value>🔗  ブラウザで地図を開く</value>
+  </data>
+  <data name="MainMenuManualButton" xml:space="preserve">
+    <value>📖  マニュアル</value>
+  </data>
+  <data name="MainMenuDiscordButton" xml:space="preserve">
+    <value>💬  Discordに参加</value>
+  </data>
+  <data name="MainMenuDataProtectionImprint" xml:space="preserve">
+    <value>🔗  プライバシーと運営者情報</value>
+  </data>
+  <data name="TransitSearchRoutesByName" xml:space="preserve">
+    <value>路線名で検索…</value>
+  </data>
+  <data name="HistoryFilterPlaceholder" xml:space="preserve">
+    <value>場所で絞り込み…</value>
+  </data>
+  <data name="HistoryGroupByLocation" xml:space="preserve">
+    <value>場所ごとにまとめる</value>
+  </data>
+  <data name="HistorySortAZ" xml:space="preserve">
+    <value>名前順</value>
+  </data>
+  <data name="HistoryRecordingsCount" xml:space="preserve">
+    <value>{0}件の測定</value>
+  </data>
+  <data name="HistoryPpmAvg" xml:space="preserve">
+    <value>平均 ppm</value>
+  </data>
+  <data name="HistoryDeleteTitle" xml:space="preserve">
+    <value>記録を削除</value>
+  </data>
+  <data name="HistoryDeleteConfirmOnline" xml:space="preserve">
+    <value>この記録をオンラインのデータベースとローカルの履歴から削除しますか？</value>
+  </data>
+  <data name="HistoryDeleteConfirmLocal" xml:space="preserve">
+    <value>この記録をローカルの履歴から削除しますか？（送信IDがないため、オンラインの記録は削除できません。）</value>
+  </data>
+  <data name="HistoryDeleteButton" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="HistoryCancelButton" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="TimeAgoJustNow" xml:space="preserve">
+    <value>たった今</value>
+  </data>
+  <data name="TimeAgoToday" xml:space="preserve">
+    <value>今日</value>
+  </data>
+  <data name="TimeAgoYesterday" xml:space="preserve">
+    <value>昨日</value>
+  </data>
+  <data name="TimeAgoDaysAgo" xml:space="preserve">
+    <value>{0}日前</value>
+  </data>
+  <data name="TimeAgoOneWeekAgo" xml:space="preserve">
+    <value>1週間前</value>
+  </data>
+  <data name="TimeAgoWeeksAgo" xml:space="preserve">
+    <value>{0}週間前</value>
+  </data>
+  <data name="TimeAgoOneMonthAgo" xml:space="preserve">
+    <value>1か月前</value>
+  </data>
+  <data name="TimeAgoMonthsAgo" xml:space="preserve">
+    <value>{0}か月前</value>
+  </data>
+  <data name="TimeAgoOneYearAgo" xml:space="preserve">
+    <value>1年前</value>
+  </data>
+  <data name="TimeAgoYearsAgo" xml:space="preserve">
+    <value>{0}年前</value>
+  </data>
+  <data name="ContextWindowsOpen" xml:space="preserve">
+    <value>窓：開</value>
+  </data>
+  <data name="ContextWindowsClosed" xml:space="preserve">
+    <value>窓：閉</value>
+  </data>
+  <data name="ContextVentilated" xml:space="preserve">
+    <value>換気あり</value>
+  </data>
+  <data name="ContextNotVentilated" xml:space="preserve">
+    <value>換気なし</value>
+  </data>
+  <data name="HistoryStatsLine" xml:space="preserve">
+    <value>最小: {0} · 最大: {1} · {2}件の測定値</value>
+  </data>
+  <data name="HistoryNoData" xml:space="preserve">
+    <value>データなし</value>
+  </data>
+  <data name="HistoryNoRecordingsYet" xml:space="preserve">
+    <value>まだ測定がありません</value>
+  </data>
+  <data name="TransitSearchButton" xml:space="preserve">
+    <value>交通機関を検索</value>
+  </data>
+  <data name="TransitSearchingButton" xml:space="preserve">
+    <value>検索中…</value>
+  </data>
+  <data name="TransitModeAll" xml:space="preserve">
+    <value>すべて</value>
+  </data>
+  <data name="TransitModeBus" xml:space="preserve">
+    <value>バス</value>
+  </data>
+  <data name="TransitModeTram" xml:space="preserve">
+    <value>路面電車</value>
+  </data>
+  <data name="TransitModeTrain" xml:space="preserve">
+    <value>電車</value>
+  </data>
+  <data name="TransitModeLightRail" xml:space="preserve">
+    <value>ライトレール</value>
+  </data>
+  <data name="TransitModeSubway" xml:space="preserve">
+    <value>地下鉄</value>
+  </data>
+  <data name="SensorWaitingForData" xml:space="preserve">
+    <value>センサーのデータを待っています…</value>
+  </data>
+  <data name="SmartHomeStep1" xml:space="preserve">
+    <value>Aranet4のデータを読み取るには、Smart Home Integrationを有効にする必要があります。
+
+1) 公式のAranet Homeアプリを開きます（インストールしていない場合は、アプリストアからインストールしてください）</value>
+  </data>
+  <data name="SmartHomeStep2" xml:space="preserve">
+    <value>2) センサーの右上にある歯車アイコンをタップします</value>
+  </data>
+  <data name="SmartHomeStep3" xml:space="preserve">
+    <value>3) 「Smart Home Integration」のスイッチを右にスライドします</value>
+  </data>
+  <data name="SmartHomeClose" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="NotificationRecordingTitle" xml:space="preserve">
+    <value>CO2を測定中</value>
+  </data>
+  <data name="NotificationChannelDescription" xml:space="preserve">
+    <value>測定中にセンサーとの接続を維持します</value>
+  </data>
+  <data name="NotificationRecordingTapToReturn" xml:space="preserve">
+    <value>タップしてアプリに戻る</value>
+  </data>
+  <data name="CommonMainMenuButton" xml:space="preserve">
+    <value>メインメニュー</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>読み込み中…</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>いいえ</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="DialogCancelMeasurementTitle" xml:space="preserve">
+    <value>測定をキャンセル</value>
+  </data>
+  <data name="DialogCancelMeasurementMessage" xml:space="preserve">
+    <value>測定をキャンセルしてホームに戻りますか？</value>
+  </data>
+  <data name="DialogSubmitMeasurementTitle" xml:space="preserve">
+    <value>測定を送信</value>
+  </data>
+  <data name="DialogSubmitMeasurementMessage" xml:space="preserve">
+    <value>この測定を送信しますか？</value>
+  </data>
+  <data name="DialogUploadFailedTitle" xml:space="preserve">
+    <value>送信に失敗しました</value>
+  </data>
+  <data name="DialogUploadFailedMessage" xml:space="preserve">
+    <value>データを送信できず、保存もされていません。もう一度お試しください。
+
+詳細: {0}</value>
+  </data>
+  <data name="DialogUploadErrorMessage" xml:space="preserve">
+    <value>データの送信中にエラーが発生しました。
+
+詳細: {0}</value>
+  </data>
+  <data name="SubmittingDataButton" xml:space="preserve">
+    <value>データを送信中…</value>
+  </data>
+  <data name="DialogNoSensorTitle" xml:space="preserve">
+    <value>センサーがありません</value>
+  </data>
+  <data name="DialogNoSensorMessage" xml:space="preserve">
+    <value>先にセンサーを選択してください。</value>
+  </data>
+  <data name="DialogSensorNotReadyTitle" xml:space="preserve">
+    <value>センサーの準備ができていません</value>
+  </data>
+  <data name="DialogSensorNotReadyMessage" xml:space="preserve">
+    <value>センサーに接続できませんでした。もう一度お試しください。</value>
+  </data>
+  <data name="DialogDeleteHistoryTitle" xml:space="preserve">
+    <value>履歴を削除</value>
+  </data>
+  <data name="DialogDeleteHistoryMessage" xml:space="preserve">
+    <value>ローカルの測定履歴をすべて削除しますか？</value>
+  </data>
+  <data name="DialogDeleteLocationCacheMessage" xml:space="preserve">
+    <value>位置情報のキャッシュを削除しますか？</value>
+  </data>
+  <data name="DialogPrivacyWarningTitle" xml:space="preserve">
+    <value>プライバシーに関する注意</value>
+  </data>
+  <data name="DialogPrivacyWarningMessage" xml:space="preserve">
+    <value>GPSの丸めを無効にすると、このログを共有したときに正確な位置が知られる可能性があります。続行しますか？</value>
+  </data>
+  <data name="DialogDisableRoundingConfirm" xml:space="preserve">
+    <value>はい、丸めを無効にする</value>
+  </data>
+  <data name="SettingsSectionLanguage" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="SettingsAppLanguage" xml:space="preserve">
+    <value>アプリの言語</value>
+  </data>
+  <data name="SettingsSectionSensorFilter" xml:space="preserve">
+    <value>センサーの絞り込み</value>
+  </data>
+  <data name="SettingsSensorFilterPlaceholder" xml:space="preserve">
+    <value>この文字列を含むセンサーのみを表示します。</value>
+  </data>
+  <data name="SettingsSectionDisplay" xml:space="preserve">
+    <value>表示</value>
+  </data>
+  <data name="SettingsShowSortingToggle" xml:space="preserve">
+    <value>建物の並べ替えの切り替えを表示</value>
+  </data>
+  <data name="SettingsShowBuildingFilter" xml:space="preserve">
+    <value>建物の検索フィルターを表示</value>
+  </data>
+  <data name="SettingsDefaultSortMode" xml:space="preserve">
+    <value>既定の並べ替え</value>
+  </data>
+  <data name="SettingsShowWebsiteButton" xml:space="preserve">
+    <value>「ブラウザで地図を開く」ボタンを表示</value>
+  </data>
+  <data name="SettingsShowImprintButton" xml:space="preserve">
+    <value>「プライバシーと運営者情報」ボタンを表示</value>
+  </data>
+  <data name="SettingsShowManualButton" xml:space="preserve">
+    <value>「マニュアル」ボタンを表示</value>
+  </data>
+  <data name="SettingsShowDiscordButton" xml:space="preserve">
+    <value>「Discordに参加」ボタンを表示</value>
+  </data>
+  <data name="SettingsShowRoutePreview" xml:space="preserve">
+    <value>路線のプレビュー地図を表示</value>
+  </data>
+  <data name="SettingsShowChangeRoute" xml:space="preserve">
+    <value>交通機関の測定中に「路線を変更」を表示</value>
+  </data>
+  <data name="SettingsSectionRecording" xml:space="preserve">
+    <value>測定</value>
+  </data>
+  <data name="SettingsConfirmBeforeSubmit" xml:space="preserve">
+    <value>測定を送信する前に確認する</value>
+  </data>
+  <data name="SettingsAllowStartWithoutSensorData" xml:space="preserve">
+    <value>センサーの最初の測定値を待たずに測定を開始できるようにする</value>
+  </data>
+  <data name="SettingsStopScanAtFirstSensor" xml:space="preserve">
+    <value>最初のセンサーが見つかったら検索を終了する（センサーが1台だけなら起動が速くなります）</value>
+  </data>
+  <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
+    <value>メモでEnterキーを押すと改行する（キーボードは「戻る」または外側をタップして閉じます）</value>
+  </data>
+  <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
+    <value>アプリがバックグラウンドでも測定を続ける（通知が表示されます）</value>
+  </data>
+  <data name="SettingsSectionData" xml:space="preserve">
+    <value>データ</value>
+  </data>
+  <data name="SettingsUseLiveLocationService" xml:space="preserve">
+    <value>リアルタイムの位置情報サービスを使う（不安定ですが、毎日ではなく毎分更新されます）</value>
+  </data>
+  <data name="SettingsEnableLocationCaching" xml:space="preserve">
+    <value>位置情報のキャッシュを有効にする</value>
+  </data>
+  <data name="SettingsCacheRangeOverride" xml:space="preserve">
+    <value>キャッシュの検索範囲（手動設定）</value>
+  </data>
+  <data name="SettingsEnableHistory" xml:space="preserve">
+    <value>ローカルの測定履歴を有効にする</value>
+  </data>
+  <data name="SettingsDeleteLocationCache" xml:space="preserve">
+    <value>位置情報のキャッシュを削除</value>
+  </data>
+  <data name="SettingsDeleteHistory" xml:space="preserve">
+    <value>ローカルの測定履歴を削除</value>
+  </data>
+  <data name="SettingsSectionDebug" xml:space="preserve">
+    <value>デバッグ</value>
+  </data>
+  <data name="SettingsRoundGps" xml:space="preserve">
+    <value>GPSの位置を0.5°単位に丸める</value>
+  </data>
+  <data name="SettingsCopyDebugLog" xml:space="preserve">
+    <value>デバッグログをクリップボードにコピー</value>
+  </data>
+  <data name="MainMenuTitle" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
+  <data name="MainMenuFetchingData" xml:space="preserve">
+    <value>データを取得中…</value>
+  </data>
+  <data name="MainMenuSmartHomeNotEnabled" xml:space="preserve">
+    <value>⚠ Smart Home Integrationが無効です</value>
+  </data>
+  <data name="TransitSelectRoute" xml:space="preserve">
+    <value>路線を選択…</value>
+  </data>
+  <data name="TransitMeasurementTitle" xml:space="preserve">
+    <value>交通機関の測定</value>
+  </data>
+  <data name="TransitLineLabel" xml:space="preserve">
+    <value>路線</value>
+  </data>
+  <data name="TransitSearchRoutesNearMe" xml:space="preserve">
+    <value>近くの路線を検索</value>
+  </data>
+  <data name="TransitApplyRouteChange" xml:space="preserve">
+    <value>路線の変更を適用</value>
+  </data>
+  <data name="TransitNoGpsPosition" xml:space="preserve">
+    <value>GPSの位置を取得できませんでした。</value>
+  </data>
+  <data name="TransitNoStopsNearby" xml:space="preserve">
+    <value>近くに駅・停留所が見つかりません。</value>
+  </data>
+  <data name="TransitSearchFailed" xml:space="preserve">
+    <value>検索に失敗しました。</value>
+  </data>
+  <data name="TransitNoCachedStopsNearby" xml:space="preserve">
+    <value>キャッシュに近くの駅・停留所がありません。</value>
+  </data>
+  <data name="TransitCacheLoadFailed" xml:space="preserve">
+    <value>キャッシュの読み込みに失敗しました。</value>
+  </data>
+  <data name="MapPageTitle" xml:space="preserve">
+    <value>地図</value>
+  </data>
+  <data name="MapBackToHistory" xml:space="preserve">
+    <value>← 履歴</value>
+  </data>
+  <data name="MapReloadTiles" xml:space="preserve">
+    <value>地図を再読み込み</value>
+  </data>
+  <data name="MapFilterBuildings" xml:space="preserve">
+    <value>建物</value>
+  </data>
+  <data name="MapShowLabels" xml:space="preserve">
+    <value>ラベル</value>
+  </data>
+  <data name="MapNotAvailableWindows" xml:space="preserve">
+    <value>Windowsでは地図を表示できません</value>
+  </data>
+  <data name="HistoryExportData" xml:space="preserve">
+    <value>データをエクスポート</value>
+  </data>
+  <data name="HistoryImportData" xml:space="preserve">
+    <value>データをインポート</value>
+  </data>
+  <data name="StatisticsCommunityStats" xml:space="preserve">
+    <value>コミュニティの統計</value>
+  </data>
+  <data name="StatisticsMeasurementsByCountry" xml:space="preserve">
+    <value>国別の測定数</value>
+  </data>
+  <data name="StatisticsColumnCountry" xml:space="preserve">
+    <value>国</value>
+  </data>
+  <data name="StatisticsColumnCount" xml:space="preserve">
+    <value>件数</value>
+  </data>
+  <data name="StatusGpsStatus" xml:space="preserve">
+    <value>GPSの状態</value>
+  </data>
+  <data name="StatusGpsPermissions" xml:space="preserve">
+    <value>GPSの許可</value>
+  </data>
+  <data name="StatusBtStatus" xml:space="preserve">
+    <value>BTの状態</value>
+  </data>
+  <data name="StatusBtPermissions" xml:space="preserve">
+    <value>BTの許可</value>
+  </data>
+  <data name="StatusAllReady" xml:space="preserve">
+    <value>✓ GPSとBluetoothの準備完了</value>
+  </data>
+  <data name="GpsAcquiring" xml:space="preserve">
+    <value>GPSの位置を取得中…</value>
+  </data>
+  <data name="GpsNoValidDataYet" xml:space="preserve">
+    <value>有効なGPSデータがまだありません。</value>
+  </data>
+  <data name="BuildingsFetching" xml:space="preserve">
+    <value>建物を取得中…</value>
+  </data>
+  <data name="BuildingsFetchFailed" xml:space="preserve">
+    <value>取得に失敗しました: {0}</value>
+  </data>
+  <data name="BuildingsParsing" xml:space="preserve">
+    <value>取得完了、処理中…</value>
+  </data>
+  <data name="BuildingsSearching" xml:space="preserve">
+    <value>建物を検索中…</value>
+  </data>
+  <data name="BuildingsFound" xml:space="preserve">
+    <value>{0}件の建物が見つかりました。</value>
+  </data>
+  <data name="BuildingsSearchFailed" xml:space="preserve">
+    <value>検索に失敗しました: {0}</value>
+  </data>
+  <data name="StatisticsLoadFailed" xml:space="preserve">
+    <value>データを読み込めませんでした: {0}</value>
+  </data>
+  <data name="StatisticsTotal" xml:space="preserve">
+    <value>合計: {0:N0}</value>
+  </data>
+  <data name="HistoryLatest" xml:space="preserve">
+    <value>最新: {0}</value>
+  </data>
+  <data name="RecordingNoActive" xml:space="preserve">
+    <value>[測定なし]</value>
+  </data>
+  <data name="DialogEnableBluetoothTitle" xml:space="preserve">
+    <value>Bluetoothを有効にする</value>
+  </data>
+  <data name="DialogEnableBluetoothMessage" xml:space="preserve">
+    <value>Bluetoothが無効になっています。有効にしますか？</value>
+  </data>
+  <data name="DialogEnableGpsTitle" xml:space="preserve">
+    <value>GPSを有効にする</value>
+  </data>
+  <data name="DialogEnableGpsMessage" xml:space="preserve">
+    <value>GPSが無効になっています。有効にしますか？</value>
+  </data>
+  <data name="DialogEnableGpsMessageIos" xml:space="preserve">
+    <value>位置情報サービスが無効になっています。「設定」でGPSを有効にしてください。</value>
+  </data>
+  <data name="DialogOpenSettings" xml:space="preserve">
+    <value>設定を開く</value>
+  </data>
+  <data name="ToastNoSensorsRetrying" xml:space="preserve">
+    <value>センサーが見つかりません。もう一度検索しています…</value>
+  </data>
+  <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
+    <value>デバッグログをコピーしました</value>
+  </data>
+  <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
+    <value>デバッグログをクリップボードにコピーしました。</value>
+  </data>
+</root>
