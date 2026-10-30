@@ -188,6 +188,12 @@ namespace IndoorCO2MapAppV2.ViewModels
             set { UserSettings.Instance.StopScanAtFirstSensor = value; OnPropertyChanged(); }
         }
 
+        public bool ShowLocationType
+        {
+            get => UserSettings.Instance.ShowLocationType;
+            set { UserSettings.Instance.ShowLocationType = value; OnPropertyChanged(); }
+        }
+
         public bool NoteEnterAddsLineBreak
         {
             get => UserSettings.Instance.NoteEnterAddsLineBreak;

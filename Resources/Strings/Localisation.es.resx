@@ -511,6 +511,9 @@ Detalles: {0}</value>
   <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
     <value>La tecla Enter añade un salto de línea en las notas (cierra el teclado con Atrás o tocando fuera)</value>
   </data>
+  <data name="SettingsShowLocationType" xml:space="preserve">
+    <value>Mostrar el tipo del lugar seleccionado (p. ej., bar o cine)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Seguir midiendo con la app en segundo plano (muestra una notificación)</value>
   </data>

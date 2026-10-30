@@ -262,6 +262,17 @@
                             </Label>
                         </Grid>
 
+                        <!-- Type of the selected place ("Cinema"), so places that share a name — a
+                             cinema and the bar inside it — can be told apart. The outer view follows the
+                             setting, the label itself whether the type is known. -->
+                        <ContentView IsVisible="{Binding Settings.ShowLocationType}">
+                            <Label Text="{Binding BuildingSearch.SelectedBuildingType}"
+                                   IsVisible="{Binding BuildingSearch.HasSelectedBuildingType}"
+                                   Style="{StaticResource CaptionLabelStyle}"
+                                   FontSize="13"
+                                   Margin="4,-4,0,0" />
+                        </ContentView>
+
                         <c:LabeledSegmentedControl Label="" Items="{Binding Settings.SortModes}"
                                                    SelectedItem="{Binding Settings.DefaultSortMode, Mode=OneTime}"
                                                    SelectionChangedCommand="{Binding BuildingSearch.SortModeChangedCommand}"

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.Resources.Strings;
 using IndoorCO2MapAppV2.Spatial;
 using IndoorCO2MapAppV2.Utility;
@@ -40,6 +41,13 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         [ObservableProperty]
         private LocationData? selectedBuilding;
+
+        /// <summary>"Cinema" for the selected building, or null when its type is unknown.</summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasSelectedBuildingType))]
+        private string? selectedBuildingType;
+
+        public bool HasSelectedBuildingType => !string.IsNullOrEmpty(SelectedBuildingType);
 
         [ObservableProperty]
         private double? latitude;
@@ -289,6 +297,15 @@ namespace IndoorCO2MapAppV2.ViewModels
         {
             OnPropertyChanged(nameof(IsFavourited));
             OnPropertyChanged(nameof(StarColor));
+            UpdateSelectedBuildingTypeAsync(value).SafeFireAndForget("BuildingSearchViewModel|UpdateSelectedBuildingTypeAsync");
+        }
+
+        private async Task UpdateSelectedBuildingTypeAsync(LocationData? building)
+        {
+            await LocationCategory.EnsureLoadedAsync();   // first call only reads the bundled file
+            if (!ReferenceEquals(building, SelectedBuilding)) return;   // selection moved on meanwhile
+
+            SelectedBuildingType = LocationCategory.GetDisplayName(building?.Category);
         }
 
 

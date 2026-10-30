@@ -18,6 +18,9 @@ namespace IndoorCO2MapAppV2.Spatial
 
         public double Distance { get; private set; }
 
+        /// <summary>OSM category as "key=value" (e.g. "amenity=bar"), or null if unknown.</summary>
+        public string? Category { get; init; }
+
         public string FavouriteKey => $"{Type}_{ID}";
 
         public LocationData(string type, long id, string name, double latitude, double longitude, double userLatitude, double userLongitude)

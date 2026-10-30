@@ -29,7 +29,8 @@ namespace IndoorCO2MapAppV2.Spatial
                 ID = loc.ID,
                 Name = loc.Name,
                 Latitude = loc.Latitude,
-                Longitude = loc.Longitude
+                Longitude = loc.Longitude,
+                Category = loc.Category
             };
 
             return db.InsertOrReplaceAsync(cached);

@@ -511,6 +511,9 @@ Détails : {0}</value>
   <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
     <value>La touche Entrée insère un saut de ligne dans les notes (fermer le clavier avec Retour ou en touchant ailleurs)</value>
   </data>
+  <data name="SettingsShowLocationType" xml:space="preserve">
+    <value>Afficher le type du lieu sélectionné (p. ex. bar ou cinéma)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Continuer l'enregistrement en arrière-plan (affiche une notification)</value>
   </data>

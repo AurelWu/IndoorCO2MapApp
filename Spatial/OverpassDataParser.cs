@@ -45,10 +45,16 @@ internal static class OverpassDataParser
 
             // tags and name
             string name = "";
-            if (element.TryGetProperty("tags", out var tags) && tags.TryGetProperty("name", out var nameProp))
-                name = nameProp.GetString() ?? "";
+            string? category = null;
+            if (element.TryGetProperty("tags", out var tags))
+            {
+                if (tags.TryGetProperty("name", out var nameProp))
+                    name = nameProp.GetString() ?? "";
+                category = LocationCategory.FromTags(k =>
+                    tags.TryGetProperty(k, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null);
+            }
 
-            locations.Add(new LocationData(type, id, name, lat, lon, userLat, userLon));
+            locations.Add(new LocationData(type, id, name, lat, lon, userLat, userLon) { Category = category });
         }
         if(updateLocationStore)
         {

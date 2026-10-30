@@ -14,7 +14,10 @@ namespace IndoorCO2MapAppV2.ExtensionMethods
                 c.Longitude,
                 userLat,
                 userLon
-            );
+            )
+            {
+                Category = c.Category
+            };
         }
     }
 }

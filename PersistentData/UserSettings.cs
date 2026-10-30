@@ -189,6 +189,15 @@ namespace IndoorCO2MapAppV2.PersistentData
             set => SetProperty(ref _noteEnterAddsLineBreak, value);
         }
 
+        // Shows the OSM type of the selected building ("Kino", "Bar") under the picker, so places
+        // that share a name — a cinema and the bar inside it — can be told apart.
+        private bool _showLocationType = true;
+        public bool ShowLocationType
+        {
+            get => _showLocationType;
+            set => SetProperty(ref _showLocationType, value);
+        }
+
         private bool _showNewsNotification = true;
         public bool ShowNewsNotification
         {

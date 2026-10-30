@@ -511,6 +511,9 @@ Detalhes: {0}</value>
   <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
     <value>A tecla Enter insere uma quebra de linha nas notas (feche o teclado com Voltar ou tocando fora)</value>
   </data>
+  <data name="SettingsShowLocationType" xml:space="preserve">
+    <value>Mostrar o tipo do local selecionado (p. ex. bar ou cinema)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Continuar a gravar em segundo plano (mostra uma notificação)</value>
   </data>

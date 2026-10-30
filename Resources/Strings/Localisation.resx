@@ -570,6 +570,9 @@ Details: {0}</value>
   <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
     <value>Enter key adds a line break in notes (close the keyboard with back or by tapping outside)</value>
   </data>
+  <data name="SettingsShowLocationType" xml:space="preserve">
+    <value>Show the type of the selected location (e.g. bar or cinema)</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>Keep recording when app is in background (shows a notification)</value>
   </data>

@@ -311,7 +311,10 @@ namespace IndoorCO2MapAppV2.Spatial
                 if (string.IsNullOrEmpty(displayName)) continue;
 
                 long osmId = long.TryParse(osmIdStr, out var parsed) ? parsed : 0L;
-                var loc = new LocationData(osmType, osmId, displayName, flat, flon, userLat, userLon);
+                var loc = new LocationData(osmType, osmId, displayName, flat, flon, userLat, userLon)
+                {
+                    Category = LocationCategory.FromTags(k => props.TryGetValue(k, out var v) ? v : null),
+                };
                 if (loc.Distance <= rangeMeters)
                     results.Add(loc);
             }

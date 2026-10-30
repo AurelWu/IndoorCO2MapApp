@@ -511,6 +511,9 @@
   <data name="SettingsNoteEnterAddsLineBreak" xml:space="preserve">
     <value>メモでEnterキーを押すと改行する（キーボードは「戻る」または外側をタップして閉じます）</value>
   </data>
+  <data name="SettingsShowLocationType" xml:space="preserve">
+    <value>選択した場所の種類を表示（例：バー、映画館）</value>
+  </data>
   <data name="SettingsKeepRecordingInBackground" xml:space="preserve">
     <value>アプリがバックグラウンドでも測定を続ける（通知が表示されます）</value>
   </data>

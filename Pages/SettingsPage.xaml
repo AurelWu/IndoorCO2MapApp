@@ -55,6 +55,7 @@
                 <Label Text="{x:Static t:Localisation.SettingsSectionDisplay}" Style="{StaticResource SectionLabelStyle}" />
                 <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowSortingToggle}" IsToggled="{Binding DisplaySortingModeToggle}" />
                 <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowBuildingFilter}" IsToggled="{Binding DisplayBuildingFilterInputField}" />
+                <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowLocationType}" IsToggled="{Binding ShowLocationType}" />
                 <c:LabeledSegmentedControl Label="{x:Static t:Localisation.SettingsDefaultSortMode}" Items="{Binding SortModes}" SelectedItem="{Binding DefaultSortMode}" />
                 <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowWebsiteButton}" IsToggled="{Binding ShowWebsiteButton}" />
                 <c:LabeledSwitch Text="{x:Static t:Localisation.SettingsShowImprintButton}" IsToggled="{Binding ShowImprintButton}" />

@@ -16,5 +16,9 @@ namespace IndoorCO2MapAppV2.Spatial
         public string Name { get; set; } = "";
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+
+        // Added later: sqlite-net's CreateTable adds the column to existing databases, and rows
+        // cached before that simply have no category.
+        public string? Category { get; set; }
     }
 }
