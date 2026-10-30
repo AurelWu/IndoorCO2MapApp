@@ -59,7 +59,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MonitorSelectionLabel" xml:space="preserve">
-    <value>Selecciona tu medidor de CO2</value>
+    <value>Selecciona tu monitor de CO2</value>
   </data>
   <data name="ScanningStatusLabel" xml:space="preserve">
     <value>Buscando dispositivos...</value>
@@ -191,7 +191,7 @@
     <value>Ninguna estación seleccionada</value>
   </data>
   <data name="MainMenuBlockedNoRoute" xml:space="preserve">
-    <value>Ninguna línea seleccionada</value>
+    <value>Ninguna ruta seleccionada</value>
   </data>
   <data name="RadioYes" xml:space="preserve">
     <value>Sí</value>
@@ -212,7 +212,7 @@
     <value>Selecciona la parada de destino...</value>
   </data>
   <data name="TransitRouteStationPlaceholder" xml:space="preserve">
-    <value>[Línea / Estación]</value>
+    <value>[Ruta / Estación]</value>
   </data>
   <data name="MainMenuResumingRecording" xml:space="preserve">
     <value>Reanudando la medición…</value>
@@ -224,7 +224,7 @@
     <value>Reanudar medición</value>
   </data>
   <data name="MainMenuRoutePreview" xml:space="preserve">
-    <value>Vista previa de la línea</value>
+    <value>Vista previa de la ruta</value>
   </data>
   <data name="MainMenuNewsButton" xml:space="preserve">
     <value>Novedades</value>
@@ -248,7 +248,7 @@
     <value>🔗  Privacidad y aviso legal</value>
   </data>
   <data name="TransitSearchRoutesByName" xml:space="preserve">
-    <value>Buscar líneas por nombre...</value>
+    <value>Buscar rutas por nombre...</value>
   </data>
   <data name="HistoryFilterPlaceholder" xml:space="preserve">
     <value>Filtrar por lugar...</value>
@@ -341,7 +341,7 @@
     <value>Todos</value>
   </data>
   <data name="TransitModeBus" xml:space="preserve">
-    <value>Bus</value>
+    <value>Autobús</value>
   </data>
   <data name="TransitModeTram" xml:space="preserve">
     <value>Tranvía</value>
@@ -443,7 +443,7 @@ Detalles: {0}</value>
     <value>¿Seguro que quieres eliminar todo tu historial local de mediciones?</value>
   </data>
   <data name="DialogDeleteLocationCacheMessage" xml:space="preserve">
-    <value>¿Seguro que quieres eliminar la caché de ubicaciones?</value>
+    <value>¿Seguro que quieres eliminar el caché de ubicaciones?</value>
   </data>
   <data name="DialogPrivacyWarningTitle" xml:space="preserve">
     <value>Aviso de privacidad</value>
@@ -491,10 +491,10 @@ Detalles: {0}</value>
     <value>Mostrar el botón «Únete a nuestro Discord»</value>
   </data>
   <data name="SettingsShowRoutePreview" xml:space="preserve">
-    <value>Mostrar el mapa de vista previa de la línea</value>
+    <value>Mostrar el mapa de vista previa de la ruta</value>
   </data>
   <data name="SettingsShowChangeRoute" xml:space="preserve">
-    <value>Mostrar la opción «Cambiar de línea» durante la medición en transporte</value>
+    <value>Mostrar la opción «Cambiar de ruta» durante la medición en transporte</value>
   </data>
   <data name="SettingsSectionRecording" xml:space="preserve">
     <value>Medición</value>
@@ -521,7 +521,7 @@ Detalles: {0}</value>
     <value>Usar el servicio de ubicación en tiempo real (poco fiable, pero se actualiza cada minuto en lugar de a diario)</value>
   </data>
   <data name="SettingsEnableLocationCaching" xml:space="preserve">
-    <value>Activar la caché de ubicaciones</value>
+    <value>Activar el caché de ubicaciones</value>
   </data>
   <data name="SettingsCacheRangeOverride" xml:space="preserve">
     <value>Radio de búsqueda en caché (personalizado)</value>
@@ -530,19 +530,19 @@ Detalles: {0}</value>
     <value>Activar el historial local de mediciones</value>
   </data>
   <data name="SettingsDeleteLocationCache" xml:space="preserve">
-    <value>Eliminar la caché de ubicaciones</value>
+    <value>Eliminar el caché de ubicaciones</value>
   </data>
   <data name="SettingsDeleteHistory" xml:space="preserve">
     <value>Eliminar el historial local de mediciones</value>
   </data>
   <data name="SettingsSectionDebug" xml:space="preserve">
-    <value>Depuración</value>
+    <value>Diagnóstico</value>
   </data>
   <data name="SettingsRoundGps" xml:space="preserve">
     <value>Redondear la posición GPS a 0,5°</value>
   </data>
   <data name="SettingsCopyDebugLog" xml:space="preserve">
-    <value>Copiar el registro de depuración al portapapeles</value>
+    <value>Copiar el registro de diagnóstico al portapapeles</value>
   </data>
   <data name="MainMenuTitle" xml:space="preserve">
     <value>Inicio</value>
@@ -554,19 +554,19 @@ Detalles: {0}</value>
     <value>⚠ Integración Smart Home no activada</value>
   </data>
   <data name="TransitSelectRoute" xml:space="preserve">
-    <value>Selecciona una línea...</value>
+    <value>Selecciona una ruta...</value>
   </data>
   <data name="TransitMeasurementTitle" xml:space="preserve">
     <value>Medición en transporte</value>
   </data>
   <data name="TransitLineLabel" xml:space="preserve">
-    <value>Línea</value>
+    <value>Ruta</value>
   </data>
   <data name="TransitSearchRoutesNearMe" xml:space="preserve">
-    <value>Buscar líneas cercanas</value>
+    <value>Buscar rutas cercanas</value>
   </data>
   <data name="TransitApplyRouteChange" xml:space="preserve">
-    <value>Aplicar cambio de línea</value>
+    <value>Aplicar cambio de ruta</value>
   </data>
   <data name="TransitNoGpsPosition" xml:space="preserve">
     <value>No se pudo obtener la posición GPS.</value>
@@ -578,10 +578,10 @@ Detalles: {0}</value>
     <value>Error en la búsqueda.</value>
   </data>
   <data name="TransitNoCachedStopsNearby" xml:space="preserve">
-    <value>No hay paradas cercanas en la caché.</value>
+    <value>No hay paradas cercanas en el caché.</value>
   </data>
   <data name="TransitCacheLoadFailed" xml:space="preserve">
-    <value>Error al cargar la caché.</value>
+    <value>Error al cargar el caché.</value>
   </data>
   <data name="MapPageTitle" xml:space="preserve">
     <value>Mapa</value>
@@ -590,7 +590,7 @@ Detalles: {0}</value>
     <value>← Historial</value>
   </data>
   <data name="MapReloadTiles" xml:space="preserve">
-    <value>Recargar el mapa</value>
+    <value>Volver a cargar mapa</value>
   </data>
   <data name="MapFilterBuildings" xml:space="preserve">
     <value>Edificios</value>
@@ -692,9 +692,9 @@ Detalles: {0}</value>
     <value>No se encontraron sensores, buscando de nuevo…</value>
   </data>
   <data name="DialogDebugLogCopiedTitle" xml:space="preserve">
-    <value>Registro copiado</value>
+    <value>Registro de diagnóstico copiado</value>
   </data>
   <data name="DialogDebugLogCopiedMessage" xml:space="preserve">
-    <value>El registro de depuración se copió al portapapeles.</value>
+    <value>El registro de diagnóstico se ha copiado al portapapeles.</value>
   </data>
 </root>
