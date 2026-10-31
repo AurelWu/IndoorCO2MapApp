@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Input;
 using IndoorCO2MapAppV2.CO2Monitors;
 using IndoorCO2MapAppV2.Enumerations;
+using IndoorCO2MapAppV2.ExtensionMethods;
 using IndoorCO2MapAppV2.PersistentData;
 using IndoorCO2MapAppV2.Resources.Strings;
 
@@ -15,10 +16,22 @@ namespace IndoorCO2MapAppV2.ViewModels
         private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
         private const string DeleteEndpoint = "https://nlg29ka74k.execute-api.eu-central-1.amazonaws.com/DeleteLastSubmission";
 
+        // Rows are added to the visible collections in chunks as the user scrolls. iOS has no
+        // list virtualisation here, so showing everything at once built views for every recording.
+        private const int PageSize = 30;
+
         private List<CO2RecordingItem> _allItems = new();
+        private List<CO2RecordingItem> _filteredItems = new();
+        private List<LocationGroupItem> _filteredGroups = new();
         private string _filterText = "";
         private bool _isGrouped;
         private bool _sortAlphabetical;
+        private CancellationTokenSource? _filterDebounce;
+
+        // What the list was last loaded from, so returning to the page skips an unchanged reload.
+        private HistoryDatabase? _loadedFrom;
+        private int _loadedVersion;
+        private DateTime _loadedAt;
 
         public ObservableCollection<CO2RecordingItem> Recordings { get; set; } = new();
         public ObservableCollection<LocationGroupItem> GroupedRecordings { get; set; } = new();
@@ -32,7 +45,7 @@ namespace IndoorCO2MapAppV2.ViewModels
             {
                 _filterText = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FilterText)));
-                ApplyFilter();
+                DebounceFilterAsync().SafeFireAndForget("HistoryViewModel|DebounceFilterAsync");
             }
         }
 
@@ -44,10 +57,7 @@ namespace IndoorCO2MapAppV2.ViewModels
                 if (_isGrouped == value) return;
                 _isGrouped = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsGrouped)));
-                if (_isGrouped)
-                    RebuildGroups();
-                else
-                    ApplyFilter();
+                ApplyFilter();
             }
         }
 
@@ -59,10 +69,11 @@ namespace IndoorCO2MapAppV2.ViewModels
                 if (_sortAlphabetical == value) return;
                 _sortAlphabetical = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SortAlphabetical)));
-                if (_isGrouped) RebuildGroups(); else ApplyFilter();
+                ApplyFilter();
             }
         }
 
+        public ICommand ShowMoreCommand { get; }
         public ICommand ToggleExpandCommand { get; }
         public ICommand ToggleGroupExpandCommand { get; }
         public ICommand ExportCommand { get; }
@@ -71,6 +82,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public HistoryViewModel()
         {
+            ShowMoreCommand = new Command(ShowMore);
+
             ToggleExpandCommand = new Command<CO2RecordingItem>(item =>
             {
                 item.IsExpanded = !item.IsExpanded;
@@ -138,9 +151,11 @@ namespace IndoorCO2MapAppV2.ViewModels
                         catch { }
                     }
 
-                    await App.HistoryDatabase.DeleteRecordingAsync(item.Id);
-                    _allItems.RemoveAll(i => i.Id == item.Id);
-                    ApplyFilter();
+                    var db = App.HistoryDatabase;
+                    bool upToDate = ReferenceEquals(db, _loadedFrom) && db.Version == _loadedVersion;
+                    await db.DeleteRecordingAsync(item.Id);
+                    if (upToDate) _loadedVersion = db.Version;   // the in-memory list reflects this delete
+                    RemoveFromView(item);
                 }
                 finally
                 {
@@ -151,59 +166,116 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task ReloadRecordingsAsync()
         {
-            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
+            var db = App.HistoryDatabase;
+            int version = db.Version;
+            // Unchanged since the last visit: keep the list. Reload anyway after a while so
+            // "just now" / "today" labels don't go stale.
+            if (ReferenceEquals(db, _loadedFrom) && version == _loadedVersion
+                && System.DateTime.UtcNow - _loadedAt < TimeSpan.FromMinutes(15))
+                return;
+
+            var all = await db.GetAllRecordingsAsync();
+            _loadedFrom = db;
+            _loadedVersion = version;
+            _loadedAt = System.DateTime.UtcNow;
             _allItems = all.Select(r => new CO2RecordingItem(r)).ToList();
             ApplyFilter();
         }
 
-        private async Task LoadRecordingsAsync()
+        // Typing rebuilds the list, so wait for a pause instead of rebuilding on every keystroke.
+        private async Task DebounceFilterAsync()
         {
-            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
-            _allItems = all.Select(r => new CO2RecordingItem(r)).ToList();
+            _filterDebounce?.Cancel();
+            var cts = _filterDebounce = new CancellationTokenSource();
+            try { await Task.Delay(250, cts.Token); }
+            catch (TaskCanceledException) { return; }
             ApplyFilter();
         }
 
+        /// <summary>Recomputes the filtered, sorted result and shows its first chunk. Only the
+        /// active view (flat or grouped) is filled.</summary>
         private void ApplyFilter()
         {
-            Recordings.Clear();
-            var filtered = string.IsNullOrWhiteSpace(_filterText)
+            var filter = _filterText?.Trim() ?? "";
+            IEnumerable<CO2RecordingItem> source = string.IsNullOrEmpty(filter)
                 ? _allItems
-                : _allItems.Where(r => r.LocationName.Contains(_filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+                : _allItems.Where(r => r.LocationName.Contains(filter, StringComparison.OrdinalIgnoreCase));
 
-            var sorted = _sortAlphabetical
-                ? filtered.OrderBy(r => r.LocationName, StringComparer.OrdinalIgnoreCase).ThenByDescending(r => r.DateTime)
-                : (IEnumerable<CO2RecordingItem>)filtered.OrderByDescending(r => r.DateTime);
-
-            foreach (var item in sorted)
-                Recordings.Add(item);
+            Recordings.Clear();
+            GroupedRecordings.Clear();
 
             if (_isGrouped)
-                RebuildGroups();
+            {
+                var grouped = source
+                    .GroupBy(r => r.LocationName)
+                    .Select(g => new LocationGroupItem(
+                        g.Key,
+                        g.OrderByDescending(r => r.DateTime).ToList()));
 
+                _filteredGroups = (_sortAlphabetical
+                    ? grouped.OrderBy(g => g.LocationName, StringComparer.OrdinalIgnoreCase)
+                    : grouped.OrderByDescending(g => g.AllRecordings[0].DateTime)).ToList();
+                _filteredItems = [];
+            }
+            else
+            {
+                _filteredItems = (_sortAlphabetical
+                    ? source.OrderBy(r => r.LocationName, StringComparer.OrdinalIgnoreCase).ThenByDescending(r => r.DateTime)
+                    : source.OrderByDescending(r => r.DateTime)).ToList();
+                _filteredGroups = [];
+            }
+
+            ShowMore();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoRecordings)));
         }
 
-        private void RebuildGroups()
+        /// <summary>Appends the next chunk of the current result; no-op once everything is shown.</summary>
+        public void ShowMore()
         {
-            GroupedRecordings.Clear();
+            if (_isGrouped)
+                AppendNextChunk(_filteredGroups, GroupedRecordings);
+            else
+                AppendNextChunk(_filteredItems, Recordings);
+        }
 
-            var filter = _filterText?.Trim() ?? "";
-            var source = string.IsNullOrWhiteSpace(filter)
-                ? _allItems
-                : _allItems.Where(r => r.LocationName.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        private static void AppendNextChunk<T>(List<T> source, ObservableCollection<T> shown)
+        {
+            int end = Math.Min(source.Count, shown.Count + PageSize);
+            for (int i = shown.Count; i < end; i++)
+                shown.Add(source[i]);
+        }
 
-            var grouped = source
-                .GroupBy(r => r.LocationName)
-                .Select(g => new LocationGroupItem(
-                    g.Key,
-                    g.OrderByDescending(r => r.DateTime).ToList()));
+        /// <summary>Removes a deleted recording in place, so the list keeps its scroll position.</summary>
+        private void RemoveFromView(CO2RecordingItem item)
+        {
+            _allItems.Remove(item);
+            if (_filteredItems.Remove(item))
+                Recordings.Remove(item);
 
-            var sortedGroups = _sortAlphabetical
-                ? grouped.OrderBy(g => g.LocationName, StringComparer.OrdinalIgnoreCase)
-                : grouped.OrderByDescending(g => g.AllRecordings[0].DateTime);
+            int g = _filteredGroups.FindIndex(x => x.AllRecordings.Contains(item));
+            if (g >= 0)
+            {
+                var old = _filteredGroups[g];
+                var rest = old.AllRecordings.Where(r => r != item).ToList();
+                if (rest.Count == 0)
+                {
+                    _filteredGroups.RemoveAt(g);
+                    if (g < GroupedRecordings.Count) GroupedRecordings.RemoveAt(g);
+                }
+                else
+                {
+                    var updated = new LocationGroupItem(old.LocationName, rest);
+                    if (old.IsExpanded)
+                    {
+                        updated.IsExpanded = true;
+                        updated.CurrentPage = old.CurrentPage;
+                    }
+                    _filteredGroups[g] = updated;
+                    if (g < GroupedRecordings.Count) GroupedRecordings[g] = updated;
+                }
+            }
 
-            foreach (var group in sortedGroups)
-                GroupedRecordings.Add(group);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNoRecordings)));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -241,18 +313,31 @@ namespace IndoorCO2MapAppV2.ViewModels
         public string LocationNameWithChevron =>
             $"{LocationName} {(_isExpanded ? "▼" : "▶")}";
 
-        public List<ushort> PpmList { get; }
-        public ushort MinCO2 { get; }
-        public ushort MaxCO2 { get; }
-        public int DataPoints { get; }
+        // The values string is parsed on first use, so only rows that are actually shown pay for it.
+        private List<ushort>? _ppmList;
+        public List<ushort> PpmList => _ppmList ??= Values.Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => ushort.TryParse(s, out var v) ? v : (ushort)0)
+            .ToList();
+        public ushort MinCO2 => PpmList.Count > 0 ? PpmList.Min() : (ushort)0;
+        public ushort MaxCO2 => PpmList.Count > 0 ? PpmList.Max() : (ushort)0;
+        public int DataPoints => PpmList.Count;
+        public bool HasReadings => PpmList.Count > 0;
+
+        private string? _statsLine;
+        public string StatsLine => _statsLine ??= DataPoints > 0
+            ? string.Format(Localisation.HistoryStatsLine, MinCO2, MaxCO2, DataPoints)
+            : Localisation.HistoryNoData;
+
+        private List<CO2Reading>? _ppmReadings;
+        public List<CO2Reading> PpmReadings => _ppmReadings ??= PpmList
+            .Select((v, i) => new CO2Reading(v, i, System.DateTime.MinValue))
+            .ToList();
+
         public Color AvgCO2Color { get; }
         public string ContextSummary { get; }
-        public string StatsLine { get; }
         public string OsmId { get; }
         public bool HasOsmId { get; }
         public bool HasContext { get; }
-        public bool HasReadings { get; }
-        public List<CO2Reading> PpmReadings { get; }
         public string TimeAgo => ToTimeAgo(DateTime);
 
         public static string ToTimeAgo(long unixMs)
@@ -285,23 +370,11 @@ namespace IndoorCO2MapAppV2.ViewModels
             SensorType = r.SensorType;
             SubmissionId = r.SubmissionId;
 
-            PpmList = Values.Split(';', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => ushort.TryParse(s, out var v) ? v : (ushort)0)
-                .ToList();
-
-            DataPoints = PpmList.Count;
-            MinCO2 = PpmList.Count > 0 ? PpmList.Min() : (ushort)0;
-            MaxCO2 = PpmList.Count > 0 ? PpmList.Max() : (ushort)0;
-
             AvgCO2Color = AvgCO2 < 800
                 ? Color.FromArgb("#4CAF50")
                 : AvgCO2 < 1200
                     ? Color.FromArgb("#FF9800")
                     : Color.FromArgb("#F44336");
-
-            StatsLine = DataPoints > 0
-                ? string.Format(Localisation.HistoryStatsLine, MinCO2, MaxCO2, DataPoints)
-                : Localisation.HistoryNoData;
 
             var parts = new List<string>();
             if (DoorWindowState == TriState.Yes) parts.Add(Localisation.ContextWindowsOpen);
@@ -313,13 +386,8 @@ namespace IndoorCO2MapAppV2.ViewModels
 
             ContextSummary = string.Join(" · ", parts);
             HasContext = parts.Count > 0;
-            HasReadings = PpmList.Count > 0;
             OsmId = NWRId.HasValue ? $"{NWRType} {NWRId}" : "";
             HasOsmId = NWRId.HasValue;
-
-            PpmReadings = PpmList
-                .Select((v, i) => new CO2Reading(v, i, System.DateTime.MinValue))
-                .ToList();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

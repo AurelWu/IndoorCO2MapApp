@@ -6,7 +6,8 @@
               xmlns:ui="clr-namespace:IndoorCO2MapAppV2.UIUtility"
               xmlns:t="clr-namespace:IndoorCO2MapAppV2.Resources.Strings"
               x:Class="IndoorCO2MapAppV2.Pages.HistoryPage"
-              Title="{x:Static t:Localisation.MainMenuHistoryButtonText}">
+              Title="{x:Static t:Localisation.MainMenuHistoryButtonText}"
+              HideSoftInputOnTapped="True">
 
     <local:AppPage.Resources>
         <ResourceDictionary>
@@ -277,8 +278,10 @@
             </HorizontalStackLayout>
 
             <!-- Search / filter -->
-            <SearchBar Placeholder="{x:Static t:Localisation.HistoryFilterPlaceholder}"
+            <SearchBar x:Name="FilterSearchBar"
+                       Placeholder="{x:Static t:Localisation.HistoryFilterPlaceholder}"
                        Text="{Binding FilterText}"
+                       SearchButtonPressed="OnFilterSearchButtonPressed"
                        HorizontalOptions="Fill" />
 
             <!-- Sort + Group toggles — wrap to next line on narrow screens -->
@@ -303,22 +306,28 @@
                Style="{StaticResource CaptionLabelStyle}" />
 
         <!-- ===== Android / Windows: virtualized CollectionView ===== -->
+        <!-- Both lists are filled in chunks; the next one loads near the end (ShowMore). -->
         <CollectionView Grid.Row="1"
                         x:Name="RecordingsCollection"
                         Margin="0,8,0,0"
                         IsVisible="{Binding IsGrouped, Converter={StaticResource InvertBooleanConverter}}"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReachedCommand="{Binding ShowMoreCommand}"
                         ItemTemplate="{StaticResource FlatItemTemplate}" />
 
         <CollectionView Grid.Row="1"
                         x:Name="GroupedCollection"
                         Margin="0,8,0,0"
                         IsVisible="{Binding IsGrouped}"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReachedCommand="{Binding ShowMoreCommand}"
                         ItemTemplate="{StaticResource GroupedItemTemplate}" />
 
         <!-- ===== iOS: BindableLayout in ScrollView (avoids UICollectionView cell-reuse self-sizing bugs) ===== -->
         <ScrollView Grid.Row="1"
                     x:Name="RecordingsScrollIOS"
                     Margin="0,8,0,0"
+                    Scrolled="OnListScrolled"
                     IsVisible="{Binding IsGrouped, Converter={StaticResource InvertBooleanConverter}}">
             <VerticalStackLayout x:Name="RecordingsListIOS"
                                  BindableLayout.ItemTemplate="{StaticResource FlatItemTemplate}" />
@@ -327,6 +336,7 @@
         <ScrollView Grid.Row="1"
                     x:Name="GroupedScrollIOS"
                     Margin="0,8,0,0"
+                    Scrolled="OnListScrolled"
                     IsVisible="{Binding IsGrouped}">
             <VerticalStackLayout x:Name="GroupedListIOS"
                                  BindableLayout.ItemTemplate="{StaticResource GroupedItemTemplate}" />

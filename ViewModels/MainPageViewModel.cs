@@ -33,8 +33,7 @@ namespace IndoorCO2MapAppV2.ViewModels
 
         public async Task RefreshHasRecordingsAsync()
         {
-            var all = await App.HistoryDatabase.GetAllRecordingsAsync();
-            HasRecordings = all.Count > 0;
+            HasRecordings = await App.HistoryDatabase.HasRecordingsAsync();
         }
 
         public MainPageViewModel()

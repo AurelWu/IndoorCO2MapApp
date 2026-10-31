@@ -11,6 +11,9 @@ namespace IndoorCO2MapAppV2.PersistentData
 
         public string DatabasePath => _dbPath;
 
+        /// <summary>Bumped on every change, so readers can skip reloading an unchanged table.</summary>
+        public int Version { get; private set; }
+
         public HistoryDatabase(string dbPath)
         {
             _dbPath = dbPath;
@@ -26,11 +29,20 @@ namespace IndoorCO2MapAppV2.PersistentData
                      .OrderByDescending(r => r.DateTime)
                      .ToListAsync();
 
-        public Task<int> SaveRecordingAsync(PersistentRecording recording) =>
-            _database.InsertAsync(recording);
+        public async Task<bool> HasRecordingsAsync() =>
+            await _database.Table<PersistentRecording>().CountAsync() > 0;
 
-        public Task<int> DeleteRecordingAsync(int id) =>
-            _database.DeleteAsync<PersistentRecording>(id);
+        public Task<int> SaveRecordingAsync(PersistentRecording recording)
+        {
+            Version++;
+            return _database.InsertAsync(recording);
+        }
+
+        public Task<int> DeleteRecordingAsync(int id)
+        {
+            Version++;
+            return _database.DeleteAsync<PersistentRecording>(id);
+        }
 
         public void Dispose()
         {
@@ -43,6 +55,7 @@ namespace IndoorCO2MapAppV2.PersistentData
 
         public async Task ClearAllRecordingsAsync()
         {
+            Version++;
             await _database.DeleteAllAsync<PersistentRecording>();
         }
     }

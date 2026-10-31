@@ -37,8 +37,20 @@ namespace IndoorCO2MapAppV2.ViewModels
         public bool IsExpanded
         {
             get => _isExpanded;
-            set { _isExpanded = value; Notify(); Notify(nameof(LocationNameWithChevron)); Notify(nameof(ExpandedHeight)); }
+            set
+            {
+                // The mini-list and chart are only built on first expand: most groups are never
+                // opened, and a filled page costs ~60 views even while hidden.
+                if (value && !_pageLoaded)
+                {
+                    _pageLoaded = true;
+                    CurrentPage = 0;
+                }
+                _isExpanded = value; Notify(); Notify(nameof(LocationNameWithChevron)); Notify(nameof(ExpandedHeight));
+            }
         }
+
+        private bool _pageLoaded;
 
         public double ExpandedHeight => _isExpanded ? -1 : 0;
 
@@ -120,10 +132,6 @@ namespace IndoorCO2MapAppV2.ViewModels
                 AvgCO2Range = "";
                 AvgCO2Color = Color.FromArgb("#9E9E9E");
             }
-
-            // Populate first page (newest)
-            foreach (var r in recordings.Take(PageSize))
-                _currentPageRecordings.Add(r);
 
             NextPageCommand = new Command(() => CurrentPage++);
             PrevPageCommand = new Command(() => CurrentPage--);
